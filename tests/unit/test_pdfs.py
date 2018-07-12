@@ -10,10 +10,7 @@ from test_util.trivials import TrivialPDF
 class TestGamma():
     """ A class containing the tests for the Gamma column pdf. """
 
-    def test_str(self):
-        """ Verify object has correct string. """
-        gamma = Gamma()
-        assert str(gamma) == 'Gamma'
+    Gamma.alt_pdfs = [TrivialPDF]
 
     @given(nrows=integers(min_value=1))
     def test_sample(self, nrows):
@@ -44,7 +41,7 @@ class TestGamma():
     def test_change_pdf(self):
         """ Verify Gamma object can mutate to another kind of pdf. Here the
         TrivialPDF class is used for illustration. """
-        gamma = Gamma(alt_pdfs={'Gamma': [TrivialPDF]})
+        gamma = Gamma()
         mutant = deepcopy(gamma).mutate(change_pdf=True)
         assert mutant != gamma
         assert 'TrivialPDF' in str(mutant)
@@ -59,10 +56,7 @@ class TestGamma():
 class TestPoisson():
     """ A class containing the tests for the Poisson column pdf. """
 
-    def test_str(self):
-        """ Verify that object has correct string. """
-        poisson = Poisson()
-        assert str(poisson) == 'Poisson'
+    Poisson.alt_pdfs = [TrivialPDF]
 
     @given(nrows=integers(min_value=1))
     def test_sample(self, nrows):
@@ -90,7 +84,7 @@ class TestPoisson():
     def test_change_pdf(self):
         """ Verify Poisson object can mutate to another kind of pdf. Here the
         TrivialPDF class is used for illustration. """
-        poisson = Poisson(alt_pdfs={'Poisson': [TrivialPDF]})
+        poisson = Poisson()
         mutant = poisson.mutate(change_pdf=True)
         assert 'TrivialPDF' in str(mutant)
 
