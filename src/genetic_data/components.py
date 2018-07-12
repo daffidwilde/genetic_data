@@ -79,23 +79,29 @@ def create_initial_population(size, row_limits, col_limits,
 
     return population
 
-def get_dataframe(individual):
-    """ Return the actual dataset represented by an individual's alleles as a
-    `pandas.DataFrame` object. """
+def get_dataframes(individual, max_seed):
+    """ Sample `max_seed` datasets from the family of datasets represented by an
+    individual's alleles. Each of these is a `pandas.DataFrame` object. """
 
-    nrows = individual[0]
-    df = pd.DataFrame({f'col_{i}': col.sample(nrows) \
-                       for i, col in enumerate(individual[2:])})
+    dfs = []
+    for seed in range(max_seed):
+        nrows = individual[0]
+        df = pd.DataFrame({f'col_{i}': col.sample(nrows, seed) \
+                           for i, col in enumerate(individual[2:])})
+        dfs.append(df)
 
-    return df
+    return dfs
 
-def get_fitness(fitness, population):
+def get_fitness(fitness, population, max_seed, selection=np.mean):
     """ Return the fitness score of each individual in a population. """
 
+    individual_fitnesses = np.empty((len(population), max_seed))
     population_fitness = np.empty(len(population))
     for i, individual in enumerate(population):
-        df = get_dataframe(individual)
-        population_fitness[i] = fitness(df)
+        dfs = get_dataframes(individual, max_seed)
+        for j, df in enumerate(dfs):
+            individual_fitnesses[i, j] = fitness(df)
+        population[i] = selection(individual_fitnesses[i, :])
 
     return population_fitness
 

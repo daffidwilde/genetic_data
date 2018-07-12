@@ -6,7 +6,7 @@ from hypothesis import settings
 from genetic_data.pdfs import Gamma, Poisson
 from genetic_data.components import create_individual, \
                                     create_initial_population, \
-                                    get_dataframe, \
+                                    get_dataframes, \
                                     get_fitness, \
                                     get_ordered_population, \
                                     select_parents, \
@@ -16,6 +16,8 @@ from genetic_data.components import create_individual, \
 from test_util.trivials import trivial_fitness
 from test_util.parameters import individual_limits, \
                                  population_limits, \
+                                 ind_fitness_limits, \
+                                 pop_fitness_limits, \
                                  selection_limits, \
                                  offspring_limits, \
                                  mutation_limits
@@ -60,35 +62,38 @@ class TestCreation():
 class TestGetFitness():
     """ Test the get_fitness function. """
 
-    @individual_limits
-    @settings(deadline=200)
-    def test_get_dataframe(self, row_limits, col_limits, weights):
+    @ind_fitness_limits
+    @settings(max_examples=10)
+    def test_get_dataframes(self, row_limits, col_limits, weights, max_seed):
         """ Verify that an individual's expanded form is a `pandas.DataFrame`
         object of the correct shape. """
 
         pdfs = [Gamma, Poisson]
         individual = create_individual(row_limits, col_limits, pdfs, weights)
-        df = get_dataframe(individual)
-        assert isinstance(df, pd.DataFrame)
-        assert df.shape == (individual[0], individual[1])
+        dfs = get_dataframes(individual, max_seed)
+        assert len(dfs) == max_seed
 
-    @population_limits
-    @settings(max_examples=10)
-    def test_get_fitness(self, size, row_limits, col_limits, weights):
+        for df in dfs:
+            assert isinstance(df, pd.DataFrame)
+            assert df.shape == (individual[0], individual[1])
+
+    @pop_fitness_limits
+    @settings(max_examples=1)
+    def test_get_fitness(self, size, row_limits, col_limits, weights, max_seed):
         """ Create a population and get its fitness. Then verify that the
         fitness is of the correct size and data type. """
 
         pdfs = [Gamma, Poisson]
         population = create_initial_population(size, row_limits, col_limits,
                                                pdfs, weights)
-        population_fitness = get_fitness(trivial_fitness, population)
+        population_fitness = get_fitness(trivial_fitness, population, max_seed)
         assert population_fitness.shape == (size,)
         assert population_fitness.dtype == 'float'
 
-    @population_limits
-    @settings(max_examples=10)
+    @pop_fitness_limits
+    @settings(max_examples=1)
     def test_get_ordered_population(self, size, row_limits, col_limits,
-                                    weights):
+                                    weights, max_seed):
         """ Create a population, get its fitness and order the individuals in
         descending order of their fitness. Verify that all individuals are
         there. """
@@ -96,7 +101,7 @@ class TestGetFitness():
         pdfs = [Gamma, Poisson]
         population = create_initial_population(size, row_limits, col_limits,
                                                pdfs, weights)
-        population_fitness = get_fitness(trivial_fitness, population)
+        population_fitness = get_fitness(trivial_fitness, population, max_seed)
         ordered_population = get_ordered_population(population,
                                                     population_fitness)
         assert set(ordered_population.keys()) == set(population)
@@ -106,9 +111,9 @@ class TestBreedingProcess():
     """ Test the breeder selection and offspring creation process. """
 
     @selection_limits
-    @settings(max_examples=10)
+    @settings(max_examples=1)
     def test_select_parents(self, size, row_limits, col_limits, weights,
-                            props):
+                            props, max_seed):
         """ Create a population, get its fitness and select potential parents
         based on that fitness vector. Verify that parents are selected without
         replacement. """
@@ -117,7 +122,7 @@ class TestBreedingProcess():
         pdfs = [Gamma, Poisson]
         population = create_initial_population(size, row_limits, col_limits,
                                                pdfs, weights)
-        population_fitness = get_fitness(trivial_fitness, population)
+        population_fitness = get_fitness(trivial_fitness, population, max_seed)
         ordered_population = get_ordered_population(population,
                                                     population_fitness)
         parents = select_parents(ordered_population, best_prop, lucky_prop)
@@ -132,9 +137,9 @@ class TestBreedingProcess():
             assert ind_counts[ind] in [0, 1]
 
     @offspring_limits
-    @settings(max_examples=25)
+    @settings(max_examples=1)
     def test_create_offspring(self, size, row_limits, col_limits, weights,
-                              props, prob):
+                              props, prob, max_seed):
         """ Create a population and use them to create a new proto-population
         of offspring. Verify that each offspring is an individual and their are
         the correct number of them. That way, this collection of offspring are
@@ -144,7 +149,7 @@ class TestBreedingProcess():
         pdfs = [Gamma, Poisson]
         population = create_initial_population(size, row_limits, col_limits,
                                                pdfs, weights)
-        population_fitness = get_fitness(trivial_fitness, population)
+        population_fitness = get_fitness(trivial_fitness, population, max_seed)
         ordered_population = get_ordered_population(population,
                                                     population_fitness)
         breeders = select_parents(ordered_population, best_prop, lucky_prop)
