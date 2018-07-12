@@ -4,7 +4,7 @@ from hypothesis import given
 from hypothesis.strategies import floats, integers, tuples
 
 size = integers(min_value=1, max_value=100)
-rate = floats(min_value=0, max_value=1)
+prob = floats(min_value=0, max_value=1)
 
 props = tuples(floats(min_value=1e-10, max_value=1),
                floats(min_value=1e-10, max_value=1)) \
@@ -39,16 +39,16 @@ offspring_limits = given(size=size,
                          col_limits=shapes,
                          weights=weights,
                          props=props,
-                         prob=rate)
+                         prob=prob)
 
 mutation_limits = given(size=size,
                         row_limits=shapes,
                         col_limits=shapes,
                         weights=weights,
-                        mutation_rate=rate,
-                        allele_prob=rate)
+                        mutation_prob=prob,
+                        allele_prob=prob)
 
 operator_limits = given(row_limits=shapes,
                         col_limits=shapes,
                         weights=weights,
-                        prob=rate)
+                        prob=prob)
