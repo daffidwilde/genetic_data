@@ -7,8 +7,7 @@ import pandas as pd
 
 from genetic_data.operators import crossover, mutate_individual
 
-def create_individual(row_limits, col_limits, column_classes, weights=None,
-                      alt_pdfs=None):
+def create_individual(row_limits, col_limits, pdfs, weights=None):
     """ Create an individual dataset's allele representation within the limits
     provided. Alleles are given in the form of a tuple.
 
@@ -18,25 +17,21 @@ def create_individual(row_limits, col_limits, column_classes, weights=None,
         Lower and upper bounds on the number of rows a dataset can have.
     col_limits : list
         Lower and upper bounds on the number of columns a dataset can have.
-    column_classes : list
-        A list of potential column classes to select from such as those found in
-        `pdfs.py`.
+    pdfs : list
+        A list of potential column pdf classes to select from such as those
+        found in `pdfs.py`.
     weights : list
         A sequence of relative weights the same length as `column_classes`. This
         acts as a loose probability distribution from which to sample column
         classes. If `None`, column classes are sampled equally.
-    alt_pdfs : dict
-        The name of each class of column pdf acts as a key with its value being
-        a list of all the other types of column pdf available.
     """
 
     nrows = random.randint(*row_limits)
     ncols = random.randint(*col_limits)
-
-    column_pdfs = [col(alt_pdfs) for col in column_classes]
+    pdfs = [pdf() for pdf in pdfs]
 
     individual = tuple([
-        nrows, ncols, *random.choices(column_pdfs, weights=weights, k=ncols)
+        nrows, ncols, *random.choices(pdfs, weights=weights, k=ncols)
     ])
 
     return individual
