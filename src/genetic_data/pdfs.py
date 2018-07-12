@@ -7,12 +7,11 @@ import numpy as np
 class Gamma():
     """ Continuous column pdf given by the gamma distribution. """
 
-    def __init__(self, alt_pdfs=None):
+    def __init__(self):
 
         self.alpha = random.uniform(0, 100)
         self.theta = random.uniform(0, 100)
         self.seed = random.randint(0, 1e6)
-        self.alt_pdfs = alt_pdfs
 
     def __str__(self):
         return 'Gamma'
@@ -51,8 +50,7 @@ class Gamma():
         """
 
         if change_pdf and self.alt_pdfs:
-            possible_pdfs = self.alt_pdfs[str(self)]
-            self = random.choice(possible_pdfs)(alt_pdfs=self.alt_pdfs)
+            self = random.choice(self.alt_pdfs)()
             return self
         if change_alpha:
             old_alpha = self.alpha
@@ -74,11 +72,10 @@ class Gamma():
 class Poisson():
     """ Discrete column pdf given by the Poisson distribution. """
 
-    def __init__(self, alt_pdfs=None):
+    def __init__(self):
 
         self.mu = random.uniform(0, 100)
         self.seed = random.randint(0, 1e6)
-        self.alt_pdfs = alt_pdfs
 
     def __str__(self):
         return 'Poisson'
@@ -114,8 +111,7 @@ class Poisson():
         """
 
         if change_pdf and self.alt_pdfs:
-            possible_pdfs = self.alt_pdfs[str(self)]
-            self = random.choice(possible_pdfs)(alt_pdfs=self.alt_pdfs)
+            self = random.choice(self.alt_pdfs)()
             return self
         if change_mu:
             old_mu = self.mu
