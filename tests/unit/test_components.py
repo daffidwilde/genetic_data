@@ -114,7 +114,8 @@ class TestGetFitness():
 
 
 class TestBreedingProcess():
-    """ Test the breeder selection and offspring creation process. """
+    """ Test the parent selection and offspring creation processes, including
+    the mutation of the new offspring population. """
 
     @selection_limits
     def test_select_parents(self, size, row_limits, col_limits, weights,
@@ -172,19 +173,20 @@ class TestBreedingProcess():
     @mutation_limits
     @settings(deadline=None)
     def test_mutate_population(self, size, row_limits, col_limits, weights,
-                               mutation_rate, allele_prob):
-        """ Create a population and mutate it according to a mutation rate.
-        Verify that the mutated population is of the correct size, and that each
-        element of the population is an individual. """
+                               mutation_prob, allele_prob):
+        """ Create a population and mutate it according to a mutation
+        probability. Verify that the mutated population is of the correct size,
+        and that each element of the population is an individual. """
 
         pdfs = [Gamma, Poisson]
-        alt_pdfs = {'Gamma': [Poisson], 'Poisson': [Gamma]}
+        for pdf in pdfs:
+            pdf.alt_pdfs = [p for p in pdfs if p != pdf]
+
         population = create_initial_population(size, row_limits, col_limits,
-                                               pdfs, weights, alt_pdfs)
-        mutant_population = mutate_population(population, mutation_rate,
+                                               pdfs, weights)
+        mutant_population = mutate_population(population, mutation_prob,
                                               allele_prob, row_limits,
-                                              col_limits, pdfs, weights,
-                                              alt_pdfs)
+                                              col_limits, pdfs, weights)
         assert isinstance(mutant_population, list)
         assert len(mutant_population) == len(population)
 

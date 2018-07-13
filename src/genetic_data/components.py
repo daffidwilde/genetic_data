@@ -7,8 +7,7 @@ import pandas as pd
 
 from genetic_data.operators import crossover, mutate_individual
 
-def create_individual(row_limits, col_limits, column_classes, weights=None,
-                      alt_pdfs=None):
+def create_individual(row_limits, col_limits, pdfs, weights=None):
     """ Create an individual dataset's allele representation within the limits
     provided. Alleles are given in the form of a tuple.
 
@@ -18,31 +17,26 @@ def create_individual(row_limits, col_limits, column_classes, weights=None,
         Lower and upper bounds on the number of rows a dataset can have.
     col_limits : list
         Lower and upper bounds on the number of columns a dataset can have.
-    column_classes : list
-        A list of potential column classes to select from such as those found in
-        `pdfs.py`.
+    pdfs : list
+        A list of potential column pdf classes to select from such as those
+        found in `pdfs.py`.
     weights : list
         A sequence of relative weights the same length as `column_classes`. This
         acts as a loose probability distribution from which to sample column
         classes. If `None`, column classes are sampled equally.
-    alt_pdfs : dict
-        The name of each class of column pdf acts as a key with its value being
-        a list of all the other types of column pdf available.
     """
 
     nrows = random.randint(*row_limits)
     ncols = random.randint(*col_limits)
-
-    column_pdfs = [col(alt_pdfs) for col in column_classes]
+    pdfs = [pdf() for pdf in pdfs]
 
     individual = tuple([
-        nrows, ncols, *random.choices(column_pdfs, weights=weights, k=ncols)
+        nrows, ncols, *random.choices(pdfs, weights=weights, k=ncols)
     ])
 
     return individual
 
-def create_initial_population(size, row_limits, col_limits,
-                              column_classes, weights=None, alt_pdfs=None):
+def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
     """ Create an initial population for the genetic algorithm based on the
     given parameters.
 
@@ -54,9 +48,9 @@ def create_initial_population(size, row_limits, col_limits,
         Limits on the number of rows a dataset can have.
     col_limits : list
         Limits on the number of columns a dataset can have.
-    column_classes : list
-        A list of potential column classes such as those found in
-        `column_pdfs.py`. Must have a `.sample()` and `.mutate()` method.
+    pdfs : list
+        A list of potential column pdf classes such as those found in
+        `pdfs.py`. Must have a `.sample()` and `.mutate()` method.
     weights : list
         A sequence of relative weights the same length as `column_classes`. This
         acts as a loose probability distribution from which to sample column
@@ -77,8 +71,7 @@ def create_initial_population(size, row_limits, col_limits,
 
     population = []
     for _ in range(size):
-        individual = create_individual(row_limits, col_limits,
-                                       column_classes, weights, alt_pdfs)
+        individual = create_individual(row_limits, col_limits, pdfs, weights)
         population.append(individual)
 
     return population
@@ -171,17 +164,17 @@ def create_offspring(parents, prob, size):
 
     return offspring
 
-def mutate_population(population, mutation_rate, allele_prob, row_limits,
-                      col_limits, pdfs, weights, alt_pdfs):
+def mutate_population(population, mutation_prob, allele_prob, row_limits,
+                      col_limits, pdfs, weights):
     """ Given a population, mutate a small number of its individuals according
-    to a mutation rate. For each individual that is to be mutated, their alleles
-    are mutated with a separate probability `allele_prob`. """
+    to a mutation probability. For each individual that is to be mutated, their
+    alleles are mutated with a separate probability `allele_prob`. """
 
     new_population = []
     for ind in population:
-        if random.random() < mutation_rate:
+        if random.random() < mutation_prob:
             ind = mutate_individual(ind, allele_prob, row_limits, col_limits,
-                                    pdfs, weights, alt_pdfs)
+                                    pdfs, weights)
         new_population.append(ind)
 
     return new_population

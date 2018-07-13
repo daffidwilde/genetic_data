@@ -6,6 +6,7 @@ from hypothesis.strategies import floats, integers, tuples
 size = integers(min_value=2, max_value=100)
 max_seed = integers(min_value=1, max_value=5)
 rate = floats(min_value=0, max_value=1)
+prob = floats(min_value=0, max_value=1)
 
 shapes = tuples(integers(min_value=1, max_value=50),
                 integers(min_value=1, max_value=50)) \
@@ -47,17 +48,17 @@ offspring_limits = given(size=size,
                          col_limits=shapes,
                          weights=weights,
                          props=weights,
-                         prob=rate,
+                         prob=prob,
                          max_seed=max_seed)
 
 mutation_limits = given(size=size,
                         row_limits=shapes,
                         col_limits=shapes,
                         weights=weights,
-                        mutation_rate=rate,
-                        allele_prob=rate)
+                        mutation_prob=prob,
+                        allele_prob=prob)
 
 operator_limits = given(row_limits=shapes,
                         col_limits=shapes,
                         weights=weights,
-                        prob=rate)
+                        prob=prob)
