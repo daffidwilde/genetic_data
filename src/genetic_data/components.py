@@ -97,7 +97,13 @@ def get_dataframes(individual, max_seed):
     return dfs
 
 def get_fitness(fitness, population, max_seed, selection=np.mean):
-    """ Return the fitness score of each individual in a population. """
+    """ Return the fitness score of each individual in a population according to
+    a selection function over a set of fitness scores from seeded samples. By
+    default, the mean of these fitness scores is taken. However, any function
+    can be passed here on how to choose from the set of fitness scores. Some
+    examples could be: choosing the best-case scenario with Python's `min` or
+    `max` functions; taking the median score; or, cutting off outliers to give a
+    truncated mean. """
 
     individual_fitnesses = np.empty((len(population), max_seed))
     population_fitness = np.empty(len(population))
@@ -109,16 +115,18 @@ def get_fitness(fitness, population, max_seed, selection=np.mean):
 
     return population_fitness
 
-def get_ordered_population(population, population_fitness):
+def get_ordered_population(population, population_fitness, maximise=True):
     """ Return a dictionary with key-value pairs given by the individuals in a
     population and their respective fitness. This population is sorted into
-    descending order of fitness. """
+    order depending on the contet of the fitness score of an individual. By
+    default, the population is ordered into descending order of fitness so that
+    higher fitness scores reflect fitter individuals. """
 
     fitness_dict = {
         ind: fit for ind, fit in zip(population, population_fitness)
     }
     ordered_population = dict(
-        sorted(fitness_dict.items(), reverse=True, key=lambda x: x[1])
+        sorted(fitness_dict.items(), reverse=maximise, key=lambda x: x[1])
     )
 
     return ordered_population
