@@ -1,8 +1,10 @@
 """ Tests for the components of the algorithm. """
 
 import pandas as pd
+import pytest
 
-from hypothesis import settings
+from hypothesis import given, settings
+from hypothesis.strategies import integers
 from genetic_data.pdfs import Gamma, Poisson
 from genetic_data.components import create_individual, \
                                     create_initial_population, \
@@ -57,6 +59,13 @@ class TestCreation():
 
             for col in ind[2:]:
                 assert isinstance(col, tuple(pdfs))
+    
+    @given(size=integers(max_value=1))
+    def test_too_small_population(self, size):
+        """ Verify that a `ValueError` is raised for small population sizes. """
+
+        with pytest.raises(ValueError):
+            population = create_initial_population(size, None, None, None, None)
 
 
 class TestGetFitness():

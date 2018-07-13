@@ -71,6 +71,10 @@ def create_initial_population(size, row_limits, col_limits,
         A collection of individuals.
     """
 
+    if size <= 1:
+        raise ValueError('There must be more than one individual in a \
+                          population')
+
     population = []
     for _ in range(size):
         individual = create_individual(row_limits, col_limits,
