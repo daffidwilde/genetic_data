@@ -56,7 +56,7 @@ def mutate_individual(individual, prob, row_limits, col_limits, pdfs, weights,
         mutant += random.choices(pdfs, weights, k=spare_cols)
 
     for col in mutant[2:]:
-        number_attrs = len(col.get_params()) + 2
+        number_attrs = len(col.get_params()) + 1
         changes = [random.random() < prob for _ in range(number_attrs)]
         col.mutate(*changes)
 

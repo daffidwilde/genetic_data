@@ -63,7 +63,6 @@ class TestGetFitness():
     """ Test the get_fitness function. """
 
     @ind_fitness_limits
-    @settings(max_examples=10)
     def test_get_dataframes(self, row_limits, col_limits, weights, max_seed):
         """ Verify that an individual's expanded form is a `pandas.DataFrame`
         object of the correct shape. """
@@ -78,7 +77,6 @@ class TestGetFitness():
             assert df.shape == (individual[0], individual[1])
 
     @pop_fitness_limits
-    @settings(max_examples=1)
     def test_get_fitness(self, size, row_limits, col_limits, weights, max_seed):
         """ Create a population and get its fitness. Then verify that the
         fitness is of the correct size and data type. """
@@ -91,7 +89,6 @@ class TestGetFitness():
         assert population_fitness.dtype == 'float'
 
     @pop_fitness_limits
-    @settings(max_examples=1)
     def test_get_ordered_population(self, size, row_limits, col_limits,
                                     weights, max_seed):
         """ Create a population, get its fitness and order the individuals in
@@ -111,7 +108,6 @@ class TestBreedingProcess():
     """ Test the breeder selection and offspring creation process. """
 
     @selection_limits
-    @settings(max_examples=1)
     def test_select_parents(self, size, row_limits, col_limits, weights,
                             props, max_seed):
         """ Create a population, get its fitness and select potential parents
@@ -137,7 +133,6 @@ class TestBreedingProcess():
             assert ind_counts[ind] in [0, 1]
 
     @offspring_limits
-    @settings(max_examples=1)
     def test_create_offspring(self, size, row_limits, col_limits, weights,
                               props, prob, max_seed):
         """ Create a population and use them to create a new proto-population
@@ -152,6 +147,7 @@ class TestBreedingProcess():
         population_fitness = get_fitness(trivial_fitness, population, max_seed)
         ordered_population = get_ordered_population(population,
                                                     population_fitness)
+
         breeders = select_parents(ordered_population, best_prop, lucky_prop)
         offspring = create_offspring(breeders, prob, size)
         assert isinstance(offspring, list)

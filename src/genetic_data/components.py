@@ -101,7 +101,7 @@ def get_fitness(fitness, population, max_seed, selection=np.mean):
         dfs = get_dataframes(individual, max_seed)
         for j, df in enumerate(dfs):
             individual_fitnesses[i, j] = fitness(df)
-        population[i] = selection(individual_fitnesses[i, :])
+        population_fitness[i] = selection(individual_fitnesses[i, :])
 
     return population_fitness
 
