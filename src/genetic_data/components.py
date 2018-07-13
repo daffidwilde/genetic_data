@@ -116,18 +116,18 @@ def get_fitness(fitness, population, max_seed, amalgamation_method=np.mean):
 
     return population_fitness
 
-def get_ordered_population(population, population_fitness, maximise=True):
+def get_ordered_population(population, population_fitness):
     """ Return a dictionary with key-value pairs given by the individuals in a
-    population and their respective fitness. This population is sorted into
-    order depending on the contet of the fitness score of an individual. By
-    default, the population is ordered into descending order of fitness so that
-    higher fitness scores reflect fitter individuals. """
+    population and their respective fitness. The population is sorted into
+    descending order of fitness so that higher fitness scores reflect fitter
+    individuals. Note that the `fitness` function passed to the algorithm may
+    need to be modified to fall in line with this convention. """
 
     fitness_dict = {
         ind: fit for ind, fit in zip(population, population_fitness)
     }
     ordered_population = dict(
-        sorted(fitness_dict.items(), reverse=maximise, key=lambda x: x[1])
+            sorted(fitness_dict.items(), reverse=True, key=lambda x: x[1])
     )
 
     return ordered_population
