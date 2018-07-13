@@ -102,7 +102,7 @@ def get_fitness(fitness, population, max_seed, amalgamation_method=np.mean):
     datasets from that individual's family of datasets. By default, the mean is
     used to amalgamate these fitness scores. However, any function can be passed
     here on how to reduce the set of fitness scores. Some examples could be:
-    choosing the best-case scenario with Python's `min` or `max` functions;
+    choosing worst/best case scenarios with Python's `min` or `max` functions;
     taking the median score; or, cutting off outliers to give a truncated mean.
     """
 
