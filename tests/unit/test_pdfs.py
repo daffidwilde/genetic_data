@@ -10,8 +10,6 @@ from test_util.trivials import TrivialPDF
 class TestGamma():
     """ A class containing the tests for the Gamma column pdf. """
 
-    Gamma.alt_pdfs = [TrivialPDF]
-
     @given(nrows=integers(min_value=1),
            seed=integers(min_value=0))
     def test_sample(self, nrows, seed):
@@ -41,6 +39,7 @@ class TestGamma():
     def test_change_pdf(self):
         """ Verify Gamma object can mutate to another kind of pdf. Here the
         TrivialPDF class is used for illustration. """
+        Gamma.alt_pdfs = [TrivialPDF]
         gamma = Gamma()
         mutant = deepcopy(gamma).mutate(change_pdf=True)
         assert mutant != gamma
@@ -49,8 +48,6 @@ class TestGamma():
 
 class TestPoisson():
     """ A class containing the tests for the Poisson column pdf. """
-
-    Poisson.alt_pdfs = [TrivialPDF]
 
     @given(nrows=integers(min_value=1),
            seed=integers(min_value=0))
@@ -78,6 +75,8 @@ class TestPoisson():
     def test_change_pdf(self):
         """ Verify Poisson object can mutate to another kind of pdf. Here the
         TrivialPDF class is used for illustration. """
+
+        Poisson.alt_pdfs = [TrivialPDF]
         poisson = Poisson()
         mutant = poisson.mutate(change_pdf=True)
         assert 'TrivialPDF' in str(mutant)
