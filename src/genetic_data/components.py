@@ -96,14 +96,15 @@ def get_dataframes(individual, max_seed):
 
     return dfs
 
-def get_fitness(fitness, population, max_seed, selection=np.mean):
-    """ Return the fitness score of each individual in a population according to
-    a selection function over a set of fitness scores from seeded samples. By
-    default, the mean of these fitness scores is taken. However, any function
-    can be passed here on how to choose from the set of fitness scores. Some
-    examples could be: choosing the best-case scenario with Python's `min` or
-    `max` functions; taking the median score; or, cutting off outliers to give a
-    truncated mean. """
+def get_fitness(fitness, population, max_seed, amalgamation_method=np.mean):
+    """ Return the fitness score of each individual in a population. Each score
+    is determined by amalgamating the fitness scores of `max_seed` sampled
+    datasets from that individual's family of datasets. By default, the mean is
+    used to amalgamate these fitness scores. However, any function can be passed
+    here on how to reduce the set of fitness scores. Some examples could be:
+    choosing the best-case scenario with Python's `min` or `max` functions;
+    taking the median score; or, cutting off outliers to give a truncated mean.
+    """
 
     individual_fitnesses = np.empty((len(population), max_seed))
     population_fitness = np.empty(len(population))
@@ -111,7 +112,7 @@ def get_fitness(fitness, population, max_seed, selection=np.mean):
         dfs = get_dataframes(individual, max_seed)
         for j, df in enumerate(dfs):
             individual_fitnesses[i, j] = fitness(df)
-        population_fitness[i] = selection(individual_fitnesses[i, :])
+        population_fitness[i] = amalgamation_method(individual_fitnesses[i, :])
 
     return population_fitness
 
