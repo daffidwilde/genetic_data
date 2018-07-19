@@ -25,11 +25,12 @@ def test_mutate_individual(row_limits, col_limits, weights, prob):
     """ Verify that an individual can be mutated to give another individual. """
 
     pdfs = [Gamma, Poisson]
-    alt_pdfs = {'Gamma': [Poisson], 'Poisson': [Gamma]}
-    individual = create_individual(row_limits, col_limits, pdfs, weights,
-                                   alt_pdfs)
+    for pdf in pdfs:
+        pdf.alt_pdfs = [p for p in pdfs if p != pdf]
+
+    individual = create_individual(row_limits, col_limits, pdfs, weights)
     mutant = mutate_individual(individual, prob, row_limits, col_limits, pdfs,
-                               weights, alt_pdfs)
+                               weights)
     assert isinstance(mutant, tuple)
     assert len(mutant) == mutant[1] + 2
 

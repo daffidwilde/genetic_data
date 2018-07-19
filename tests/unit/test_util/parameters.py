@@ -3,20 +3,17 @@
 from hypothesis import given
 from hypothesis.strategies import floats, integers, tuples
 
-size = integers(min_value=1, max_value=100)
+size = integers(min_value=2, max_value=100)
+max_seed = integers(min_value=1, max_value=5)
 rate = floats(min_value=0, max_value=1)
+prob = floats(min_value=0, max_value=1)
 
-props = tuples(floats(min_value=1e-10, max_value=1),
-               floats(min_value=1e-10, max_value=1)) \
-        .map(sorted).filter(lambda x: sum(x) <= 1.0)
-
-shapes = tuples(integers(min_value=1, max_value=1e3),
-                integers(min_value=1, max_value=1e3)) \
+shapes = tuples(integers(min_value=1, max_value=50),
+                integers(min_value=1, max_value=50)) \
          .map(sorted).filter(lambda x: x[0] <= x[1])
 
-weights = tuples(floats(min_value=1e-10, max_value=1),
-                 floats(min_value=1e-10, max_value=1)) \
-          .map(sorted).filter(lambda x: sum(x) <= 1.0)
+weights = tuples(rate, rate) \
+          .map(sorted).filter(lambda x: sum(x) <= 1.0 and sum(x) > 0)
 
 
 individual_limits = given(row_limits=shapes,
@@ -28,27 +25,40 @@ population_limits = given(size=size,
                           col_limits=shapes,
                           weights=weights)
 
+ind_fitness_limits = given(row_limits=shapes,
+                           col_limits=shapes,
+                           weights=weights,
+                           max_seed=max_seed)
+
+pop_fitness_limits = given(size=size,
+                           row_limits=shapes,
+                           col_limits=shapes,
+                           weights=weights,
+                           max_seed=max_seed)
+
 selection_limits = given(size=size,
                          row_limits=shapes,
                          col_limits=shapes,
                          weights=weights,
-                         props=props)
+                         props=weights,
+                         max_seed=max_seed)
 
 offspring_limits = given(size=size,
                          row_limits=shapes,
                          col_limits=shapes,
                          weights=weights,
-                         props=props,
-                         prob=rate)
+                         props=weights,
+                         prob=prob,
+                         max_seed=max_seed)
 
 mutation_limits = given(size=size,
                         row_limits=shapes,
                         col_limits=shapes,
                         weights=weights,
-                        mutation_rate=rate,
-                        allele_prob=rate)
+                        mutation_prob=prob,
+                        allele_prob=prob)
 
 operator_limits = given(row_limits=shapes,
                         col_limits=shapes,
                         weights=weights,
-                        prob=rate)
+                        prob=prob)

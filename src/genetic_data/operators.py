@@ -32,8 +32,7 @@ def crossover(parent1, parent2, prob=0.5):
     offspring = tuple([nrows, ncols, *cols])
     return offspring
 
-def mutate_individual(individual, prob, row_limits, col_limits, pdfs, weights,
-                      alt_pdfs):
+def mutate_individual(individual, prob, row_limits, col_limits, pdfs, weights):
     """ Mutate an individual's allele representation. Alleles are split into
     three parts: number of rows, number of columns, and the column
     distributions. Each of these parts is mutated with a different """
@@ -52,11 +51,11 @@ def mutate_individual(individual, prob, row_limits, col_limits, pdfs, weights,
 
     spare_cols = mutant[1] - len(mutant[2:])
     if spare_cols > 0:
-        pdfs = [pdf(alt_pdfs=alt_pdfs) for pdf in pdfs]
+        pdfs = [pdf() for pdf in pdfs]
         mutant += random.choices(pdfs, weights, k=spare_cols)
 
     for col in mutant[2:]:
-        number_attrs = len(col.get_params()) + 2
+        number_attrs = len(col.get_params()) + 1
         changes = [random.random() < prob for _ in range(number_attrs)]
         col.mutate(*changes)
 

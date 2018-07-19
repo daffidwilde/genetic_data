@@ -1,12 +1,14 @@
 """ Tests for the components of the algorithm. """
 
 import pandas as pd
+import pytest
 
-from hypothesis import settings
+from hypothesis import given, settings
+from hypothesis.strategies import integers
 from genetic_data.pdfs import Gamma, Poisson
 from genetic_data.components import create_individual, \
                                     create_initial_population, \
-                                    get_dataframe, \
+                                    get_dataframes, \
                                     get_fitness, \
                                     get_ordered_population, \
                                     select_parents, \
@@ -16,6 +18,8 @@ from genetic_data.components import create_individual, \
 from test_util.trivials import trivial_fitness
 from test_util.parameters import individual_limits, \
                                  population_limits, \
+                                 ind_fitness_limits, \
+                                 pop_fitness_limits, \
                                  selection_limits, \
                                  offspring_limits, \
                                  mutation_limits
@@ -55,40 +59,47 @@ class TestCreation():
 
             for col in ind[2:]:
                 assert isinstance(col, tuple(pdfs))
+    
+    @given(size=integers(max_value=1))
+    def test_too_small_population(self, size):
+        """ Verify that a `ValueError` is raised for small population sizes. """
+
+        with pytest.raises(ValueError):
+            population = create_initial_population(size, None, None, None, None)
 
 
 class TestGetFitness():
     """ Test the get_fitness function. """
 
-    @individual_limits
-    @settings(deadline=200)
-    def test_get_dataframe(self, row_limits, col_limits, weights):
+    @ind_fitness_limits
+    def test_get_dataframes(self, row_limits, col_limits, weights, max_seed):
         """ Verify that an individual's expanded form is a `pandas.DataFrame`
         object of the correct shape. """
 
         pdfs = [Gamma, Poisson]
         individual = create_individual(row_limits, col_limits, pdfs, weights)
-        df = get_dataframe(individual)
-        assert isinstance(df, pd.DataFrame)
-        assert df.shape == (individual[0], individual[1])
+        dfs = get_dataframes(individual, max_seed)
+        assert len(dfs) == max_seed
 
-    @population_limits
-    @settings(max_examples=10)
-    def test_get_fitness(self, size, row_limits, col_limits, weights):
+        for df in dfs:
+            assert isinstance(df, pd.DataFrame)
+            assert df.shape == (individual[0], individual[1])
+
+    @pop_fitness_limits
+    def test_get_fitness(self, size, row_limits, col_limits, weights, max_seed):
         """ Create a population and get its fitness. Then verify that the
         fitness is of the correct size and data type. """
 
         pdfs = [Gamma, Poisson]
         population = create_initial_population(size, row_limits, col_limits,
                                                pdfs, weights)
-        population_fitness = get_fitness(trivial_fitness, population)
+        population_fitness = get_fitness(trivial_fitness, population, max_seed)
         assert population_fitness.shape == (size,)
         assert population_fitness.dtype == 'float'
 
-    @population_limits
-    @settings(max_examples=10)
+    @pop_fitness_limits
     def test_get_ordered_population(self, size, row_limits, col_limits,
-                                    weights):
+                                    weights, max_seed):
         """ Create a population, get its fitness and order the individuals in
         descending order of their fitness. Verify that all individuals are
         there. """
@@ -96,19 +107,19 @@ class TestGetFitness():
         pdfs = [Gamma, Poisson]
         population = create_initial_population(size, row_limits, col_limits,
                                                pdfs, weights)
-        population_fitness = get_fitness(trivial_fitness, population)
+        population_fitness = get_fitness(trivial_fitness, population, max_seed)
         ordered_population = get_ordered_population(population,
                                                     population_fitness)
         assert set(ordered_population.keys()) == set(population)
 
 
 class TestBreedingProcess():
-    """ Test the breeder selection and offspring creation process. """
+    """ Test the parent selection and offspring creation processes, including
+    the mutation of the new offspring population. """
 
     @selection_limits
-    @settings(max_examples=10)
     def test_select_parents(self, size, row_limits, col_limits, weights,
-                            props):
+                            props, max_seed):
         """ Create a population, get its fitness and select potential parents
         based on that fitness vector. Verify that parents are selected without
         replacement. """
@@ -117,7 +128,7 @@ class TestBreedingProcess():
         pdfs = [Gamma, Poisson]
         population = create_initial_population(size, row_limits, col_limits,
                                                pdfs, weights)
-        population_fitness = get_fitness(trivial_fitness, population)
+        population_fitness = get_fitness(trivial_fitness, population, max_seed)
         ordered_population = get_ordered_population(population,
                                                     population_fitness)
         parents = select_parents(ordered_population, best_prop, lucky_prop)
@@ -132,9 +143,8 @@ class TestBreedingProcess():
             assert ind_counts[ind] in [0, 1]
 
     @offspring_limits
-    @settings(max_examples=25)
     def test_create_offspring(self, size, row_limits, col_limits, weights,
-                              props, prob):
+                              props, prob, max_seed):
         """ Create a population and use them to create a new proto-population
         of offspring. Verify that each offspring is an individual and their are
         the correct number of them. That way, this collection of offspring are
@@ -144,9 +154,10 @@ class TestBreedingProcess():
         pdfs = [Gamma, Poisson]
         population = create_initial_population(size, row_limits, col_limits,
                                                pdfs, weights)
-        population_fitness = get_fitness(trivial_fitness, population)
+        population_fitness = get_fitness(trivial_fitness, population, max_seed)
         ordered_population = get_ordered_population(population,
                                                     population_fitness)
+
         breeders = select_parents(ordered_population, best_prop, lucky_prop)
         offspring = create_offspring(breeders, prob, size)
         assert isinstance(offspring, list)
@@ -162,19 +173,20 @@ class TestBreedingProcess():
     @mutation_limits
     @settings(deadline=None)
     def test_mutate_population(self, size, row_limits, col_limits, weights,
-                               mutation_rate, allele_prob):
-        """ Create a population and mutate it according to a mutation rate.
-        Verify that the mutated population is of the correct size, and that each
-        element of the population is an individual. """
+                               mutation_prob, allele_prob):
+        """ Create a population and mutate it according to a mutation
+        probability. Verify that the mutated population is of the correct size,
+        and that each element of the population is an individual. """
 
         pdfs = [Gamma, Poisson]
-        alt_pdfs = {'Gamma': [Poisson], 'Poisson': [Gamma]}
+        for pdf in pdfs:
+            pdf.alt_pdfs = [p for p in pdfs if p != pdf]
+
         population = create_initial_population(size, row_limits, col_limits,
-                                               pdfs, weights, alt_pdfs)
-        mutant_population = mutate_population(population, mutation_rate,
+                                               pdfs, weights)
+        mutant_population = mutate_population(population, mutation_prob,
                                               allele_prob, row_limits,
-                                              col_limits, pdfs, weights,
-                                              alt_pdfs)
+                                              col_limits, pdfs, weights)
         assert isinstance(mutant_population, list)
         assert len(mutant_population) == len(population)
 
