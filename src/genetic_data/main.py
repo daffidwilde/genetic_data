@@ -2,16 +2,16 @@
 
 import random
 
-from genetic_data.pdfs import Gamma, Poisson
 from genetic_data.components import create_initial_population, \
                                     create_offspring, get_fitness, \
-                                    select_parents, mutate_population 
+                                    get_ordered_population, select_parents, \
+                                    mutate_population 
 
-def run_algorithm(fitness, size, row_limits, col_limits,
-                  column_classes=[Gamma, Poisson], weights=None, stop=0.01,
-                  max_iter=100, best_prop=0.2, lucky_prop=0.05,
-                  mutation_rate=0.01, allele_prob=0.1, seed=0):
-    """ Run a genetic algorithm under the presented constraints, giving a
+def run_algorithm(fitness, size, row_limits, col_limits, pdfs, weights=None,
+                  num_samples=10, amalgamation_method=np.mean, stop=None,
+                  max_iter=100, best_prop=0.25, lucky_prop=0.01, prob=0.5,
+                  mutation_prob=1, allele_prob=0.01, seed=0):
+    """ Run a genetic algorithm (GA) under the presented constraints, giving a
     population of artificial datasets for which the fitness function performs
     well.
 
@@ -26,18 +26,26 @@ def run_algorithm(fitness, size, row_limits, col_limits,
         Lower and upper bounds on the number of rows a dataset can have.
     col_limits : list
         Lower and upper bounds on the number of columns a dataset can have.
-    column_classes : list
+    pdfs : list
         The classes of distribution each column of a dataset can take. These
         distributions should take values either from the real numbers or the
-        integers. Also, classes must have `__str__`, `sample` and `mutate`
-        methods detailing the name of the distribution, how to sample from the
-        distribution in question, and how to mutate itself and its parameters.
+        integers. Also, classes must have `sample` and `mutate` methods
+        detailing how to sample from the distribution, and how to mutate itself
+        and its parameters.
     weights : list
         Relative probability distribution on how to select columns from
         `column_classes`. If not specified, will choose evenly.
+    num_samples : int
+        The number of samples to take from an individual's dataset family. These
+        samples are used to determine the fitness of the individual.
+    amalgamation_method : func
+        How to amalgamate the fitness of the samples taken from an individual's
+        dataset family. By default, the mean is taken using `np.mean` but any
+        function may be used that returns a real value.
     stop : float
-        A stopping tolerance on the normed change in the average fitness from
-        the last generation.
+        A stopping tolerance on the coefficient of variation in the fitness of
+        the current generation. If `None`, the GA will run to its maximum number
+        of iterations.
     max_iter : int
         The maximum number of iterations to be carried out before stopping.
     best_prop : float
@@ -46,12 +54,14 @@ def run_algorithm(fitness, size, row_limits, col_limits,
     lucky_prop : float
         The proportion of a population from which to sample some "lucky"
         potential parents.
-    mutation_rate : float
+    prob : float
+        The probability with which to sample from the first parent over the
+        second in a crossover operation.
+    mutation_prob : float
         The probability of any particular individual being mutated in a
         generation.
     allele_prob : float
-        Given an individual that is to be mutated, this is the probability of
-        any particular allele in that individual being mutated.
+        The probability of any particular allele in an individual being mutated.
     seed : int
         The seed for a pseudo-random number generator for the run of the
         algorithm.
@@ -59,5 +69,32 @@ def run_algorithm(fitness, size, row_limits, col_limits,
 
     random.seed(seed)
 
+    for pdf if pdfs:
+        pdf.alt_pdfs = [p for p in pdfs if p != pdf]
+
     population = create_initial_population(size, row_limits, col_limits,
-            column_classes, weights,)
+                                           pdfs, weights)
+    pop_fitness = get_fitness(fitness, population, num_samples,
+                              amalgamation_method)
+
+    if stop:
+        converged = np.std(pop_fitness) / np.mean(pop_fitness) < stop
+    else:
+        converged = False
+
+    itr = 0
+    while itr < max_iter and not converged:
+        ordered_population = get_ordered_population(population, pop_fitness)
+        parents = select_parents(ordered_population, best_prop, lucky_prop)
+        offspring = create_offspring(parents, prob, size)
+
+        population = mutate_population(offspring, mutation_prob, allele_prob,
+                                       row_limits, col_limits, pdfs, weights)
+        pop_fitness = get_fitness(fitness, population, num_samples,
+                                  amalgamation_method)
+
+        if stop:
+            converged = np.std(pop_fitness) / np.mean(pop_fitness) < stop
+        itr += 1
+
+    return population, pop_fitness
