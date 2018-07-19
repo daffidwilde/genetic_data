@@ -21,6 +21,7 @@ from test_util.parameters import individual_limits, \
                                  ind_fitness_limits, \
                                  pop_fitness_limits, \
                                  selection_limits, \
+                                 small_props_limits, \
                                  offspring_limits, \
                                  mutation_limits
 
@@ -59,7 +60,7 @@ class TestCreation():
 
             for col in ind[2:]:
                 assert isinstance(col, tuple(pdfs))
-    
+
     @given(size=integers(max_value=1))
     def test_too_small_population(self, size):
         """ Verify that a `ValueError` is raised for small population sizes. """
@@ -129,9 +130,8 @@ class TestBreedingProcess():
         population = create_initial_population(size, row_limits, col_limits,
                                                pdfs, weights)
         population_fitness = get_fitness(trivial_fitness, population, max_seed)
-        ordered_population = get_ordered_population(population,
-                                                    population_fitness)
-        parents = select_parents(ordered_population, best_prop, lucky_prop)
+        parents = select_parents(population, population_fitness,
+                                 best_prop, lucky_prop)
 
         ind_counts = {ind: 0 for ind in population}
         while parents != []:
@@ -141,6 +141,22 @@ class TestBreedingProcess():
                     parents.remove(ind)
         for ind in ind_counts:
             assert ind_counts[ind] in [0, 1]
+
+    @small_props_limits
+    def test_select_parents_raises_error(self, size, row_limits, col_limits,
+                                         weights, props, max_seed):
+        """ Assert that best and lucky proportions must be sensible. """
+
+        with pytest.raises(ValueError):
+            best_prop, lucky_prop = props
+            pdfs = [Gamma, Poisson]
+            population = create_initial_population(size, row_limits, col_limits,
+                                                   pdfs, weights)
+            population_fitness = get_fitness(trivial_fitness, population,
+                                             max_seed)
+
+            parents = select_parents(population, population_fitness,
+                                     best_prop, lucky_prop)
 
     @offspring_limits
     def test_create_offspring(self, size, row_limits, col_limits, weights,
@@ -155,11 +171,9 @@ class TestBreedingProcess():
         population = create_initial_population(size, row_limits, col_limits,
                                                pdfs, weights)
         population_fitness = get_fitness(trivial_fitness, population, max_seed)
-        ordered_population = get_ordered_population(population,
-                                                    population_fitness)
-
-        breeders = select_parents(ordered_population, best_prop, lucky_prop)
-        offspring = create_offspring(breeders, prob, size)
+        parents = select_parents(population, population_fitness,
+                                 best_prop, lucky_prop)
+        offspring = create_offspring(parents, prob, size)
         assert isinstance(offspring, list)
         assert len(offspring) == size
 

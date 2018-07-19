@@ -2,10 +2,12 @@
 
 import random
 
+import numpy as np
+
 from genetic_data.components import create_initial_population, \
                                     create_offspring, get_fitness, \
                                     get_ordered_population, select_parents, \
-                                    mutate_population 
+                                    mutate_population
 
 def run_algorithm(fitness, size, row_limits, col_limits, pdfs, weights=None,
                   num_samples=10, amalgamation_method=np.mean, stop=None,
@@ -69,7 +71,7 @@ def run_algorithm(fitness, size, row_limits, col_limits, pdfs, weights=None,
 
     random.seed(seed)
 
-    for pdf if pdfs:
+    for pdf in pdfs:
         pdf.alt_pdfs = [p for p in pdfs if p != pdf]
 
     population = create_initial_population(size, row_limits, col_limits,
@@ -78,23 +80,23 @@ def run_algorithm(fitness, size, row_limits, col_limits, pdfs, weights=None,
                               amalgamation_method)
 
     if stop:
-        converged = np.std(pop_fitness) / np.mean(pop_fitness) < stop
+        converged = abs(np.std(pop_fitness) / np.mean(pop_fitness)) < stop
     else:
         converged = False
 
+    all_fitness_scores = [pop_fitness]
     itr = 0
     while itr < max_iter and not converged:
-        ordered_population = get_ordered_population(population, pop_fitness)
-        parents = select_parents(ordered_population, best_prop, lucky_prop)
+        parents = select_parents(population, pop_fitness, best_prop, lucky_prop)
         offspring = create_offspring(parents, prob, size)
 
         population = mutate_population(offspring, mutation_prob, allele_prob,
                                        row_limits, col_limits, pdfs, weights)
         pop_fitness = get_fitness(fitness, population, num_samples,
                                   amalgamation_method)
-
+        all_fitness_scores.append(pop_fitness)
         if stop:
-            converged = np.std(pop_fitness) / np.mean(pop_fitness) < stop
+            converged = abs(np.std(pop_fitness) / np.mean(pop_fitness)) < stop
         itr += 1
 
-    return population, pop_fitness
+    return population, pop_fitness, all_fitness_scores

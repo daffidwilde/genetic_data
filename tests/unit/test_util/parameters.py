@@ -3,10 +3,11 @@
 from hypothesis import given
 from hypothesis.strategies import floats, integers, tuples
 
-size = integers(min_value=2, max_value=100)
+size = integers(min_value=2, max_value=10)
 max_seed = integers(min_value=1, max_value=5)
 rate = floats(min_value=0, max_value=1)
 prob = floats(min_value=0, max_value=1)
+small_prob = floats(min_value=0, max_value=1e-3)
 
 shapes = tuples(integers(min_value=1, max_value=50),
                 integers(min_value=1, max_value=50)) \
@@ -40,14 +41,23 @@ selection_limits = given(size=size,
                          row_limits=shapes,
                          col_limits=shapes,
                          weights=weights,
-                         props=weights,
+                         props=weights.filter(lambda x: x[0] > 0.5
+                                              or x[1] > 0.5),
                          max_seed=max_seed)
+
+small_props_limits = given(size=size,
+                           row_limits=shapes,
+                           col_limits=shapes,
+                           weights=weights,
+                           props=tuples(small_prob, small_prob),
+                           max_seed=max_seed)
 
 offspring_limits = given(size=size,
                          row_limits=shapes,
                          col_limits=shapes,
                          weights=weights,
-                         props=weights,
+                         props=weights.filter(lambda x: x[0] > 0.5
+                                              or x[1] > 0.5),
                          prob=prob,
                          max_seed=max_seed)
 
