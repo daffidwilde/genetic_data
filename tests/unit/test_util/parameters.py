@@ -40,14 +40,16 @@ selection_limits = given(size=size,
                          row_limits=shapes,
                          col_limits=shapes,
                          weights=weights,
-                         props=weights,
+                         props=weights.filter(lambda x: x[0] > 0.5
+                                              or x[1] > 0.5),
                          max_seed=max_seed)
 
 offspring_limits = given(size=size,
                          row_limits=shapes,
                          col_limits=shapes,
                          weights=weights,
-                         props=weights,
+                         props=weights.filter(lambda x: x[0] > 0.5
+                                              or x[1] > 0.5),
                          prob=prob,
                          max_seed=max_seed)
 
