@@ -125,17 +125,23 @@ def get_ordered_population(population, population_fitness):
 
     return ordered_population
 
-def select_parents(ordered_population, best_prop, lucky_prop):
-    """ Given a population ranked by their fitness, select a proportion of the
-    `best` individuals and another of the `lucky` individuals (if they are
-    available) to form a set of potential parents. This mirrors the survival of
-    the fittest paradigm whilst including a number of less-fit individuals to
-    stop the algorithm from converging too early. """
+def select_parents(population, population_fitness, best_prop, lucky_prop):
+    """ Given a population, rank them and select a proportion of the `best`
+    individuals and another of the `lucky` individuals (if they are available)
+    to form a set of potential parents. This mirrors the survival of the fittest
+    paradigm whilst including a number of less-fit individuals to stop the
+    algorithm from converging too early. """
+
+    ordered_population = get_ordered_population(population, population_fitness)
 
     size = len(ordered_population)
-    num_best = max(int(best_prop * size), 1)
-    num_lucky = max(int(lucky_prop * size), 1)
+    num_best = int(best_prop * size)
+    num_lucky = int(lucky_prop * size)
     population = list(ordered_population.keys())
+
+    if num_best == 0 and num_lucky == 0:
+        raise ValueError('Not a large enough proportion of "best" and/or \
+                          "lucky" individuals chosen. Reconsider these values.')
 
     parents = []
     for _ in range(num_best):
