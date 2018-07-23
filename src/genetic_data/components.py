@@ -28,11 +28,13 @@ def create_individual(row_limits, col_limits, pdfs, weights=None):
 
     nrows = random.randint(*row_limits)
     ncols = random.randint(*col_limits)
-    pdfs = [pdf() for pdf in pdfs]
+    cols = [pdf() for pdf in pdfs]
 
-    individual = tuple([
-        nrows, ncols, *random.choices(pdfs, weights=weights, k=ncols)
-    ])
+    individual = pd.DataFrame({
+        f'col_{i}': pdf.sample(nrows) for col in random.choices(cols,
+                                                                weights=weights,
+                                                                k=ncols)
+    })
 
     return individual
 
@@ -76,38 +78,14 @@ def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
 
     return population
 
-def get_dataframes(individual, max_seed):
-    """ Sample `max_seed` datasets from the family of datasets represented by an
-    individual's alleles. Each of these is a `pandas.DataFrame` object. """
+def get_fitness(fitness, population):
+    """ Return the fitness score of each individual in a population. """
 
-    dfs = []
-    for seed in range(max_seed):
-        nrows = individual[0]
-        df = pd.DataFrame({f'col_{i}': col.sample(nrows, seed) \
-                           for i, col in enumerate(individual[2:])})
-        dfs.append(df)
-
-    return dfs
-
-def get_fitness(fitness, population, max_seed, amalgamation_method=np.mean):
-    """ Return the fitness score of each individual in a population. Each score
-    is determined by amalgamating the fitness scores of `max_seed` sampled
-    datasets from that individual's family of datasets. By default, the mean is
-    used to amalgamate these fitness scores. However, any function can be passed
-    here on how to reduce the set of fitness scores. Some examples could be:
-    choosing worst/best case scenarios with Python's `min` or `max` functions;
-    taking the median score; or, cutting off outliers to give a truncated mean.
-    """
-
-    individual_fitnesses = np.empty((len(population), max_seed))
-    population_fitness = np.empty(len(population))
+    pop_fitness = np.empty(len(population))
     for i, individual in enumerate(population):
-        dfs = get_dataframes(individual, max_seed)
-        for j, df in enumerate(dfs):
-            individual_fitnesses[i, j] = fitness(df)
-        population_fitness[i] = amalgamation_method(individual_fitnesses[i, :])
+        pop_fitness[i] = fitness(individual)
 
-    return population_fitness
+    return pop_fitness
 
 def get_ordered_population(population, population_fitness):
     """ Return a dictionary with key-value pairs given by the individuals in a
