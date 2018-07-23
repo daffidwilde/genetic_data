@@ -4,15 +4,33 @@ import random
 
 import numpy as np
 
-from genetic_data.components import create_initial_population, \
-                                    create_offspring, get_fitness, \
-                                    get_ordered_population, select_parents, \
-                                    mutate_population
+from genetic_data.pdfs import Normal
+from genetic_data.components import (
+    create_initial_population,
+    create_offspring,
+    get_fitness,
+    get_ordered_population,
+    select_parents,
+    mutate_population,
+)
 
-def run_algorithm(fitness, size, row_limits, col_limits, pdfs, weights=None,
-                  num_samples=10, amalgamation_method=np.mean, stop=None,
-                  max_iter=100, best_prop=0.25, lucky_prop=0.01, prob=0.5,
-                  mutation_prob=1, allele_prob=0.01, seed=0):
+
+def run_algorithm(
+    fitness,
+    size,
+    row_limits,
+    col_limits,
+    pdfs=[Normal],
+    weights=None,
+    stop=None,
+    max_iter=100,
+    best_prop=25,
+    lucky_prop=0.01,
+    crossover_prob=0.5,
+    mutation_prob=0.01,
+    maximise=True,
+    seed=0,
+):
     """ Run a genetic algorithm (GA) under the presented constraints, giving a
     population of artificial datasets for which the fitness function performs
     well.
@@ -21,7 +39,8 @@ def run_algorithm(fitness, size, row_limits, col_limits, pdfs, weights=None,
     ----------
     fitness : func
         Any real-valued function that takes one `pandas.DataFrame` as argument.
-        Here, higher values are considered 'fitter'.
+        Use the `maximise` parameter to determine how `fitness` should be
+        interpreted.
     size : int
         The size of the population to create.
     row_limits : list
@@ -29,74 +48,88 @@ def run_algorithm(fitness, size, row_limits, col_limits, pdfs, weights=None,
     col_limits : list
         Lower and upper bounds on the number of columns a dataset can have.
     pdfs : list
-        The classes of distribution each column of a dataset can take. These
-        distributions should take values either from the real numbers or the
-        integers. Also, classes must have `sample` and `mutate` methods
-        detailing how to sample from the distribution, and how to mutate itself
-        and its parameters.
+        Used to create the initial population. These classes represent the
+        distribution each column of a dataset can take. These distributions
+        should take values either from the real numbers or the integers.
+
+        By default, a random-parameter normal distribution is used. However,
+        user-defined classes can be used so long as they have a `sample` method
+        detailing how to sample from the distribution. For reproducibility,
+        methods using NumPy are encouraged as the seed for the GA is set using
+        `np.random.seed`.
     weights : list
-        Relative probability distribution on how to select columns from
-        `column_classes`. If not specified, will choose evenly.
-    num_samples : int
-        The number of samples to take from an individual's dataset family. These
-        samples are used to determine the fitness of the individual.
-    amalgamation_method : func
-        How to amalgamate the fitness of the samples taken from an individual's
-        dataset family. By default, the mean is taken using `np.mean` but any
-        function may be used that returns a real value.
-    stop : float
-        A stopping tolerance on the coefficient of variation in the fitness of
-        the current generation. If `None`, the GA will run to its maximum number
-        of iterations.
+        A probability distribution on how to select columns from
+        `pdfs`. If `None`, pdfs will be chosen uniformly.
+    stop : func
+        A function which acts as a stopping condition on the fitness of the
+        current population. If `None`, the GA will run to its maximum number of
+        iterations.
     max_iter : int
-        The maximum number of iterations to be carried out before stopping.
+        The maximum number of iterations to be carried out before terminating.
     best_prop : float
         The proportion of a population from which to select the "best" potential
         parents.
     lucky_prop : float
         The proportion of a population from which to sample some "lucky"
         potential parents.
-    prob : float
+    crossover_prob : float
         The probability with which to sample from the first parent over the
         second in a crossover operation.
     mutation_prob : float
-        The probability of any particular individual being mutated in a
-        generation.
-    allele_prob : float
-        The probability of any particular allele in an individual being mutated.
+        The probability of a particular "allele" in an individual being mutated.
+    maximise : bool
+        Determines whether `fitness` is a function to be maximised or not.
     seed : int
         The seed for a pseudo-random number generator for the run of the
         algorithm.
+
+    Returns
+    -------
+    population : list
+        The final population.
+    pop_fitness : array
+        The fitness of `population`.
+    all_populations : list
+        Every individual in each generation.
+    all_fitnesses : list
+        Every individual's fitness in each generation.
     """
 
     random.seed(seed)
 
-    for pdf in pdfs:
-        pdf.alt_pdfs = [p for p in pdfs if p != pdf]
+    population = create_initial_population(
+        size, row_limits, col_limits, pdfs, weights
+    )
 
-    population = create_initial_population(size, row_limits, col_limits,
-                                           pdfs, weights)
-    pop_fitness = get_fitness(fitness, population, num_samples,
-                              amalgamation_method)
+    pop_fitness = get_fitness(fitness, population)
 
     if stop:
-        converged = abs(np.std(pop_fitness) / np.mean(pop_fitness)) < stop
+        converged = stop(pop_fitness)
     else:
         converged = False
 
-    all_fitness_scores = [pop_fitness]
+    all_populations = [population]
+    all_fitnesses = [pop_fitness]
     itr = 0
     while itr < max_iter and not converged:
-        parents = select_parents(population, pop_fitness, best_prop, lucky_prop)
-        offspring = create_offspring(parents, prob, size)
 
-        population = mutate_population(offspring, mutation_prob, allele_prob,
-                                       row_limits, col_limits, pdfs, weights)
-        pop_fitness = get_fitness(fitness, population, num_samples,
-                                  amalgamation_method)
-        all_fitness_scores.append(pop_fitness)
+        parents = select_parents(
+            population, pop_fitness, best_prop, lucky_prop, maximise
+        )
+
+        offspring = create_offspring(parents, crossover_prob, size)
+
+        population = mutate_population(
+            offspring, mutation_prob, row_limits, col_limits
+        )
+
+        pop_fitness = get_fitness(fitness, population)
+
+        all_populations.append(population)
+        all_fitnesses.append(pop_fitness)
+
         if stop:
-            converged = abs(np.std(pop_fitness) / np.mean(pop_fitness)) < stop
+            converged = stop(pop_fitness)
         itr += 1
 
-    return population, pop_fitness, all_fitness_scores
+    return population, pop_fitness, all_populations, all_fitnesses
