@@ -4,9 +4,14 @@ import itertools as itr
 import numpy as np
 
 from hypothesis import given
-from hypothesis.strategies import floats, integers, sampled_from, tuples
+from hypothesis.strategies import (
+    booleans,
+    floats,
+    integers,
+    sampled_from,
+    tuples,
+)
 
-SEED = integers(min_value=0, max_value=5)
 SIZE = integers(min_value=2, max_value=10)
 PROB = floats(min_value=0, max_value=1)
 SMALL_PROB = floats(min_value=0, max_value=1e-3)
@@ -32,44 +37,12 @@ POPULATION = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
 )
 
-IND_FITNESS = given(
-    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, max_seed=SEED
+CROSSOVER = given(
+    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, prob=PROB
 )
 
-POP_FITNESS = given(
-    size=SIZE,
-    row_limits=SHAPES,
-    col_limits=SHAPES,
-    weights=WEIGHTS,
-    max_seed=SEED,
-)
-
-SELECTION = given(
-    size=SIZE,
-    row_limits=SHAPES,
-    col_limits=SHAPES,
-    weights=WEIGHTS,
-    props=tuples(PROB, PROB).filter(lambda x: x[0] > 0.5 or x[1] > 0.5),
-    max_seed=SEED,
-)
-
-SMALL_PROPS = given(
-    size=SIZE,
-    row_limits=SHAPES,
-    col_limits=SHAPES,
-    weights=WEIGHTS,
-    props=tuples(SMALL_PROB, SMALL_PROB),
-    max_seed=SEED,
-)
-
-OFFSPRING = given(
-    size=SIZE,
-    row_limits=SHAPES,
-    col_limits=SHAPES,
-    weights=WEIGHTS,
-    props=tuples(PROB, PROB).filter(lambda x: x[0] > 0.5 or x[1] > 0.5),
-    prob=PROB,
-    max_seed=SEED,
+FITNESS = given(
+    size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
 )
 
 MUTATION = given(
@@ -80,6 +53,32 @@ MUTATION = given(
     sigma=floats(min_value=0),
 )
 
-CROSSOVER = given(
-    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, prob=PROB
+OFFSPRING = given(
+    size=SIZE,
+    row_limits=SHAPES,
+    col_limits=SHAPES,
+    weights=WEIGHTS,
+    props=tuples(PROB, PROB).filter(lambda x: x[0] > 0.5 or x[1] > 0.5),
+    crossover_prob=PROB,
+    mutation_prob=PROB,
+    maximise=booleans(),
+    sigma=floats(min_value=0),
+)
+
+SELECTION = given(
+    size=SIZE,
+    row_limits=SHAPES,
+    col_limits=SHAPES,
+    weights=WEIGHTS,
+    props=tuples(PROB, PROB).filter(lambda x: x[0] > 0.5 or x[1] > 0.5),
+    maximise=booleans(),
+)
+
+SMALL_PROPS = given(
+    size=SIZE,
+    row_limits=SHAPES,
+    col_limits=SHAPES,
+    weights=WEIGHTS,
+    props=tuples(SMALL_PROB, SMALL_PROB),
+    maximise=booleans(),
 )
