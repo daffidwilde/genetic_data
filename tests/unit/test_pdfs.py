@@ -45,6 +45,7 @@ def test_normal_sample(nrows, seed):
     assert sample.shape == (nrows,)
     assert sample.dtype == "float"
 
+
 @given(mean_limits=LIMITS, std_limits=LIMITS, seed=integers(min_value=0))
 def test_normal_set_param_limits(mean_limits, std_limits, seed):
     """ Check that a Normal object can sample its parameters correctly if its
@@ -58,6 +59,7 @@ def test_normal_set_param_limits(mean_limits, std_limits, seed):
     assert normal.mean >= mean_limits[0] and normal.mean <= mean_limits[1]
     assert normal.std >= std_limits[0] and normal.std <= std_limits[1]
 
+
 @given(nrows=integers(min_value=1), seed=integers(min_value=0))
 def test_poisson_sample(nrows, seed):
     """ Verify that a Poisson object can sample correctly. """
@@ -66,6 +68,7 @@ def test_poisson_sample(nrows, seed):
     sample = poisson.sample(nrows)
     assert sample.shape == (nrows,)
     assert sample.dtype == "int"
+
 
 @given(lam_limits=LIMITS, seed=integers(min_value=0))
 def test_poisson_set_param_limits(lam_limits, seed):

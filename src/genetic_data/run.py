@@ -9,9 +9,7 @@ from genetic_data.components import (
     create_initial_population,
     create_offspring,
     get_fitness,
-    get_ordered_population,
     select_parents,
-    mutate_population,
 )
 
 
@@ -117,10 +115,15 @@ def run_algorithm(
             population, pop_fitness, best_prop, lucky_prop, maximise
         )
 
-        offspring = create_offspring(parents, crossover_prob, size)
-
-        population = mutate_population(
-            offspring, mutation_prob, row_limits, col_limits
+        population = create_offspring(
+            parents,
+            size,
+            crossover_prob,
+            mutation_prob,
+            row_limits,
+            col_limits,
+            pdfs,
+            weights,
         )
 
         pop_fitness = get_fitness(fitness, population)
