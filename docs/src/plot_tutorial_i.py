@@ -56,7 +56,7 @@ def main():
             label.set_fontsize(20)
 
     plt.tight_layout(pad=5)
-    plt.savefig("../_static/example1_plot.png")
+    plt.savefig("../_static/tutorial_i_plot.png")
 
 
 if __name__ == "__main__":
