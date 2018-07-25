@@ -106,14 +106,16 @@ def run_algorithm(
 
     pop_fitness = get_fitness(fitness, population)
 
+    print(f'the best score in this iteration is {np.min(pop_fitness)}')
+    print('the number of scores is', len(pop_fitness), '\n')
+
     if stop:
         converged = stop(pop_fitness)
     else:
         converged = False
 
-    all_populations = [population]
-    all_fitnesses = [pop_fitness]
     itr = 0
+    all_populations, all_fitnesses = [population], [pop_fitness]
     while itr < max_iter and not converged:
 
         parents = select_parents(
@@ -134,6 +136,8 @@ def run_algorithm(
 
         pop_fitness = get_fitness(fitness, population)
 
+        print(f'the best score in this iteration is {np.min(pop_fitness)}')
+        print('the number of scores is', len(pop_fitness), '\n')
         all_populations.append(population)
         all_fitnesses.append(pop_fitness)
 
@@ -141,4 +145,5 @@ def run_algorithm(
             converged = stop(pop_fitness)
         itr += 1
 
+    print('the best scores: \n', [np.min(scores) for scores in all_fitnesses])
     return population, pop_fitness, all_populations, all_fitnesses
