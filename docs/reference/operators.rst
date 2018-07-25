@@ -4,8 +4,8 @@ Operators
 =========
 
 Most genetic algorithms make use of three operators to move from the current
-population to the next. These are *selection*, *crossover* and *mutation*. For
-the GA used in GeneticData, descriptions of these operators are given below.
+population to the next. These are *selection*, *crossover* and *mutation*.
+Descriptions of the operators in this GA are given below.
 
 Selection
 ---------
@@ -15,77 +15,158 @@ current population to act as the "parents" of the next generation. Almost
 always, selection operators determine whether an individual should become a
 parent based on their fitness.
 
-In GeneticData, a population is ranked in *descending* order of fitness and a
-proportion of the top is skimmed off to become parents. We also allow for the
-random selection of some "lucky" individuals to be carried forward with the
-fittest members of the population, if there are any still available.
+In GeneticData, a proportion of the best performing datasets are taken from the
+population where the meaning of "best" is controlled by the `maximise`
+parameter. We also allow for the random selection of some "lucky" individuals to
+be carried forward with the fittest members of the population, if there are any
+still available.
 
 These proportions are controlled using the :code:`best_prop` and
-:code:`lucky_prop` parameters in :code:`run_algorithm`.
+:code:`lucky_prop` parameters respectively.
 
 .. note::
-    The best individuals are always chosen before lucky ones. For instance, if
-    :code:`best_prop` takes value 1, then all individuals are used as parents
-    and :code:`lucky_prop` can be any value.
+    The best individuals are always chosen before lucky ones. This does mean
+    that random selection can still be forced by setting :code:`best_prop` to be
+    0.
+
+.. _cross:
 
 Crossover
 ---------
 
-Crossover operators take two individuals and return one or more "offspring"
-individuals. In GeneticData, the crossover operator returns exactly one
-individual from a pair of parents.
+Crossover operators take two individuals (parents) and return one or more
+"offspring" individuals. In GeneticData, the crossover operator returns exactly
+one individual from a pair of parents.
 
-Here, parents can have chromosomes of different lengths, i.e. if they have
-different numbers of columns from one another. So, the "alleles" are sampled
-from the parents in order; beginning with the number of rows, then the number of
-columns, and then each column distribution until enough columns have been
-chosen.
+An individual is defined by its dimensions and its values. So, in the crossover
+of two individuals, an offspring inherits the same characteristics from its
+parents according to a probability defined by the `crossover_prob` parameter in
+:code:`run_algorithm`. This probability indicates the probability with which to
+inherit from the first parent rather than the second, and is 0.5 by default.
 
-Alleles are sampled from the first parent with a probability, given by
-:code:`prob`, otherwise they are sampled from the second parent. In the case
-where the number of columns in the offspring is sampled from the longer parent,
-column distributions are taken according to :code:`prob` from either parent
-until the shorter parent's final column. All subsequent column distributions are
-then inherited directly from the longer parent.
+The process of crossing two datasets is:
 
-Example::
+0. Determine the widest parent. If they are the same width, this is unimportant.
 
-    >>> import random
+1. Choose the number of rows (:math:`n`) and number of columns (:math:`k`) from
+   the two parents. Each choice is independent of the other.
+
+2. If :math:`k` was inherited from the thinner parent, then inherit columns from
+   either parent according to `crossover_prob` as needed. Otherwise, if the new
+   individual will be the same width as the wider parent, inherit from either
+   parent where possible (up to the last column of the thinner parent) and then
+   simply inherit from the wider parent.
+
+3. Now that the individual is of the correct width, its length needs to be
+   corrected. This is done by adding and removing rows as needed. Rows to be
+   removed are selected at random. Rows are added to the end of a dataset by
+   adding a row of :code:`NaN` values. These are then filled in by sampling a
+   value from each column. If, for whatever reason, there are no real values in
+   a column, then the entire column is replaced by a new column of the correct
+   length. This is done in the same way as the
+   :ref:`initial creation <create-ind>` of an individual.
+
+Example
++++++++
+
+Import the relative pieces from :code:`genetic_data`::
+
+    >>> import numpy as np
+    >>> from genetic_data.components import create_individual
     >>> from genetic_data.operators import crossover
+    >>> from genetic_data.pdfs import Normal
 
-    >>> random.seed(101)
+Set a seed::
 
-    >>> parent1 = tuple([10, 3, 'one', 'one', 'one'])
-    >>> parent2 = tuple([12, 1, 'two'])
+    >>> np.random.seed(1)
 
-    >>> offspring = crossover(parent1, parent2, prob=0.5)
-    >>> print(offspring)
-    (12, 3, 'two', 'one', 'one')
+Define the constraints and initial parameters of the simulation::
 
+    >>> row_limits, col_limits = [1, 3], [1, 5]
+    >>> pdfs = [Normal]
+
+Generate two individuals::
+
+    >>> parents = [create_individual(row_limits, col_limits, pdfs) \
+    ...            for _ in range(2)]
+
+These individuals look like this (every dataset's entries in the following
+examples has been rounded to 4 d.p.):
+
+.. csv-table:: The first parent
+   :file: parent_1.csv
+   :align: center
+
+.. csv-table:: The second parent
+   :file: parent_2.csv
+   :align: center
+
+Finally, apply the crossover::
+
+    >>> offspring = crossover(*parents, prob=0.5)
+
+Then :code:`offspring` is the following dataset:
+
+.. csv-table:: The offspring
+   :file: offspring.csv
+   :align: center
+
+.. _mutate:
 
 Mutation
 --------
 
 To maintain a level of variety in a population and to force a GA to explore more
-of the search space, individuals are mutated during the "birth" process. There
-are several practices taken but the most common is this. Take each individual in
-the new population of offspring and run along their alleles, deciding whether or
-not to mutate that allele according to a probability.
+of the search space, individuals are mutated immediately after the crossover
+process. There are many ways of mutating an individual. The most common is to
+take each individual in the population of offspting and run along their alleles,
+deciding whether or not to mutate that allele according to a small probability.
 
 In GeneticData, this probability is controlled by the parameter
-:code:`allele_prob`. There is also the ability to control the probability with
-which *any* individual is mutated using the :code:`mutation_prob` parameter.
+:code:`mutation_prob` in :code:`run_algorithm`. However, the method of mutation
+is not quite as simple. An individual is mutated in the following way:
 
-By default, :code:`mutation_prob` takes value 1 so all individuals are up for
-mutation, and each allele is mutated in the following way:
+1. The number of rows and columns are mutated by adding or removing a line from
+   each axis with equal probability either way. The process of adding and
+   removing lines is the same as in the :ref:`crossover <cross>` process. Note
+   that the number of rows and columns will not mutate beyond the bounds passed
+   to the GA in the :code:`row_limits` and :code:`col_limits` parameters.
 
-* The number of rows and/or columns are mutated by resampling from the discrete
-  uniform distribution over :code:`row_limits` and :code:`col_limits`
-  respectively.
-* Each subsequent column distribution is mutated by either:
+2. Then, with the dimension of the dataset mutated, each value in the dataset is
+   mutated with the same mutation probability. A value is mutated by sampling a
+   single value from the normal distribution centred at the current value and
+   with standard deviation given by the parameter :code:`sigma`. This stops the
+   mutation process from changing an individual too drastically by using smaller
+   values of :code:`sigma`. Though, more dramatic mutation can be encouraged by
+   setting this parameter (and `mutation_prob`) to be higher.
 
-  - mutating to another type of distribution passed to the GA in the
-    :code:`pdfs` parameter (and sampling the required parameters for that
-    distribution); or
-  - mutating the parameter(s) for the current type of distribution, i.e.
-    changing the shape of that column.
+Example
++++++++
+
+Import the mutation operator::
+
+    >>> from genetic_data.operators import mutation
+
+Set the mutation parameters. These are deliberately large to guarantee a
+substantial mutation::
+
+    >>> mutation_prob = 1.
+    >>> sigma = 10.
+
+Mutate the offspring that was just created::
+
+    >>> mutant = mutation(
+    ...     offspring,
+    ...     prob=mutation_prob,
+    ...     row_limits=row_limits,
+    ...     col_limits=col_limits,
+    ...     pdfs=pdfs,
+    ...     weights=None,
+    ...     sigma=10.
+    ... )
+
+This gives the following mutated dataset:
+
+.. csv-table:: The mutant
+   :file: mutant.csv
+   :align: center

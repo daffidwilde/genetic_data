@@ -126,7 +126,7 @@ solid blue line) with our observed fitness scores (orange scatter points)::
 
 The above code should give a figure like this:
 
-.. image:: ../_static/example1_plot.png
+.. image:: ../_static/tutorial_i_plot.png
    :width: 100 %
    :align: center
    :alt: Fitness scores of every individual 
