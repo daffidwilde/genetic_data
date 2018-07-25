@@ -106,26 +106,28 @@ def crossover(parent1, parent2, prob, pdfs, weights):
     return individual
 
 
-def mutation(individual, prob, row_limits, col_limits, pdfs, weights, sigma=1):
+def mutation(individual, prob, row_limits, col_limits, pdfs, weights, sigma):
     """ Mutate an individual. Here, the characteristics of an individual can be
     split into two parts: their dimensions, and their values. Each of these
     parts is mutated in a different way using the same probability, `prob`. """
 
+    mutant = individual.copy()
     # Add or remove a row or column at random.
     limits = [row_limits, col_limits]
     for axis in [0, 1]:
         r = np.random.random()
         if r < prob / 2 and len(individual) > limits[axis][0]:
-            individual = _remove_line(individual, axis=0)
-        elif r < prob / 2 and len(individual) < limits[axis][1]:
-            individual = _add_line(individual, axis, pdfs, weights)
+            mutant = _remove_line(mutant, axis)
+        elif r < prob and len(individual) < limits[axis][1]:
+            mutant = _add_line(mutant, axis, pdfs, weights)
 
     # Iterate over the elements of an individual, mutating them by resampling
     # from the normal distribution with standard deviation `sigma` around the
     # current value.
-    for col in individual.columns:
-        for value in individual[col]:
+    for j, col in enumerate(mutant.columns):
+        for i, value in enumerate(mutant[col]):
             if np.random.random() < prob:
                 value = np.random.normal(loc=value, scale=sigma)
+                mutant.iloc[i, j] = value
 
-    return individual
+    return mutant
