@@ -1,3 +1,5 @@
+.. _optimise_xsquared:
+
 Optimising a function
 ---------------------
 
@@ -48,9 +50,6 @@ First, import the library::
 Define fitness::
 
     >>> def x_squared(df):
-    ...     """ Take a 1x1 `pandas.DataFrame` object and return the square of
-    ...     its only value. """
-    ...
     ...     return df.iloc[0, 0] ** 2
 
 Set up and run the GA::
