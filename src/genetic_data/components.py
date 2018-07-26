@@ -4,6 +4,7 @@ algorithm. """
 import numpy as np
 import pandas as pd
 
+from copy import deepcopy
 from genetic_data.operators import crossover, mutation
 
 
@@ -109,6 +110,8 @@ def select_parents(population, pop_fitness, best_prop, lucky_prop, maximise):
                           "lucky" individuals chosen. Reconsider these values.'
         )
 
+    population = deepcopy(population)
+    pop_fitness = deepcopy(pop_fitness)
     parents = []
     for _ in range(num_best):
         if population != []:
