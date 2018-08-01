@@ -1,133 +1,191 @@
 """ Default crossover and mutation operators for a genetic algorithm. """
 
+from copy import deepcopy
+
 import numpy as np
 import pandas as pd
 
+from genetic_data.individual import Individual
 
-def _rename(df, axis):
-    """ Rename columns or reindex to make sense after deletion or addition of a
+
+def _rename(dataframe, axis):
+    """ Rename metadata or reindex to make sense after deletion or addition of a
     new line. """
 
     if axis == 0:
-        df = df.reset_index(drop=True)
+        dataframe = dataframe.reset_index(drop=True)
     else:
-        df.columns = [f"col_{i}" for i in range(len(df.columns))]
+        dataframe.columns = [f"col_{i}" for i in range(len(dataframe.columns))]
 
-    return df
+    return dataframe
 
 
-def _fillna_random(df, pdfs=None, weights=None):
-    """ Fill in `NaN` values of a column by sampling from the real values in
-    that column. If no such values are available, then create a new column. """
+def _fillna(dataframe, metadata):
+    """ Fill in `NaN` values of a column by sampling from the distribution
+    associated with it. """
 
-    for col in df.columns:
-        data = df[col]
+    for i, col in enumerate(dataframe.columns):
+        data = dataframe[col]
+        pdf = metadata[i]
         if data.isnull().any():
             nulls = data.isnull()
-            if data[-nulls].size > 0:
-                samples = np.random.choice(
-                    data[-nulls].values, size=nulls.sum()
-                )
-                df.loc[nulls, col] = samples
-            else:
-                pdf = np.random.choice(pdfs, p=weights)
-                df.loc[:, col] = pdf().sample(len(df))
+            dataframe.loc[nulls, col] = pdf.sample(nulls.sum())
 
-    return df
+    return dataframe
 
 
-def _remove_line(df, axis):
+def _remove_line(dataframe, axis, metadata):
     """ Remove a line (row or column) from a dataset at random. """
 
     if axis == 0:
-        line = np.random.choice(df.index)
+        line = np.random.choice(dataframe.index)
     else:
-        line = np.random.choice(df.columns)
+        line = np.random.choice(dataframe.columns)
+        idx = dataframe.columns.get_loc(line)
+        metadata.pop(idx)
 
-    df = _rename(df.drop(line, axis=axis), axis)
-    return df
+    dataframe = _rename(dataframe.drop(line, axis=axis), axis)
+    return dataframe, metadata
 
 
-def _add_line(df, axis, pdfs=None, weights=None):
+def _add_line(dataframe, axis, metadata=None, pdfs=None, weights=None):
     """ Add a line (row or column) to the end of a dataset. Rows are added by
-    adding a row of `NaN`s and then filling these with values in the respective
-    columns where possible. Columns are added in the same way that they are at
-    the initial creation of an individual. """
+    sampling from the distribution associated with that column in `metadata`.
+    metadata are added in the same way that they are at the initial creation of
+    an individual by sampling from the list of all `pdfs` according to
+    `weights`. """
 
-    nrows, ncols = df.shape
+    nrows, ncols = dataframe.shape
 
     if axis == 0:
-        df = df.append(
-            {f"col_{i}": np.nan for i in range(ncols)}, ignore_index=True
+        dataframe = dataframe.append(
+            {f"col_{i}": pdf.sample(1) for i, pdf in enumerate(metadata)},
+            ignore_index=True,
         )
     else:
-        pdf = np.random.choice(pdfs, p=weights)
-        df[f"col_{ncols + 1}"] = pdf().sample(nrows)
+        pdf = np.random.choice(pdfs, p=weights)()
+        dataframe[f"col_{ncols + 1}"] = pdf.sample(nrows)
+        metadata.append(pdf)
 
-    df = _fillna_random(_rename(df, axis), pdfs, weights)
-    return df
+    dataframe = _rename(dataframe, axis)
+    return dataframe, metadata
 
 
-def crossover(parent1, parent2, prob, pdfs, weights):
-    """ Select "alleles" from `parent1` with probability `prob`. Otherwise
-    select from `parent2`. Collate alleles to form a new individual. """
+def get_fitness(fitness, population):
+    """ Return the fitness score of each individual in a population. """
 
-    widest_parent = sorted(
-        [parent1, parent2], key=lambda x: len(x.columns), reverse=True
-    )[0]
+    return [fitness(individual.dataframe) for individual in population]
+
+
+def selection(population, pop_fitness, best_prop, lucky_prop, maximise):
+    """ Given a population, select a proportion of the `best` individuals and
+    another of the `lucky` individuals (if they are available) to form a set of
+    potential parents. This mirrors the survival of the fittest paradigm whilst
+    including a number of less-fit individuals to stop the algorithm from
+    converging too early on a suboptimal population. """
+
+    size = len(population)
+    num_best = int(best_prop * size)
+    num_lucky = int(lucky_prop * size)
+
+    if maximise:
+        best_choice = np.argmax
+    else:
+        best_choice = np.argmin
+
+    if num_best == 0 and num_lucky == 0:
+        raise ValueError(
+            'Not a large enough proportion of "best" and/or \
+                          "lucky" individuals chosen. Reconsider these values.'
+        )
+
+    population = deepcopy(population)
+    pop_fitness = deepcopy(pop_fitness)
+    parents = []
+    for _ in range(num_best):
+        if population != []:
+            best = best_choice(pop_fitness)
+            pop_fitness.pop(best)
+            parents.append(population.pop(best))
+
+    for _ in range(num_lucky):
+        if population != []:
+            lucky = np.random.choice(len(population))
+            parents.append(population.pop(lucky))
+
+    return parents
+
+
+def crossover(parent1, parent2, prob):
+    """ Select information from `parent1` with probability `prob`. Otherwise
+    select from `parent2`. Collate information to form a new individual. """
+
+    metadata1, dataframe1 = parent1
+    metadata2, dataframe2 = parent2
+
+    widest = np.argmax([len(dataframe1.columns), len(dataframe2.columns)])
+    widest_metadata, widest_dataframe = [parent1, parent2][widest]
 
     if np.random.random() < prob:
-        nrows = len(parent1)
+        nrows = len(dataframe1)
     else:
-        nrows = len(parent2)
+        nrows = len(dataframe2)
 
     if np.random.random() < prob:
-        ncols = len(parent1.columns)
+        ncols = len(dataframe1.columns)
     else:
-        ncols = len(parent2.columns)
+        ncols = len(dataframe2.columns)
 
-    individual = pd.DataFrame({f"col_{i}": [] for i in range(ncols)})
+    metadata, dataframe = [], pd.DataFrame()
+
     for i in range(ncols):
-        if i < min([len(parent1.columns), len(parent2.columns)]):
+        if i < min([len(dataframe1.columns), len(dataframe2.columns)]):
             if np.random.random() < prob:
-                individual[f"col_{i}"] = parent1[f"col_{i}"]
+                dataframe_col = dataframe1[f"col_{i}"]
+                col_pdf = metadata1[i]
             else:
-                individual[f"col_{i}"] = parent2[f"col_{i}"]
+                dataframe_col = dataframe2[f"col_{i}"]
+                col_pdf = metadata2[i]
         else:
-            individual[f"col_{i}"] = widest_parent[f"col_{i}"]
+            dataframe_col = widest_dataframe[f"col_{i}"]
+            col_pdf = widest_metadata[i]
 
-    while len(individual) != nrows:
-        if len(individual) > nrows:
-            individual = _remove_line(individual, axis=0)
-        elif len(individual) < nrows:
-            individual = _add_line(individual, axis=0)
+        dataframe[f"col_{i}"] = dataframe_col
+        metadata.append(col_pdf)
 
-    individual = _fillna_random(individual, pdfs, weights)
-    return individual
+    while len(dataframe) != nrows:
+        if len(dataframe) > nrows:
+            dataframe = dataframe.iloc[:nrows, :]
+        elif len(dataframe) < nrows:
+            dataframe, metadata = _add_line(dataframe, 0, metadata)
+
+    dataframe = _fillna(dataframe, metadata)
+    return Individual(metadata, dataframe)
 
 
-def mutation(individual, prob, row_limits, col_limits, pdfs, weights, sigma):
+def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
     """ Mutate an individual. Here, the characteristics of an individual can be
     split into two parts: their dimensions, and their values. Each of these
     parts is mutated in a different way using the same probability, `prob`. """
 
-    mutant = individual.copy()
+    metadata, dataframe = deepcopy(individual)
+
     # Add or remove a row or column at random.
     limits = [row_limits, col_limits]
     for axis in [0, 1]:
         r = np.random.random()
-        if r < prob / 2 and mutant.shape[axis] > limits[axis][0]:
-            mutant = _remove_line(mutant, axis)
-        elif r < prob and mutant.shape[axis] < limits[axis][1]:
-            mutant = _add_line(mutant, axis, pdfs, weights)
+        if r < prob / 2 and dataframe.shape[axis] > limits[axis][0]:
+            dataframe, metadata = _remove_line(dataframe, axis, metadata)
+        elif r < prob and dataframe.shape[axis] < limits[axis][1]:
+            dataframe, metadata = _add_line(dataframe, axis, metadata, pdfs, weights)
 
-    # Iterate over the elements of an individual, mutating them by resampling
-    # from the normal distribution with standard deviation `sigma` around the
-    # current value.
-    for j, col in enumerate(mutant.columns):
-        for i, value in enumerate(mutant[col]):
+    # Iterate over the elements of dataframe, mutating them by resampling from each
+    # column's associated distribution in `metadata`.
+    for j, col in enumerate(dataframe.columns):
+        pdf = metadata[j]
+        for i, value in enumerate(dataframe[col]):
             if np.random.random() < prob:
-                value = np.random.normal(loc=value, scale=sigma)
-                mutant.iloc[i, j] = value
+                value = pdf.sample(1)
+                dataframe.iloc[i, j] = value
 
-    return mutant
+    return Individual(metadata, dataframe)

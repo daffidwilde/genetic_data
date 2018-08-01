@@ -4,7 +4,7 @@ algorithm. """
 import numpy as np
 import pandas as pd
 
-from copy import deepcopy
+from genetic_data.individual import Individual
 from genetic_data.operators import crossover, mutation
 
 
@@ -30,16 +30,14 @@ def create_individual(row_limits, col_limits, pdfs, weights=None):
     nrows = np.random.randint(row_limits[0], row_limits[1] + 1)
     ncols = np.random.randint(col_limits[0], col_limits[1] + 1)
 
-    individual = pd.DataFrame(
-        {
-            f"col_{i}": pdf().sample(nrows)
-            for i, pdf in enumerate(
-                np.random.choice(pdfs, p=weights, size=ncols)
-            )
-        }
-    )
+    metadata, dataframe = [], pd.DataFrame()
 
-    return individual
+    for i, pdf in enumerate(np.random.choice(pdfs, p=weights, size=ncols)):
+        pdf = pdf()
+        dataframe[f'col_{i}'] = pdf.sample(nrows)
+        metadata.append(pdf)
+
+    return Individual(metadata, dataframe)
 
 
 def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
@@ -78,56 +76,11 @@ def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
         create_individual(row_limits, col_limits, pdfs, weights)
         for _ in range(size)
     ]
+
     return population
 
 
-def get_fitness(fitness, population):
-    """ Return the fitness score of each individual in a population. """
-
-    pop_fitness = [fitness(individual) for individual in population]
-    return pop_fitness
-
-
-def select_parents(population, pop_fitness, best_prop, lucky_prop, maximise):
-    """ Given a population, select a proportion of the `best` individuals and
-    another of the `lucky` individuals (if they are available) to form a set of
-    potential parents. This mirrors the survival of the fittest paradigm whilst
-    including a number of less-fit individuals to stop the algorithm from
-    converging too early on a suboptimal population. """
-
-    size = len(population)
-    num_best = int(best_prop * size)
-    num_lucky = int(lucky_prop * size)
-
-    if maximise:
-        best_choice = np.argmax
-    else:
-        best_choice = np.argmin
-
-    if num_best == 0 and num_lucky == 0:
-        raise ValueError(
-            'Not a large enough proportion of "best" and/or \
-                          "lucky" individuals chosen. Reconsider these values.'
-        )
-
-    population = deepcopy(population)
-    pop_fitness = deepcopy(pop_fitness)
-    parents = []
-    for _ in range(num_best):
-        if population != []:
-            best = best_choice(pop_fitness)
-            pop_fitness.pop(best)
-            parents.append(population.pop(best))
-
-    for _ in range(num_lucky):
-        if population != []:
-            lucky = np.random.choice(len(population))
-            parents.append(population.pop(lucky))
-
-    return parents
-
-
-def create_offspring(
+def create_new_population(
     parents,
     size,
     crossover_prob,
@@ -136,18 +89,18 @@ def create_offspring(
     col_limits,
     pdfs,
     weights,
-    sigma,
 ):
-    """ Given a set of potential parents, create offspring from pairs until
-    there are enough individuals. Each individual offspring is formed using a
-    crossover operator on the two parent individuals and then mutating them
-    according to the probability `mutation_prob`. """
+    """ Given a set of potential parents to be carried into the next generation,
+    create offspring from pairs within that set until there are enough
+    individuals. Each individual offspring is formed using a crossover operator
+    on the two parent individuals and then mutating them according to the
+    probability `mutation_prob`. """
 
     population = parents
     while len(population) < size:
         parent1_idx, parent2_idx = np.random.choice(len(parents), size=2)
         parent1, parent2 = parents[parent1_idx], parents[parent2_idx]
-        offspring = crossover(parent1, parent2, crossover_prob, pdfs, weights)
+        offspring = crossover(parent1, parent2, crossover_prob)
         mutant = mutation(
             offspring,
             mutation_prob,
@@ -155,7 +108,6 @@ def create_offspring(
             col_limits,
             pdfs,
             weights,
-            sigma,
         )
         population.append(mutant)
 

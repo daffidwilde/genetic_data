@@ -3,12 +3,9 @@
 import numpy as np
 
 from genetic_data.pdfs import Normal
-from genetic_data.components import (
-    create_initial_population,
-    create_offspring,
-    get_fitness,
-    select_parents,
+from genetic_data.creation import ( create_initial_population, create_new_population
 )
+from genetic_data.operators import crossover, get_fitness, mutation, selection
 
 
 def run_algorithm(
@@ -25,7 +22,7 @@ def run_algorithm(
     crossover_prob=0.5,
     mutation_prob=0.01,
     sigma=1.,
-    maximise=True,
+    maximise=False,
     seed=None,
 ):
     """ Run a genetic algorithm (GA) under the presented constraints, giving a
@@ -74,13 +71,10 @@ def run_algorithm(
         second in a crossover operation.
     mutation_prob : float
         The probability of a particular "allele" in an individual being mutated.
-    sigma : float
-        When values are mutated in a dataset, they are resampled from the normal
-        distribution centred around the current value with standard deviation
-        `sigma`. By default this value is 1.
     maximise : bool
         Determines whether `fitness` is a function to be maximised or not.
-        Fitness is maximised by default.
+        Fitness scores are minimised by default as they are based on the
+        objective function of an algorithm.
     seed : int
         The seed for a pseudo-random number generator for the run of the
         algorithm. If `None`, no seed is set.
@@ -115,11 +109,11 @@ def run_algorithm(
     all_populations, all_fitnesses = [population], [pop_fitness]
     while itr < max_iter and not converged:
 
-        parents = select_parents(
+        parents = selection(
             population, pop_fitness, best_prop, lucky_prop, maximise
         )
 
-        population = create_offspring(
+        population = create_new_population(
             parents,
             size,
             crossover_prob,
@@ -128,7 +122,6 @@ def run_algorithm(
             col_limits,
             pdfs,
             weights,
-            sigma,
         )
 
         pop_fitness = get_fitness(fitness, population)
