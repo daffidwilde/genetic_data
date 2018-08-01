@@ -86,8 +86,8 @@ def test_run_algorithm(
 
             for i, limits in enumerate([row_limits, col_limits]):
                 assert (
-                    dataframe.shape[i] >= limits[0] and dataframe.shape[i] <=
-                    limits[1]
+                    dataframe.shape[i] >= limits[0]
+                    and dataframe.shape[i] <= limits[1]
                 )
 
             for score in scores:

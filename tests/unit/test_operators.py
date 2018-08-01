@@ -32,6 +32,7 @@ def test_get_fitness(size, row_limits, col_limits, weights):
         size, row_limits, col_limits, pdfs, weights
     )
     pop_fitness = get_fitness(trivial_fitness, population)
+
     assert len(pop_fitness) == size
     assert np.array(pop_fitness).dtype == "float"
 
@@ -102,15 +103,15 @@ def test_crossover(row_limits, col_limits, weights, prob):
     ]
 
     individual = crossover(parent1, parent2, prob)
-    columns, dataframe = individual
+    metadata, dataframe = individual
 
     assert isinstance(individual, Individual)
-    assert isinstance(columns, list)
-    assert len(columns) == len(dataframe.columns)
+    assert isinstance(metadata, list)
+    assert len(metadata) == len(dataframe.columns)
     assert isinstance(dataframe, pd.DataFrame)
 
-    for col in columns:
-        assert col in parent1.column_metadata + parent2.column_metadata
+    for pdf in metadata:
+        assert pdf in parent1.column_metadata + parent2.column_metadata
 
     for i in range(2):
         assert dataframe.shape[i] in [
@@ -127,15 +128,15 @@ def test_mutation(row_limits, col_limits, weights, prob):
     individual = create_individual(row_limits, col_limits, pdfs, weights)
     mutant = mutation(individual, prob, row_limits, col_limits, pdfs, weights)
 
-    columns, dataframe = mutant
+    metadata, dataframe = mutant
 
     assert isinstance(mutant, Individual)
-    assert isinstance(columns, list)
-    assert len(columns) == len(dataframe.columns)
+    assert isinstance(metadata, list)
+    assert len(metadata) == len(dataframe.columns)
     assert isinstance(dataframe, pd.DataFrame)
 
-    for col in columns:
-        assert isinstance(col, tuple(pdfs))
+    for pdf in metadata:
+        assert isinstance(pdf, tuple(pdfs))
 
     for axis in [0, 1]:
         assert (
