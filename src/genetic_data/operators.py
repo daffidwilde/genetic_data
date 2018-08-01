@@ -9,7 +9,7 @@ def _rename(df, axis):
     new line. """
 
     if axis == 0:
-        df.reset_index(drop=True)
+        df = df.reset_index(drop=True)
     else:
         df.columns = [f"col_{i}" for i in range(len(df.columns))]
 
@@ -28,10 +28,10 @@ def _fillna_random(df, pdfs=None, weights=None):
                 samples = np.random.choice(
                     data[-nulls].values, size=nulls.sum()
                 )
-                data[nulls] = samples
+                df.loc[nulls, col] = samples
             else:
                 pdf = np.random.choice(pdfs, p=weights)
-                data[col] = pdf().sample(len(df))
+                df.loc[:, col] = pdf().sample(len(df))
 
     return df
 

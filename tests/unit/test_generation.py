@@ -1,6 +1,7 @@
 """ Tests for each of the steps in the population generation process. """
 
 import pandas as pd
+import numpy as np
 import pytest
 
 from hypothesis import settings
@@ -83,7 +84,8 @@ def test_create_offspring(
     parents = select_parents(
         population, pop_fitness, best_prop, lucky_prop, maximise
     )
-    offspring = create_offspring(
+
+    population = create_offspring(
         parents,
         size,
         crossover_prob,
@@ -94,8 +96,14 @@ def test_create_offspring(
         weights,
         sigma,
     )
-    assert isinstance(offspring, list)
-    assert len(offspring) == size
+    assert isinstance(population, list)
+    assert len(population) == size
 
-    for ind in offspring:
+    for parent in parents:
+        try:
+            assert np.any([np.all(parent == ind) for ind in population])
+        except:
+            ValueError
+
+    for ind in population:
         assert isinstance(ind, pd.DataFrame)

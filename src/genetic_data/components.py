@@ -139,11 +139,11 @@ def create_offspring(
     sigma,
 ):
     """ Given a set of potential parents, create offspring from pairs until
-    there are enough offspring. Each individual offspring is formed using a
+    there are enough individuals. Each individual offspring is formed using a
     crossover operator on the two parent individuals and then mutating them
     according to the probability `mutation_prob`. """
 
-    population = []
+    population = parents
     while len(population) < size:
         parent1_idx, parent2_idx = np.random.choice(len(parents), size=2)
         parent1, parent2 = parents[parent1_idx], parents[parent2_idx]
