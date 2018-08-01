@@ -177,7 +177,9 @@ def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
         if r < prob / 2 and dataframe.shape[axis] > limits[axis][0]:
             dataframe, metadata = _remove_line(dataframe, axis, metadata)
         elif r < prob and dataframe.shape[axis] < limits[axis][1]:
-            dataframe, metadata = _add_line(dataframe, axis, metadata, pdfs, weights)
+            dataframe, metadata = _add_line(
+                dataframe, axis, metadata, pdfs, weights
+            )
 
     # Iterate over the elements of dataframe, mutating them by resampling from each
     # column's associated distribution in `metadata`.
