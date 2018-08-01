@@ -33,6 +33,9 @@ class Normal:
         self.mean = np.random.uniform(*self.mean_limits)
         self.std = np.random.uniform(*self.std_limits)
 
+    def __repr__(self):
+        return f"Normal(mean={self.mean:.2f}, std={self.std:.2f})"
+
     def sample(self, nrows):
         """ Take a sample of size `nrows` from the normal distribution with
         mean and standard deviation given by `mean` and `std` respectively. """
@@ -48,6 +51,10 @@ class Poisson:
     def __init__(self):
 
         self.lam = np.random.uniform(*self.lam_limits)
+
+    def __repr__(self):
+
+        return f"Poisson(lambda={self.lam:.2f})"
 
     def sample(self, nrows):
         """ Take a sample of size `nrows` from the Poisson distribution with

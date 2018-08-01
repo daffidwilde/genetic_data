@@ -18,7 +18,7 @@ SMALL_PROB = floats(min_value=0, max_value=1e-3)
 
 SHAPES = (
     tuples(
-        integers(min_value=1, max_value=50), integers(min_value=1, max_value=50)
+        integers(min_value=1, max_value=10), integers(min_value=1, max_value=10)
     )
     .map(sorted)
     .filter(lambda x: x[0] <= x[1])
@@ -46,11 +46,7 @@ FITNESS = given(
 )
 
 MUTATION = given(
-    row_limits=SHAPES,
-    col_limits=SHAPES,
-    weights=WEIGHTS,
-    prob=PROB,
-    sigma=floats(min_value=0),
+    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, prob=PROB
 )
 
 OFFSPRING = given(
@@ -62,7 +58,6 @@ OFFSPRING = given(
     crossover_prob=PROB,
     mutation_prob=PROB,
     maximise=booleans(),
-    sigma=floats(min_value=0),
 )
 
 SELECTION = given(

@@ -3,7 +3,9 @@
 import numpy as np
 
 from genetic_data.pdfs import Normal
-from genetic_data.creation import ( create_initial_population, create_new_population
+from genetic_data.creation import (
+    create_initial_population,
+    create_new_population,
 )
 from genetic_data.operators import crossover, get_fitness, mutation, selection
 

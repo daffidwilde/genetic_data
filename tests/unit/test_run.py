@@ -6,6 +6,8 @@ from hypothesis.strategies import booleans
 import pandas as pd
 
 import genetic_data as gd
+
+from genetic_data.individual import Individual
 from genetic_data.pdfs import Gamma, Normal, Poisson
 
 from test_util.trivials import trivial_fitness
@@ -71,8 +73,22 @@ def test_run_algorithm(
         assert len(population) == size
         assert len(scores) == size
 
-        for ind in population:
-            assert isinstance(ind, pd.DataFrame)
+        for individual in population:
+            metadata, dataframe = individual
 
-        for score in scores:
-            assert isinstance(score, float)
+            assert isinstance(individual, Individual)
+            assert isinstance(metadata, list)
+            assert isinstance(dataframe, pd.DataFrame)
+            assert len(metadata) == len(dataframe.columns)
+
+            for pdf in metadata:
+                assert isinstance(pdf, tuple(pdfs))
+
+            for i, limits in enumerate([row_limits, col_limits]):
+                assert (
+                    dataframe.shape[i] >= limits[0] and dataframe.shape[i] <=
+                    limits[1]
+                )
+
+            for score in scores:
+                assert isinstance(score, float)
