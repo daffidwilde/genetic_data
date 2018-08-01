@@ -7,6 +7,7 @@ from hypothesis import given
 from hypothesis.strategies import integers
 
 from genetic_data.components import create_individual, create_initial_population
+from genetic_data.individual import Individual
 from genetic_data.pdfs import Gamma, Normal, Poisson
 
 from test_util.parameters import INDIVIDUAL, POPULATION
@@ -19,11 +20,19 @@ def test_individual(row_limits, col_limits, weights):
 
     pdfs = [Gamma, Normal, Poisson]
     individual = create_individual(row_limits, col_limits, pdfs, weights)
-    assert isinstance(individual, pd.DataFrame)
+    metadata, dataframe = individual
+
+    assert isinstance(individual, Individual)
+    assert isinstance(metadata, list)
+    assert isinstance(dataframe, pd.DataFrame)
+    assert len(metadata) == len(dataframe.columns)
+
+    for pdf in metadata:
+        assert isinstance(pdf, tuple(pdfs))
+
     for i, limits in enumerate([row_limits, col_limits]):
         assert (
-            individual.shape[i] >= limits[0]
-            and individual.shape[i] <= limits[1]
+            dataframe.shape[i] >= limits[0] and dataframe.shape[i] <= limits[1]
         )
 
 
@@ -36,11 +45,26 @@ def test_initial_population(size, row_limits, col_limits, weights):
     population = create_initial_population(
         size, row_limits, col_limits, pdfs, weights
     )
+
     assert isinstance(population, list)
     assert len(population) == size
 
-    for ind in population:
-        assert isinstance(ind, pd.DataFrame)
+    for individual in population:
+        metadata, dataframe = individual
+
+        assert isinstance(individual, Individual)
+        assert isinstance(metadata, list)
+        assert isinstance(dataframe, pd.DataFrame)
+        assert len(metadata) == len(dataframe.columns)
+
+        for pdf in metadata:
+            assert isinstance(pdf, tuple(pdfs))
+
+        for i, limits in enumerate([row_limits, col_limits]):
+            assert (
+                dataframe.shape[i] >= limits[0] and dataframe.shape[i] <=
+                limits[1]
+            )
 
 
 @given(size=integers(max_value=1))
