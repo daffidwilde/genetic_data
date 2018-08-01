@@ -34,7 +34,7 @@ def create_individual(row_limits, col_limits, pdfs, weights=None):
 
     for i, pdf in enumerate(np.random.choice(pdfs, p=weights, size=ncols)):
         pdf = pdf()
-        dataframe[f'col_{i}'] = pdf.sample(nrows)
+        dataframe[f"col_{i}"] = pdf.sample(nrows)
         metadata.append(pdf)
 
     return Individual(metadata, dataframe)
@@ -102,12 +102,7 @@ def create_new_population(
         parent1, parent2 = parents[parent1_idx], parents[parent2_idx]
         offspring = crossover(parent1, parent2, crossover_prob)
         mutant = mutation(
-            offspring,
-            mutation_prob,
-            row_limits,
-            col_limits,
-            pdfs,
-            weights,
+            offspring, mutation_prob, row_limits, col_limits, pdfs, weights
         )
         population.append(mutant)
 
