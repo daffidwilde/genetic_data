@@ -1,9 +1,13 @@
 """ Unit tests for the standard columns pdf's. """
 
 import numpy as np
+
+import pytest
+
 from hypothesis import given
 from hypothesis.strategies import floats, integers, tuples
-from genetic_data.pdfs import Gamma, Normal, Poisson
+
+from genetic_data.pdfs import Distribution, Gamma, Normal, Poisson
 
 LIMITS = (
     tuples(floats(min_value=0, max_value=10), floats(min_value=0, max_value=10))
@@ -12,8 +16,17 @@ LIMITS = (
 )
 
 
+def test_Distribution_sample():
+    """ Verify Distribution object alone raises an error when trying to sample
+    from it. """
+
+    with pytest.raises(NotImplementedError):
+        dist = Distribution()
+        sample = dist.sample()
+
+
 @given(nrows=integers(min_value=1), seed=integers(min_value=0))
-def test_gamma_sample(nrows, seed):
+def test_Gamma_sample(nrows, seed):
     """ Verify that a Gamma object can sample correctly. """
     np.random.seed(seed)
     gamma = Gamma()
@@ -23,7 +36,7 @@ def test_gamma_sample(nrows, seed):
 
 
 @given(alpha_limits=LIMITS, theta_limits=LIMITS, seed=integers(min_value=0))
-def test_gamma_set_param_limits(alpha_limits, theta_limits, seed):
+def test_Gamma_set_param_limits(alpha_limits, theta_limits, seed):
     """ Check that a Gamma object can sample its parameters correctly if its
     class attributes are altered. """
 
@@ -37,7 +50,7 @@ def test_gamma_set_param_limits(alpha_limits, theta_limits, seed):
 
 
 @given(nrows=integers(min_value=1), seed=integers(min_value=0))
-def test_normal_sample(nrows, seed):
+def test_Normal_sample(nrows, seed):
     """ Verify that a Normal object can sample correctly. """
     np.random.seed(seed)
     normal = Normal()
@@ -47,7 +60,7 @@ def test_normal_sample(nrows, seed):
 
 
 @given(mean_limits=LIMITS, std_limits=LIMITS, seed=integers(min_value=0))
-def test_normal_set_param_limits(mean_limits, std_limits, seed):
+def test_Normal_set_param_limits(mean_limits, std_limits, seed):
     """ Check that a Normal object can sample its parameters correctly if its
     class attributes are altered. """
 
@@ -61,7 +74,7 @@ def test_normal_set_param_limits(mean_limits, std_limits, seed):
 
 
 @given(nrows=integers(min_value=1), seed=integers(min_value=0))
-def test_poisson_sample(nrows, seed):
+def test_Poisson_sample(nrows, seed):
     """ Verify that a Poisson object can sample correctly. """
     np.random.seed(seed)
     poisson = Poisson()
@@ -71,7 +84,7 @@ def test_poisson_sample(nrows, seed):
 
 
 @given(lam_limits=LIMITS, seed=integers(min_value=0))
-def test_poisson_set_param_limits(lam_limits, seed):
+def test_Poisson_set_param_limits(lam_limits, seed):
     """ Check that a Poisson object can sample its parameters correctly if its
     class attributes are altered. """
 
