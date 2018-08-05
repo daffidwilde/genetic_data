@@ -3,11 +3,11 @@
 import numpy as np
 
 from genetic_data.pdfs import Normal
+from genetic_data.operators import get_fitness, selection
 from genetic_data.creation import (
     create_initial_population,
     create_new_population,
 )
-from genetic_data.operators import crossover, get_fitness, mutation, selection
 
 
 def run_algorithm(
@@ -23,7 +23,6 @@ def run_algorithm(
     lucky_prop=0,
     crossover_prob=0.5,
     mutation_prob=0.01,
-    sigma=1.,
     maximise=False,
     seed=None,
 ):

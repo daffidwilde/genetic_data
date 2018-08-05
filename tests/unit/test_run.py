@@ -61,7 +61,6 @@ def test_run_algorithm(
         lucky_prop,
         crossover_prob,
         mutation_prob,
-        sigma=1.,
         maximise=maximise,
         seed=seed,
     )
