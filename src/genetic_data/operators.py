@@ -29,7 +29,8 @@ def _fillna(dataframe, metadata):
         pdf = metadata[i]
         if data.isnull().any():
             nulls = data.isnull()
-            dataframe.loc[nulls, col] = pdf.sample(nulls.sum())
+            samples = pdf.sample(nulls.sum())
+            dataframe.loc[nulls, col] = samples
 
     return dataframe
 
@@ -59,7 +60,7 @@ def _add_line(dataframe, axis, metadata=None, pdfs=None, weights=None):
 
     if axis == 0:
         dataframe = dataframe.append(
-            {f"col_{i}": pdf.sample(1) for i, pdf in enumerate(metadata)},
+            {f"col_{i}": pdf.sample(1)[0] for i, pdf in enumerate(metadata)},
             ignore_index=True,
         )
     else:
@@ -187,7 +188,7 @@ def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
         pdf = metadata[j]
         for i, value in enumerate(dataframe[col]):
             if np.random.random() < prob:
-                value = pdf.sample(1)
+                value = pdf.sample(1)[0]
                 dataframe.iloc[i, j] = value
 
     return Individual(metadata, dataframe)
