@@ -77,12 +77,12 @@ Import the relative pieces from :code:`genetic_data`::
 
 Set a seed::
 
-    >>> np.random.seed(1)
+    >>> np.random.seed(0)
 
 Define the constraints and initial parameters of the simulation::
 
     >>> row_limits, col_limits = [1, 3], [1, 5]
-    >>> pdfs = [Normal]
+    >>> pdfs = [Poisson]
 
 Generate two individuals::
 
@@ -128,9 +128,9 @@ In GeneticData, this probability is controlled by the parameter
 :code:`mutation_prob` in :code:`run_algorithm`. However, the method of mutation
 is not quite as simple. An individual is mutated in the following way:
 
-1. The number of rows and columns are mutated by adding or removing a line from
-   each axis with equal probability either way. Lines are removed at random, and
-   rows and columns are added in the same way as the :ref:`crossover <cross>`
+1. The number of rows and columns are mutated by adding and/or removing a line
+   from each axis with equal probability. Lines are removed at random, and rows
+   and columns are added in the same way as the :ref:`crossover <cross>`
    and :ref:`creation <create-ind>` processes respectively. Note that the
    number of rows and columns will not mutate beyond the bounds passed to the GA
    in the :code:`row_limits` and :code:`col_limits` parameters.
@@ -146,10 +146,10 @@ Import the mutation operator::
 
     >>> from genetic_data.operators import mutation
 
-Set the mutation probability. This is deliberately large to guarantee a
+Set the mutation probability. This is deliberately large to make for a
 substantial mutation::
 
-    >>> mutation_prob = 1.
+    >>> mutation_prob = 0.5
 
 Mutate the offspring that was just created::
 
