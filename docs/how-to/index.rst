@@ -9,17 +9,10 @@ How-to
 
 .. include:: selection.rst
 
+.. include:: mutation.rst
 
-Change the mutation process
----------------------------
+.. include:: access_info.rst
 
-.. include:: individual.rst
+.. include:: customise_column.rst
 
-Use multiple column distributions
----------------------------------
-
-Customise column distributions
-------------------------------
-
-Implement a new column distribution
------------------------------------
+.. include:: new_column.rst
