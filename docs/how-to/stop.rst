@@ -18,9 +18,25 @@ Consider the example from the :ref:`first tutorial <refs-tutorial-i>` where we
 are trying to optimise the function :math:`f(x) = x^2`. Let us define a stopping
 condition on the mean fitness of a population::
 
+    >>> def x_squared(df):
+    ...     return df.iloc[0, 0] ** 2
+
     >>> def mean_stopping(population_fitness, tolerance=1e-1):
     ...     """ Return `True` when the mean fitness score is below a tolerance
-    ...     level. Otherwise return `False`. """
+    ...     level. Otherwise return `False`. The tolerance is 0.1 by default.
+    ...     """
     ... 
     ...     mean_score = sum(population_fitness) / len(population_fitness)
     ...     return mean_score < tolerance
+
+Then we simply pass that function to :code:`run_algorithm`, like so::
+
+    >>> pop, fit, all_pops, all_fits = gd.run_algorithm(
+    ...     fitness=x_squared,
+    ...     size=100,
+    ...     row_limits=[1, 1],
+    ...     col_limits=[1, 1],
+    ...     stop=mean_stopping,
+    ...     max_iter=100,
+    ...     seed=0
+    ... )
