@@ -108,7 +108,7 @@ points)::
     ...         axes = bottom
     ...
     ...     j = i % 2
-    ...     data = [[ind.iloc[0, 0] for ind in all_pops[i]], all_fits[i]]
+    ...     data = [[ind.dataframe.iloc[0, 0] for ind in all_pops[i]], all_fits[i]]
     ...
     ...     axes[j].plot(xs, xs ** 2, lw=3, zorder=-1)
     ...     axes[j].scatter(*data, s=200, color='orange')

@@ -20,7 +20,6 @@ def main():
         row_limits=[1, 1],
         col_limits=[1, 1],
         max_iter=5,
-        maximise=False,
         seed=0,
     )
 
@@ -40,7 +39,7 @@ def main():
             axes = bottom
 
         j = i % 2
-        data = [[df.iloc[0, 0] for df in all_pops[i]], all_fits[i]]
+        data = [[ind.dataframe.iloc[0, 0] for ind in all_pops[i]], all_fits[i]]
 
         axes[j].plot(x_data, x_data ** 2, lw=3, zorder=-1)
         axes[j].scatter(*data, s=200, color="orange")
