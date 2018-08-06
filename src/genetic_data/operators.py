@@ -125,7 +125,7 @@ def crossover(parent1, parent2, prob):
     metadata2, dataframe2 = parent2
 
     widest = np.argmax([len(dataframe1.columns), len(dataframe2.columns)])
-    widest_metadata, widest_dataframe = [parent1, parent2][widest]
+    widest_metadata, widest_dataframe = parent2 if widest else parent1
 
     if np.random.random() < prob:
         nrows = len(dataframe1)
@@ -171,19 +171,23 @@ def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
 
     metadata, dataframe = deepcopy(individual)
 
-    # Add or remove a row or column at random.
     limits = [row_limits, col_limits]
     for axis in [0, 1]:
-        r = np.random.random()
-        if r < prob / 2 and dataframe.shape[axis] > limits[axis][0]:
+
+        # Try to remove a line at random
+        r_remove = np.random.random()
+        if r_remove < prob and dataframe.shape[axis] > limits[axis][0]:
             dataframe, metadata = _remove_line(dataframe, axis, metadata)
-        elif r < prob and dataframe.shape[axis] < limits[axis][1]:
+
+        # Try to add a line to the end of axis
+        r_add = np.random.random()
+        if r_add < prob and dataframe.shape[axis] < limits[axis][1]:
             dataframe, metadata = _add_line(
                 dataframe, axis, metadata, pdfs, weights
             )
 
-    # Iterate over the elements of dataframe, mutating them by resampling from each
-    # column's associated distribution in `metadata`.
+    # Iterate over the elements of the dataframe, mutating them by resampling
+    # from each column's associated distribution in `metadata`.
     for j, col in enumerate(dataframe.columns):
         pdf = metadata[j]
         for i, value in enumerate(dataframe[col]):
