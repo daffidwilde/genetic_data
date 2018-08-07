@@ -15,6 +15,9 @@ from hypothesis.strategies import (
 SIZE = integers(min_value=2, max_value=10)
 PROB = floats(min_value=0, max_value=1)
 SMALL_PROB = floats(min_value=0, max_value=1e-3)
+TUPS = tuples(
+    integers(min_value=0), integers(min_value=0), integers(min_value=0)
+)
 
 SHAPES = (
     tuples(
@@ -24,6 +27,16 @@ SHAPES = (
     .filter(lambda x: x[0] <= x[1])
 )
 
+INT_TUPS = tuples(integers(min_value=1, max_value=10), TUPS).filter(
+    lambda x: sum(x[1]) >= x[0]
+)
+
+TUP_INTS = tuples(TUPS, integers(min_value=1, max_value=10)).filter(
+    lambda x: sum(x[0]) <= x[1]
+)
+
+TUPLES = tuples(TUPS, TUPS).filter(lambda x: sum(x[0]) <= sum(x[1]))
+
 UNIT = np.linspace(0, 1, 101)
 
 WEIGHTS = sampled_from(
@@ -31,7 +44,19 @@ WEIGHTS = sampled_from(
 )
 
 
-INDIVIDUAL = given(row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS)
+INTEGER_INDIVIDUAL = given(
+    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
+)
+
+INTEGER_TUPLE_INDIVIDUAL = given(
+    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS
+)
+
+TUPLE_INTEGER_INDIVIDUAL = given(
+    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS
+)
+
+TUPLE_INDIVIDUAL = given(row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS)
 
 POPULATION = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
