@@ -54,7 +54,7 @@ of their application, have the following operators:
 
 A schematic of a generic GA is given below.
 
-.. image:: ./docs/_static/flowchart.png
+.. image:: ./docs/_static/flowchart.svg
     :alt: A schematic for a genetic algorithm
     :align: center
 
