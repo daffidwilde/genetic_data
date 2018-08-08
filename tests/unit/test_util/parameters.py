@@ -13,29 +13,28 @@ from hypothesis.strategies import (
 )
 
 SIZE = integers(min_value=2, max_value=10)
+INTS = integers(min_value=1, max_value=10)
 PROB = floats(min_value=0, max_value=1)
 SMALL_PROB = floats(min_value=0, max_value=1e-3)
 TUPS = tuples(
-    integers(min_value=0), integers(min_value=0), integers(min_value=0)
+    integers(min_value=0, max_value=2),
+    integers(min_value=0, max_value=2),
+    integers(min_value=0, max_value=2),
 )
 
-SHAPES = (
-    tuples(
-        integers(min_value=1, max_value=10), integers(min_value=1, max_value=10)
-    )
-    .map(sorted)
-    .filter(lambda x: x[0] <= x[1])
+SHAPES = tuples(INTS, INTS).map(sorted).filter(lambda x: x[0] <= x[1])
+
+INT_TUPS = tuples(INTS, TUPS).filter(
+    lambda x: sum(x[1]) >= x[0] and sum(x[1]) > 0
 )
 
-INT_TUPS = tuples(integers(min_value=1, max_value=10), TUPS).filter(
-    lambda x: sum(x[1]) >= x[0]
+TUP_INTS = tuples(TUPS, INTS).filter(
+    lambda x: sum(x[0]) <= x[1] and sum(x[0]) > 0
 )
 
-TUP_INTS = tuples(TUPS, integers(min_value=1, max_value=10)).filter(
-    lambda x: sum(x[0]) <= x[1]
+TUPLES = tuples(TUPS, TUPS).filter(
+    lambda x: sum(x[0]) <= sum(x[1]) and sum(x[0]) > 0 and sum(x[1]) > 0
 )
-
-TUPLES = tuples(TUPS, TUPS).filter(lambda x: sum(x[0]) <= sum(x[1]))
 
 UNIT = np.linspace(0, 1, 101)
 

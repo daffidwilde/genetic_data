@@ -52,6 +52,7 @@ def test_create_individual_int_int_lims(row_limits, col_limits, weights):
 
 
 @INTEGER_TUPLE_INDIVIDUAL
+# @settings(max_examples=1)
 def test_create_individual_int_tup_lims(row_limits, col_limits, weights):
     """ Create an individual with integer lower limits and tuple upper limits on
     the columns. Verify the individual is valid and of a reasonable shape and
