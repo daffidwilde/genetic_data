@@ -1,5 +1,6 @@
 *_build*
 .cache/
+*coverage*
 *egg-info*
 *.hypothesis/*
 *ipynb*
