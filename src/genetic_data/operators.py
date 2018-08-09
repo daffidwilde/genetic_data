@@ -177,13 +177,15 @@ def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
         # Try to remove a line at random
         r_remove = np.random.random()
         if r_remove < prob and dataframe.shape[axis] > limits[axis][0]:
-            dataframe, metadata = _remove_line(dataframe, axis, metadata)
+            dataframe, metadata = _remove_line(
+                dataframe, metadata, axis, col_limits, pdfs
+            )
 
         # Try to add a line to the end of axis
         r_add = np.random.random()
         if r_add < prob and dataframe.shape[axis] < limits[axis][1]:
             dataframe, metadata = _add_line(
-                dataframe, axis, metadata, pdfs, weights
+                dataframe, metadata, axis, col_limits, pdfs, weights
             )
 
     # Iterate over the elements of the dataframe, mutating them by resampling

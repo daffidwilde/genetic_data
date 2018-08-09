@@ -63,8 +63,8 @@ def create_individual(row_limits, col_limits, pdfs, weights=None):
     if isinstance(col_limits[1], tuple):
         while curr_col < ncols:
             pdf_class = np.random.choice(pdfs, p=weights, size=1)[0]
-            pdf = pdf_class()
             idx = pdfs.index(pdf_class)
+            pdf = pdf_class()
             if pdf_counts[pdf_class] < col_limits[1][idx]:
                 dataframe[f"col_{curr_col}"] = pdf.sample(nrows)
                 metadata.append(pdf)
