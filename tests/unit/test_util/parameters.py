@@ -17,9 +17,9 @@ INTS = integers(min_value=1, max_value=10)
 PROB = floats(min_value=0, max_value=1)
 SMALL_PROB = floats(min_value=0, max_value=1e-3)
 TUPS = tuples(
-    integers(min_value=0, max_value=2),
-    integers(min_value=0, max_value=2),
-    integers(min_value=0, max_value=2),
+    integers(min_value=0, max_value=3),
+    integers(min_value=0, max_value=3),
+    integers(min_value=0, max_value=3),
 )
 
 SHAPES = tuples(INTS, INTS).map(sorted).filter(lambda x: x[0] <= x[1])
@@ -33,10 +33,15 @@ TUP_INTS = tuples(TUPS, INTS).filter(
 )
 
 TUPLES = tuples(TUPS, TUPS).filter(
-    lambda x: sum(x[0]) <= sum(x[1]) and sum(x[0]) > 0 and sum(x[1]) > 0
+    lambda x: sum(x[0]) <= sum(x[1])
+    and sum(x[0]) > 0
+    and sum(x[1]) > 0
+    and x[0][0] <= x[1][0]
+    and x[0][1] <= x[1][1]
+    and x[0][2] <= x[1][2]
 )
 
-UNIT = np.linspace(0, 1, 101)
+UNIT = np.linspace(0.01, 1, 100)
 
 WEIGHTS = sampled_from(
     [dist for dist in itr.product(UNIT, repeat=3) if sum(dist) == 1.0]
