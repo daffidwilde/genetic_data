@@ -8,6 +8,15 @@ import pandas as pd
 from genetic_data.individual import Individual
 
 
+def _get_pdf_counts(metadata, pdfs):
+    """ Get the count of each pdf class present in metadata. """
+
+    return {
+        pdf_class: sum([isinstance(pdf, pdf_class) for pdf in metadata])
+        for pdf_class in pdfs
+    }
+
+
 def _rename(dataframe, axis):
     """ Rename metadata or reindex to make sense after deletion or addition of a
     new line. """
@@ -35,21 +44,37 @@ def _fillna(dataframe, metadata):
     return dataframe
 
 
-def _remove_line(dataframe, axis, metadata):
+def _remove_line(dataframe, metadata, axis, col_limits=None, pdfs=None):
     """ Remove a line (row or column) from a dataset at random. """
 
     if axis == 0:
         line = np.random.choice(dataframe.index)
+        dataframe = _rename(dataframe.drop(line, axis=axis), axis)
     else:
-        line = np.random.choice(dataframe.columns)
-        idx = dataframe.columns.get_loc(line)
-        metadata.pop(idx)
+        try:
+            ncols = dataframe.shape[1]
+            pdf_counts = _get_pdf_counts(metadata, pdfs)
+            while len(dataframe.columns) != ncols - 1:
+                line = np.random.choice(dataframe.columns)
+                column_idx = dataframe.columns.get_loc(line)
+                pdf = metadata[column_idx]
+                pdf_class = pdf.__class__
+                pdf_idx = pdfs.index(pdf_class)
+                if pdf_counts[pdf_class] > col_limits[0][pdf_idx]:
+                    dataframe = _rename(dataframe.drop(line, axis=axis), axis)
+                    metadata.pop(column_idx)
+        except TypeError:
+            line = np.random.choice(dataframe.columns)
+            idx = dataframe.columns.get_loc(line)
+            dataframe = _rename(dataframe.drop(line, axis=axis), axis)
+            metadata.pop(idx)
 
-    dataframe = _rename(dataframe.drop(line, axis=axis), axis)
     return dataframe, metadata
 
 
-def _add_line(dataframe, axis, metadata=None, pdfs=None, weights=None):
+def _add_line(
+    dataframe, metadata, axis, col_limits=None, pdfs=None, weights=None
+):
     """ Add a line (row or column) to the end of a dataset. Rows are added by
     sampling from the distribution associated with that column in `metadata`.
     metadata are added in the same way that they are at the initial creation of
@@ -63,10 +88,22 @@ def _add_line(dataframe, axis, metadata=None, pdfs=None, weights=None):
             {f"col_{i}": pdf.sample(1)[0] for i, pdf in enumerate(metadata)},
             ignore_index=True,
         )
+
     else:
-        pdf = np.random.choice(pdfs, p=weights)()
-        dataframe[f"col_{ncols + 1}"] = pdf.sample(nrows)
-        metadata.append(pdf)
+        try:
+            pdf_counts = _get_pdf_counts(metadata, pdfs)
+            while len(dataframe.columns) != ncols + 1:
+                pdf_class = np.random.choice(pdfs, p=weights)
+                idx = pdfs.index(pdf_class)
+                pdf = pdf_class()
+                if pdf_counts[pdf_class] < col_limits[1][idx]:
+                    dataframe[f"col_{ncols + 1}"] = pdf.sample(nrows)
+                    metadata.append(pdf)
+        except TypeError:
+            pdf_class = np.random.choice(pdfs, p=weights)
+            pdf = pdf_class()
+            dataframe[f"col_{ncols + 1}"] = pdf.sample(nrows)
+            metadata.append(pdf)
 
     dataframe = _rename(dataframe, axis)
     return dataframe, metadata
@@ -117,7 +154,7 @@ def selection(population, pop_fitness, best_prop, lucky_prop, maximise):
     return parents
 
 
-def crossover(parent1, parent2, prob):
+def crossover(parent1, parent2, prob, col_limits=None, pdfs=None):
     """ Select information from `parent1` with probability `prob`. Otherwise
     select from `parent2`. Collate information to form a new individual. """
 
@@ -158,7 +195,7 @@ def crossover(parent1, parent2, prob):
         if len(dataframe) > nrows:
             dataframe = dataframe.iloc[:nrows, :]
         elif len(dataframe) < nrows:
-            dataframe, metadata = _add_line(dataframe, 0, metadata)
+            dataframe, metadata = _add_line(dataframe, metadata, 0)
 
     dataframe = _fillna(dataframe, metadata)
     return Individual(metadata, dataframe)
@@ -171,22 +208,37 @@ def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
 
     metadata, dataframe = deepcopy(individual)
 
-    limits = [row_limits, col_limits]
-    for axis in [0, 1]:
+    # Mutate nrows
+    r_remove = np.random.random()
+    if r_remove < prob and dataframe.shape[0] > row_limits[0]:
+        dataframe, metadata = _remove_line(dataframe, metadata, axis=0)
 
-        # Try to remove a line at random
-        r_remove = np.random.random()
-        if r_remove < prob and dataframe.shape[axis] > limits[axis][0]:
-            dataframe, metadata = _remove_line(
-                dataframe, metadata, axis, col_limits, pdfs
-            )
+    r_add = np.random.random()
+    if r_add < prob and dataframe.shape[0] < row_limits[1]:
+        dataframe, metadata = _add_line(dataframe, metadata, axis=0)
 
-        # Try to add a line to the end of axis
-        r_add = np.random.random()
-        if r_add < prob and dataframe.shape[axis] < limits[axis][1]:
-            dataframe, metadata = _add_line(
-                dataframe, metadata, axis, col_limits, pdfs, weights
-            )
+    # Mutate ncols
+    r_remove = np.random.random()
+    try:
+        column_condition = dataframe.shape[1] > sum(col_limits[0])
+    except TypeError:
+        column_condition = dataframe.shape[1] > col_limits[0]
+
+    if r_remove < prob and column_condition:
+        dataframe, metadata = _remove_line(
+            dataframe, metadata, 1, col_limits, pdfs
+        )
+
+    r_add = np.random.random()
+    try:
+        column_condition = dataframe.shape[1] < sum(col_limits[1])
+    except TypeError:
+        column_condition = dataframe.shape[1] < col_limits[1]
+
+    if r_add < prob and column_condition:
+        dataframe, metadata = _add_line(
+            dataframe, metadata, 1, col_limits, pdfs, weights
+        )
 
     # Iterate over the elements of the dataframe, mutating them by resampling
     # from each column's associated distribution in `metadata`.

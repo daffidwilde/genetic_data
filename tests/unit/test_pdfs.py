@@ -25,6 +25,14 @@ def test_Distribution_sample():
         sample = dist.sample()
 
 
+@given(seed=integers(min_value=0))
+def test_Gamma_string(seed):
+    """ Assert that a Gamma object has the correct string presentation. """
+    np.random.seed(0)
+    gamma = Gamma()
+    assert str(gamma).startswith("Gamma")
+
+
 @given(nrows=integers(min_value=1), seed=integers(min_value=0))
 def test_Gamma_sample(nrows, seed):
     """ Verify that a Gamma object can sample correctly. """
@@ -49,6 +57,14 @@ def test_Gamma_set_param_limits(alpha_limits, theta_limits, seed):
     assert gamma.theta >= theta_limits[0] and gamma.theta <= theta_limits[1]
 
 
+@given(seed=integers(min_value=0))
+def test_Normal_string(seed):
+    """ Assert that a Normal object has the correct string representation. """
+    np.random.seed(0)
+    normal = Normal()
+    assert str(normal).startswith("Normal")
+
+
 @given(nrows=integers(min_value=1), seed=integers(min_value=0))
 def test_Normal_sample(nrows, seed):
     """ Verify that a Normal object can sample correctly. """
@@ -71,6 +87,14 @@ def test_Normal_set_param_limits(mean_limits, std_limits, seed):
     normal = Normal()
     assert normal.mean >= mean_limits[0] and normal.mean <= mean_limits[1]
     assert normal.std >= std_limits[0] and normal.std <= std_limits[1]
+
+
+@given(seed=integers(min_value=0))
+def test_Poisson_string(seed):
+    """ Assert that a Poisson object has the correct string representation. """
+    np.random.seed(seed)
+    poisson = Poisson()
+    assert str(poisson).startswith("Poisson")
 
 
 @given(nrows=integers(min_value=1), seed=integers(min_value=0))
