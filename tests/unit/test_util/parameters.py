@@ -74,8 +74,20 @@ FITNESS = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
 )
 
-MUTATION = given(
+INTEGER_MUTATION = given(
     row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, prob=PROB
+)
+
+INTEGER_TUPLE_MUTATION = given(
+    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS, prob=PROB
+)
+
+TUPLE_INTEGER_MUTATION = given(
+    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS, prob=PROB
+)
+
+TUPLE_MUTATION = given(
+    row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS, prob=PROB
 )
 
 OFFSPRING = given(
