@@ -29,7 +29,7 @@ HALF_PROB = PROB.filter(lambda x: x > 0.5)
     maximise=booleans(),
     seed=SIZE.filter(lambda x: x < 10),
 )
-@settings(deadline=200)
+@settings(deadline=None)
 def test_run_algorithm(
     size,
     row_limits,

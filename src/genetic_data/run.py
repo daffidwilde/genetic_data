@@ -101,10 +101,9 @@ def run_algorithm(
 
     pop_fitness = get_fitness(fitness, population)
 
+    converged = False
     if stop:
         converged = stop(pop_fitness)
-    else:
-        converged = False
 
     itr = 0
     all_populations, all_fitnesses = [population], [pop_fitness]
