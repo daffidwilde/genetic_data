@@ -105,7 +105,7 @@ def test_crossover(row_limits, col_limits, weights, prob):
         for _ in range(2)
     ]
 
-    individual = crossover(parent1, parent2, prob)
+    individual = crossover(parent1, parent2, col_limits, pdfs)
     metadata, dataframe = individual
 
     assert isinstance(individual, Individual)
