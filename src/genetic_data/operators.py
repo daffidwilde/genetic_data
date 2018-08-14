@@ -198,7 +198,6 @@ def crossover(parent1, parent2, col_limits, pdfs):
             parent_columns.pop(idx)
 
     if isinstance(col_limits[1], tuple):
-        all_idxs = []
         pdf_counts = _get_pdf_counts(metadata, pdfs)
         while len(cols) < ncols:
             idx = np.random.randint(len(parent_columns))
@@ -207,12 +206,9 @@ def crossover(parent1, parent2, col_limits, pdfs):
 
             if pdf_counts[pdf.__class__] < col_limits[1][pdf_idx]:
                 metadata.append(pdf)
-                cols.append(parent_columns[idx])
+                cols.append(parent_columns.pop(idx))
+                parent_metadata.pop(idx)
                 pdf_counts[pdf.__class__] += 1
-
-        for idx in sorted(all_idxs, reverse=True):
-            parent_metadata.pop(idx)
-            parent_columns.pop(idx)
 
     while len(cols) < ncols:
         idx = np.random.randint(len(parent_columns))
