@@ -50,24 +50,25 @@ def _remove_line(dataframe, metadata, axis, col_limits=None, pdfs=None):
     if axis == 0:
         line = np.random.choice(dataframe.index)
         dataframe = _rename(dataframe.drop(line, axis=axis), axis)
-    else:
-        try:
-            ncols = dataframe.shape[1]
-            pdf_counts = _get_pdf_counts(metadata, pdfs)
-            while len(dataframe.columns) != ncols - 1:
-                line = np.random.choice(dataframe.columns)
-                column_idx = dataframe.columns.get_loc(line)
-                pdf = metadata[column_idx]
-                pdf_class = pdf.__class__
-                pdf_idx = pdfs.index(pdf_class)
-                if pdf_counts[pdf_class] > col_limits[0][pdf_idx]:
-                    dataframe = _rename(dataframe.drop(line, axis=axis), axis)
-                    metadata.pop(column_idx)
-        except TypeError:
+
+    elif isinstance(col_limits[0], tuple):
+        ncols = dataframe.shape[1]
+        pdf_counts = _get_pdf_counts(metadata, pdfs)
+        while len(dataframe.columns) != ncols - 1:
             line = np.random.choice(dataframe.columns)
-            idx = dataframe.columns.get_loc(line)
-            dataframe = _rename(dataframe.drop(line, axis=axis), axis)
-            metadata.pop(idx)
+            column_idx = dataframe.columns.get_loc(line)
+            pdf = metadata[column_idx]
+            pdf_class = pdf.__class__
+            pdf_idx = pdfs.index(pdf_class)
+            if pdf_counts[pdf_class] > col_limits[0][pdf_idx]:
+                dataframe = _rename(dataframe.drop(line, axis=axis), axis)
+                metadata.pop(column_idx)
+
+    else:
+        line = np.random.choice(dataframe.columns)
+        idx = dataframe.columns.get_loc(line)
+        dataframe = _rename(dataframe.drop(line, axis=axis), axis)
+        metadata.pop(idx)
 
     return dataframe, metadata
 
@@ -89,21 +90,20 @@ def _add_line(
             ignore_index=True,
         )
 
-    else:
-        try:
-            pdf_counts = _get_pdf_counts(metadata, pdfs)
-            while len(dataframe.columns) != ncols + 1:
-                pdf_class = np.random.choice(pdfs, p=weights)
-                idx = pdfs.index(pdf_class)
-                pdf = pdf_class()
-                if pdf_counts[pdf_class] < col_limits[1][idx]:
-                    dataframe[f"col_{ncols + 1}"] = pdf.sample(nrows)
-                    metadata.append(pdf)
-        except TypeError:
+    elif isinstance(col_limits[1], tuple):
+        pdf_counts = _get_pdf_counts(metadata, pdfs)
+        while len(dataframe.columns) != ncols + 1:
             pdf_class = np.random.choice(pdfs, p=weights)
+            idx = pdfs.index(pdf_class)
             pdf = pdf_class()
-            dataframe[f"col_{ncols + 1}"] = pdf.sample(nrows)
-            metadata.append(pdf)
+            if pdf_counts[pdf_class] < col_limits[1][idx]:
+                dataframe[f"col_{ncols + 1}"] = pdf.sample(nrows)
+                metadata.append(pdf)
+    else:
+        pdf_class = np.random.choice(pdfs, p=weights)
+        pdf = pdf_class()
+        dataframe[f"col_{ncols + 1}"] = pdf.sample(nrows)
+        metadata.append(pdf)
 
     dataframe = _rename(dataframe, axis)
     return dataframe, metadata
@@ -154,48 +154,74 @@ def selection(population, pop_fitness, best_prop, lucky_prop, maximise):
     return parents
 
 
-def crossover(parent1, parent2, prob, col_limits=None, pdfs=None):
-    """ Select information from `parent1` with probability `prob`. Otherwise
-    select from `parent2`. Collate information to form a new individual. """
+def crossover(parent1, parent2, col_limits, pdfs):
+    """ Blend the information from two parents to create a new
+    :code:`Individual`. Dimensions are inherited equally from either parent,
+    then column-metadata pairs from each parent are pooled together and sampled
+    uniformly according to :code:`col_limits`. This information is then collated
+    to form a new individual, filling in missing values as necessary. """
 
-    metadata1, dataframe1 = parent1
-    metadata2, dataframe2 = parent2
-
-    widest = np.argmax([len(dataframe1.columns), len(dataframe2.columns)])
-    widest_metadata, widest_dataframe = parent2 if widest else parent1
-
-    if np.random.random() < prob:
-        nrows = len(dataframe1)
+    if np.random.random() < 0.5:
+        nrows = len(parent1.dataframe)
     else:
-        nrows = len(dataframe2)
+        nrows = len(parent2.dataframe)
 
-    if np.random.random() < prob:
-        ncols = len(dataframe1.columns)
+    if np.random.random() < 0.5:
+        ncols = len(parent1.dataframe.columns)
     else:
-        ncols = len(dataframe2.columns)
+        ncols = len(parent2.dataframe.columns)
 
-    metadata, dataframe = [], pd.DataFrame()
+    parent_columns, parent_metadata = [], []
+    for meta, df in [parent1, parent2]:
+        parent_columns += [df[col] for col in df.columns]
+        parent_metadata += meta
 
-    for i in range(ncols):
-        if i < min([len(dataframe1.columns), len(dataframe2.columns)]):
-            if np.random.random() < prob:
-                dataframe_col = dataframe1[f"col_{i}"]
-                col_pdf = metadata1[i]
-            else:
-                dataframe_col = dataframe2[f"col_{i}"]
-                col_pdf = metadata2[i]
-        else:
-            dataframe_col = widest_dataframe[f"col_{i}"]
-            col_pdf = widest_metadata[i]
+    metadata, cols = [], []
 
-        dataframe[f"col_{i}"] = dataframe_col
-        metadata.append(col_pdf)
+    if isinstance(col_limits[0], tuple):
+        all_idxs = []
+        for limit, pdf_class in zip(col_limits[0], pdfs):
+            if limit:
+                all_pdf_class_idxs = np.where(
+                    [isinstance(pdf, pdf_class) for pdf in parent_metadata]
+                )
+                idxs = np.random.choice(
+                    *all_pdf_class_idxs, size=limit, replace=False
+                )
+                for idx in idxs:
+                    metadata.append(parent_metadata[idx])
+                    cols.append(parent_columns[idx])
+                    all_idxs.append(idx)
+
+        for idx in sorted(all_idxs, reverse=True):
+            parent_metadata.pop(idx)
+            parent_columns.pop(idx)
+
+    if isinstance(col_limits[1], tuple):
+        pdf_counts = _get_pdf_counts(metadata, pdfs)
+        while len(cols) < ncols:
+            idx = np.random.randint(len(parent_columns))
+            pdf = parent_metadata[idx]
+            pdf_idx = pdfs.index(pdf.__class__)
+
+            if pdf_counts[pdf.__class__] < col_limits[1][pdf_idx]:
+                metadata.append(pdf)
+                cols.append(parent_columns.pop(idx))
+                parent_metadata.pop(idx)
+                pdf_counts[pdf.__class__] += 1
+
+    while len(cols) < ncols:
+        idx = np.random.randint(len(parent_columns))
+        metadata.append(parent_metadata.pop(idx))
+        cols.append(parent_columns.pop(idx))
+
+    dataframe = pd.DataFrame({f"col_{i}": col for i, col in enumerate(cols)})
 
     while len(dataframe) != nrows:
         if len(dataframe) > nrows:
             dataframe = dataframe.iloc[:nrows, :]
         elif len(dataframe) < nrows:
-            dataframe, metadata = _add_line(dataframe, metadata, 0)
+            dataframe, metadata = _add_line(dataframe, metadata, axis=0)
 
     dataframe = _fillna(dataframe, metadata)
     return Individual(metadata, dataframe)
@@ -219,23 +245,23 @@ def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
 
     # Mutate ncols
     r_remove = np.random.random()
-    try:
-        column_condition = dataframe.shape[1] > sum(col_limits[0])
-    except TypeError:
-        column_condition = dataframe.shape[1] > col_limits[0]
+    if isinstance(col_limits[0], tuple):
+        condition = dataframe.shape[1] > sum(col_limits[0])
+    else:
+        condition = dataframe.shape[1] > col_limits[0]
 
-    if r_remove < prob and column_condition:
+    if r_remove < prob and condition:
         dataframe, metadata = _remove_line(
             dataframe, metadata, 1, col_limits, pdfs
         )
 
     r_add = np.random.random()
-    try:
-        column_condition = dataframe.shape[1] < sum(col_limits[1])
-    except TypeError:
-        column_condition = dataframe.shape[1] < col_limits[1]
+    if isinstance(col_limits[1], tuple):
+        condition = dataframe.shape[1] < sum(col_limits[1])
+    else:
+        condition = dataframe.shape[1] < col_limits[1]
 
-    if r_add < prob and column_condition:
+    if r_add < prob and condition:
         dataframe, metadata = _add_line(
             dataframe, metadata, 1, col_limits, pdfs, weights
         )
