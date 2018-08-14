@@ -35,7 +35,7 @@ def test_create_individual_int_int_lims(row_limits, col_limits, weights):
 
     pdfs = [Gamma, Normal, Poisson]
     individual = create_individual(row_limits, col_limits, pdfs, weights)
-    metadata, dataframe = individual
+    dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
     assert isinstance(metadata, list)
@@ -59,7 +59,7 @@ def test_create_individual_int_tup_lims(row_limits, col_limits, weights):
 
     pdfs = [Gamma, Normal, Poisson]
     individual = create_individual(row_limits, col_limits, pdfs, weights)
-    metadata, dataframe = individual
+    dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
     assert isinstance(metadata, list)
@@ -96,7 +96,7 @@ def test_create_individual_tup_int_lims(row_limits, col_limits, weights):
 
     pdfs = [Gamma, Normal, Poisson]
     individual = create_individual(row_limits, col_limits, pdfs, weights)
-    metadata, dataframe = individual
+    dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
     assert isinstance(metadata, list)
@@ -134,7 +134,7 @@ def test_create_individual_tup_tup_lims(row_limits, col_limits, weights):
 
     pdfs = [Gamma, Normal, Poisson]
     individual = create_individual(row_limits, col_limits, pdfs, weights)
-    metadata, dataframe = individual
+    dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
     assert isinstance(metadata, list)
@@ -177,7 +177,7 @@ def test_create_initial_population(size, row_limits, col_limits, weights):
     assert len(population) == size
 
     for individual in population:
-        metadata, dataframe = individual
+        dataframe, metadata = individual
 
         assert isinstance(individual, Individual)
         assert isinstance(metadata, list)
@@ -254,7 +254,7 @@ def test_create_new_population(
             ValueError
 
     for individual in population:
-        metadata, dataframe = individual
+        dataframe, metadata = individual
 
         assert isinstance(individual, Individual)
         assert isinstance(metadata, list)

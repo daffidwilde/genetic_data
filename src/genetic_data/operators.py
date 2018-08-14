@@ -154,6 +154,70 @@ def selection(population, pop_fitness, best_prop, lucky_prop, maximise):
     return parents
 
 
+def _collate_parents(parent1, parent2):
+    """ Concatenate the columns and metadata from each parent together. These
+    lists form a pool from which information is inherited during the crossover
+    process. """
+
+    parent_columns, parent_metadata = [], []
+    for dataframe, metadata in [parent1, parent2]:
+        parent_columns += [dataframe[col] for col in dataframe.columns]
+        parent_metadata += metadata
+
+    return parent_columns, parent_metadata
+
+
+def _cross_minimum_cols(parent_columns, parent_metadata, col_limits, pdfs):
+    """ If :code:`col_limits` has a tuple lower limit, inherit the minimum
+    number of columns from two parents to satisfy this limit. Return part of a
+    whole individual and the adjusted parent information. """
+
+    all_idxs, cols, metadata = [], [], []
+    for limit, pdf_class in zip(col_limits[0], pdfs):
+        if limit:
+            pdf_class_idxs = np.where(
+                [isinstance(pdf, pdf_class) for pdf in parent_metadata]
+            )
+
+            idxs = np.random.choice(*pdf_class_idxs, size=limit, replace=False)
+            for idx in idxs:
+                metadata.append(parent_metadata[idx])
+                cols.append(parent_columns[idx])
+                all_idxs.append(idx)
+
+    for idx in sorted(all_idxs, reverse=True):
+        parent_columns.pop(idx)
+        parent_metadata.pop(idx)
+
+    return cols, metadata, parent_columns, parent_metadata
+
+
+def _cross_remaining_cols(
+    cols, metadata, ncols, parent_columns, parent_metadata, col_limits, pdfs
+):
+    """ Regardless of whether :code:`col_limits` has a tuple upper limit or not,
+    inherit all remaining columns from the two parents so as not to exceed these
+    bounds. Return the components of a full inidividual. """
+
+    pdf_counts = _get_pdf_counts(metadata, pdfs)
+    while len(cols) < ncols:
+        idx = np.random.randint(len(parent_columns))
+        pdf = parent_metadata[idx]
+        pdf_idx = pdfs.index(pdf.__class__)
+
+        try:
+            if pdf_counts[pdf.__class__] < col_limits[1][pdf_idx]:
+                cols.append(parent_columns.pop(idx))
+                metadata.append(parent_metadata.pop(idx))
+                pdf_counts[pdf.__class__] += 1
+
+        except TypeError:
+            cols.append(parent_columns.pop(idx))
+            metadata.append(parent_metadata.pop(idx))
+
+    return cols, metadata
+
+
 def crossover(parent1, parent2, col_limits, pdfs):
     """ Blend the information from two parents to create a new
     :code:`Individual`. Dimensions are inherited equally from either parent,
@@ -161,59 +225,27 @@ def crossover(parent1, parent2, col_limits, pdfs):
     uniformly according to :code:`col_limits`. This information is then collated
     to form a new individual, filling in missing values as necessary. """
 
+    parent_columns, parent_metadata = _collate_parents(parent1, parent2)
+    cols, metadata = [], []
+
     if np.random.random() < 0.5:
         nrows = len(parent1.dataframe)
     else:
         nrows = len(parent2.dataframe)
 
     if np.random.random() < 0.5:
-        ncols = len(parent1.dataframe.columns)
+        ncols = len(parent1.metadata)
     else:
-        ncols = len(parent2.dataframe.columns)
-
-    parent_columns, parent_metadata = [], []
-    for meta, df in [parent1, parent2]:
-        parent_columns += [df[col] for col in df.columns]
-        parent_metadata += meta
-
-    metadata, cols = [], []
+        ncols = len(parent2.metadata)
 
     if isinstance(col_limits[0], tuple):
-        all_idxs = []
-        for limit, pdf_class in zip(col_limits[0], pdfs):
-            if limit:
-                all_pdf_class_idxs = np.where(
-                    [isinstance(pdf, pdf_class) for pdf in parent_metadata]
-                )
-                idxs = np.random.choice(
-                    *all_pdf_class_idxs, size=limit, replace=False
-                )
-                for idx in idxs:
-                    metadata.append(parent_metadata[idx])
-                    cols.append(parent_columns[idx])
-                    all_idxs.append(idx)
+        cols, metadata, parent_columns, parent_metadata = _cross_minimum_cols(
+            parent_columns, parent_metadata, col_limits, pdfs
+        )
 
-        for idx in sorted(all_idxs, reverse=True):
-            parent_metadata.pop(idx)
-            parent_columns.pop(idx)
-
-    if isinstance(col_limits[1], tuple):
-        pdf_counts = _get_pdf_counts(metadata, pdfs)
-        while len(cols) < ncols:
-            idx = np.random.randint(len(parent_columns))
-            pdf = parent_metadata[idx]
-            pdf_idx = pdfs.index(pdf.__class__)
-
-            if pdf_counts[pdf.__class__] < col_limits[1][pdf_idx]:
-                metadata.append(pdf)
-                cols.append(parent_columns.pop(idx))
-                parent_metadata.pop(idx)
-                pdf_counts[pdf.__class__] += 1
-
-    while len(cols) < ncols:
-        idx = np.random.randint(len(parent_columns))
-        metadata.append(parent_metadata.pop(idx))
-        cols.append(parent_columns.pop(idx))
+    cols, metadata = _cross_remaining_cols(
+        cols, metadata, ncols, parent_columns, parent_metadata, col_limits, pdfs
+    )
 
     dataframe = pd.DataFrame({f"col_{i}": col for i, col in enumerate(cols)})
 
@@ -224,50 +256,60 @@ def crossover(parent1, parent2, col_limits, pdfs):
             dataframe, metadata = _add_line(dataframe, metadata, axis=0)
 
     dataframe = _fillna(dataframe, metadata)
-    return Individual(metadata, dataframe)
+    return Individual(dataframe, metadata)
 
 
-def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
-    """ Mutate an individual. Here, the characteristics of an individual can be
-    split into two parts: their dimensions, and their values. Each of these
-    parts is mutated in a different way using the same probability, `prob`. """
+def _mutate_nrows(dataframe, metadata, row_limits, prob):
+    """ Mutate the number of rows an individual has by adding a new row and/or
+    dropping a row at random so as not to exceed the bounds of
+    :code:`row_limits`. """
 
-    metadata, dataframe = deepcopy(individual)
-
-    # Mutate nrows
-    r_remove = np.random.random()
-    if r_remove < prob and dataframe.shape[0] > row_limits[0]:
-        dataframe, metadata = _remove_line(dataframe, metadata, axis=0)
-
-    r_add = np.random.random()
-    if r_add < prob and dataframe.shape[0] < row_limits[1]:
+    add = np.random.random()
+    if add < prob and dataframe.shape[0] < row_limits[1]:
         dataframe, metadata = _add_line(dataframe, metadata, axis=0)
 
-    # Mutate ncols
-    r_remove = np.random.random()
-    if isinstance(col_limits[0], tuple):
-        condition = dataframe.shape[1] > sum(col_limits[0])
-    else:
-        condition = dataframe.shape[1] > col_limits[0]
+    remove = np.random.random()
+    if remove < prob and dataframe.shape[0] > row_limits[0]:
+        dataframe, metadata = _remove_line(dataframe, metadata, axis=0)
 
-    if r_remove < prob and condition:
-        dataframe, metadata = _remove_line(
-            dataframe, metadata, 1, col_limits, pdfs
-        )
+    return dataframe, metadata
 
-    r_add = np.random.random()
+
+def _mutate_ncols(dataframe, metadata, col_limits, pdfs, weights, prob):
+    """ Mutate the number of columns an individual has by adding a new column
+    and/or dropping a column at random. In either case, the bounds defined in
+    :code:`col_limits` cannot be exceeded. """
+
+    add = np.random.random()
     if isinstance(col_limits[1], tuple):
         condition = dataframe.shape[1] < sum(col_limits[1])
     else:
         condition = dataframe.shape[1] < col_limits[1]
 
-    if r_add < prob and condition:
+    if add < prob and condition:
         dataframe, metadata = _add_line(
             dataframe, metadata, 1, col_limits, pdfs, weights
         )
 
-    # Iterate over the elements of the dataframe, mutating them by resampling
-    # from each column's associated distribution in `metadata`.
+    remove = np.random.random()
+    if isinstance(col_limits[0], tuple):
+        condition = dataframe.shape[1] > sum(col_limits[0])
+    else:
+        condition = dataframe.shape[1] > col_limits[0]
+
+    if remove < prob and condition:
+        dataframe, metadata = _remove_line(
+            dataframe, metadata, 1, col_limits, pdfs
+        )
+
+    return dataframe, metadata
+
+
+def _mutate_values(dataframe, metadata, prob):
+    """ Iterate over the values of :code:`dataframe`, mutating them with
+    probability :code:`prob`. Mutation is done by resampling from each column's
+    associated distribution in :code:`metadata`. """
+
     for j, col in enumerate(dataframe.columns):
         pdf = metadata[j]
         for i, value in enumerate(dataframe[col]):
@@ -275,4 +317,19 @@ def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
                 value = pdf.sample(1)[0]
                 dataframe.iloc[i, j] = value
 
-    return Individual(metadata, dataframe)
+    return dataframe
+
+
+def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
+    """ Mutate an individual. Here, the characteristics of an individual can be
+    split into two parts: their dimensions, and their values. Each of these
+    parts is mutated in a different way using the same probability, `prob`. """
+
+    dataframe, metadata = deepcopy(individual)
+    dataframe, metadata = _mutate_nrows(dataframe, metadata, row_limits, prob)
+    dataframe, metadata = _mutate_ncols(
+        dataframe, metadata, col_limits, pdfs, weights, prob
+    )
+
+    dataframe = _mutate_values(dataframe, metadata, prob)
+    return Individual(dataframe, metadata)

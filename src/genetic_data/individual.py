@@ -5,4 +5,4 @@ missing values during crossover. """
 
 from collections import namedtuple
 
-Individual = namedtuple("Individual", ["column_metadata", "dataframe"])
+Individual = namedtuple("Individual", ["dataframe", "metadata"])

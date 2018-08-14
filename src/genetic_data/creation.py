@@ -47,7 +47,7 @@ def create_individual(row_limits, col_limits, pdfs, weights=None):
     ncols = _get_ncols(col_limits)
 
     curr_col = 0
-    metadata, dataframe = [], pd.DataFrame()
+    dataframe, metadata = pd.DataFrame(), []
     pdf_counts = {pdf_class: 0 for pdf_class in pdfs}
 
     if isinstance(col_limits[0], tuple):
@@ -79,7 +79,7 @@ def create_individual(row_limits, col_limits, pdfs, weights=None):
             dataframe[f"col_{i}"] = pdf.sample(nrows)
             metadata.append(pdf)
 
-    return Individual(metadata, dataframe)
+    return Individual(dataframe, metadata)
 
 
 def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
