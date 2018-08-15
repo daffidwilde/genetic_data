@@ -74,7 +74,7 @@ def test_run_algorithm(
         assert len(scores) == size
 
         for individual in population:
-            metadata, dataframe = individual
+            dataframe, metadata = individual
 
             assert isinstance(individual, Individual)
             assert isinstance(metadata, list)

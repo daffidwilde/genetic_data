@@ -7,10 +7,11 @@ import pytest
 
 from hypothesis import settings
 
-from genetic_data.creation import create_individual, create_initial_population
-from genetic_data.individual import Individual
-from genetic_data.operators import crossover, get_fitness, mutation, selection
+from genetic_data.fitness import get_fitness
+from genetic_data.individual import Individual, create_individual
+from genetic_data.operators import crossover, mutation, selection
 from genetic_data.pdfs import Gamma, Normal, Poisson
+from genetic_data.population import create_initial_population
 
 from test_util.parameters import (
     FITNESS,
@@ -65,7 +66,7 @@ def test_selection(size, row_limits, col_limits, weights, props, maximise):
     )
 
     for individual in parents:
-        metadata, dataframe = individual
+        dataframe, metadata = individual
 
         assert isinstance(individual, Individual)
         assert isinstance(metadata, list)
@@ -113,7 +114,7 @@ def test_crossover_int_int_lims(row_limits, col_limits, weights):
     ]
 
     individual = crossover(parent1, parent2, col_limits, pdfs)
-    metadata, dataframe = individual
+    dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
     assert isinstance(metadata, list)
@@ -121,7 +122,7 @@ def test_crossover_int_int_lims(row_limits, col_limits, weights):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert pdf in parent1.column_metadata + parent2.column_metadata
+        assert pdf in parent1.metadata + parent2.metadata
 
     for i in range(2):
         assert dataframe.shape[i] in [
@@ -142,7 +143,7 @@ def test_crossover_int_tup_lims(row_limits, col_limits, weights):
     ]
 
     individual = crossover(parent1, parent2, col_limits, pdfs)
-    metadata, dataframe = individual
+    dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
     assert isinstance(metadata, list)
@@ -150,7 +151,7 @@ def test_crossover_int_tup_lims(row_limits, col_limits, weights):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert pdf in parent1.column_metadata + parent2.column_metadata
+        assert pdf in parent1.metadata + parent2.metadata
 
     for i in range(2):
         assert dataframe.shape[i] in [
@@ -179,7 +180,7 @@ def test_crossover_tup_int_lims(row_limits, col_limits, weights):
     ]
 
     individual = crossover(parent1, parent2, col_limits, pdfs)
-    metadata, dataframe = individual
+    dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
     assert isinstance(metadata, list)
@@ -187,7 +188,7 @@ def test_crossover_tup_int_lims(row_limits, col_limits, weights):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert pdf in parent1.column_metadata + parent2.column_metadata
+        assert pdf in parent1.metadata + parent2.metadata
 
     for i in range(2):
         assert dataframe.shape[i] in [
@@ -216,7 +217,7 @@ def test_crossover_tup_tup_lims(row_limits, col_limits, weights):
     ]
 
     individual = crossover(parent1, parent2, col_limits, pdfs)
-    metadata, dataframe = individual
+    dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
     assert isinstance(metadata, list)
@@ -224,7 +225,7 @@ def test_crossover_tup_tup_lims(row_limits, col_limits, weights):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert pdf in parent1.column_metadata + parent2.column_metadata
+        assert pdf in parent1.metadata + parent2.metadata
 
     for i in range(2):
         assert dataframe.shape[i] in [
@@ -250,7 +251,7 @@ def test_mutation_int_int_lims(row_limits, col_limits, weights, prob):
     individual = create_individual(row_limits, col_limits, pdfs, weights)
 
     mutant = mutation(individual, prob, row_limits, col_limits, pdfs, weights)
-    metadata, dataframe = mutant
+    dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)
     assert isinstance(metadata, list)
@@ -275,7 +276,7 @@ def test_mutation_int_tup_lims(row_limits, col_limits, weights, prob):
     individual = create_individual(row_limits, col_limits, pdfs, weights)
 
     mutant = mutation(individual, prob, row_limits, col_limits, pdfs, weights)
-    metadata, dataframe = mutant
+    dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)
     assert isinstance(metadata, list)
@@ -312,7 +313,7 @@ def test_mutation_tup_int_lims(row_limits, col_limits, weights, prob):
     individual = create_individual(row_limits, col_limits, pdfs, weights)
 
     mutant = mutation(individual, prob, row_limits, col_limits, pdfs, weights)
-    metadata, dataframe = mutant
+    dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)
     assert isinstance(metadata, list)
@@ -350,7 +351,7 @@ def test_mutation_tup_tup_lims(row_limits, col_limits, weights, prob):
     individual = create_individual(row_limits, col_limits, pdfs, weights)
 
     mutant = mutation(individual, prob, row_limits, col_limits, pdfs, weights)
-    metadata, dataframe = mutant
+    dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)
     assert isinstance(metadata, list)
