@@ -17,8 +17,8 @@ from genetic_data.operators import selection
 from genetic_data.individual import Individual
 from genetic_data.pdfs import Gamma, Normal, Poisson
 
-from test_util.parameters import POPULATION, OFFSPRING
-from test_util.trivials import trivial_fitness
+from .util.parameters import POPULATION, OFFSPRING
+from .util.trivials import trivial_fitness
 
 
 @POPULATION

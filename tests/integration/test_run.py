@@ -10,8 +10,8 @@ import genetic_data as gd
 from genetic_data.individual import Individual
 from genetic_data.pdfs import Gamma, Normal, Poisson
 
-from test_util.trivials import trivial_fitness, trivial_stop
-from test_util.parameters import PROB, SHAPES, SIZE, WEIGHTS
+from .util.trivials import trivial_fitness, trivial_stop
+from .util.parameters import PROB, SHAPES, SIZE, WEIGHTS
 
 HALF_PROB = PROB.filter(lambda x: x > 0.5)
 
@@ -27,7 +27,7 @@ HALF_PROB = PROB.filter(lambda x: x > 0.5)
     crossover_prob=PROB,
     mutation_prob=PROB,
     maximise=booleans(),
-    seed=SIZE.filter(lambda x: x < 10),
+    seed=SIZE,
 )
 @settings(deadline=None)
 def test_run_algorithm(

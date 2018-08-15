@@ -5,7 +5,7 @@ import pandas as pd
 from genetic_data.individual import Individual, create_individual
 from genetic_data.pdfs import Gamma, Normal, Poisson
 
-from test_util.parameters import (
+from .util.parameters import (
     INTEGER_INDIVIDUAL,
     INTEGER_TUPLE_INDIVIDUAL,
     TUPLE_INTEGER_INDIVIDUAL,

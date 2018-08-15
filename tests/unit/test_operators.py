@@ -13,7 +13,7 @@ from genetic_data.operators import crossover, mutation, selection
 from genetic_data.pdfs import Gamma, Normal, Poisson
 from genetic_data.population import create_initial_population
 
-from test_util.parameters import (
+from .util.parameters import (
     FITNESS,
     INTEGER_CROSSOVER,
     INTEGER_TUPLE_CROSSOVER,
@@ -26,7 +26,7 @@ from test_util.parameters import (
     SELECTION,
     SMALL_PROPS,
 )
-from test_util.trivials import trivial_fitness
+from .util.trivials import trivial_fitness
 
 
 @FITNESS
