@@ -69,8 +69,8 @@ def run_algorithm(
         The proportion of a population from which to sample some "lucky"
         potential parents. Set to zero as standard.
     crossover_prob : float
-        The probability with which to sample from the first parent over the
-        second in a crossover operation.
+        The probability with which to sample dimensions from the first parent
+        over the second in a crossover operation. Defaults to 0.5.
     mutation_prob : float
         The probability of a particular characteristic in an individual's
         dataset being mutated.

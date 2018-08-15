@@ -3,8 +3,8 @@ algorithm. """
 
 import numpy as np
 
-from genetic_data.individual import create_individual
-from genetic_data.operators import crossover, mutation
+from .individual import create_individual
+from .operators import crossover, mutation
 
 
 def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
@@ -67,7 +67,9 @@ def create_new_population(
     while len(population) < size:
         parent1_idx, parent2_idx = np.random.choice(len(parents), size=2)
         parent1, parent2 = parents[parent1_idx], parents[parent2_idx]
-        offspring = crossover(parent1, parent2, col_limits, pdfs)
+        offspring = crossover(
+            parent1, parent2, col_limits, pdfs, crossover_prob
+        )
         mutant = mutation(
             offspring, mutation_prob, row_limits, col_limits, pdfs, weights
         )

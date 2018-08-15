@@ -71,22 +71,23 @@ def _cross_remaining_cols(
     return cols, metadata
 
 
-def crossover(parent1, parent2, col_limits, pdfs):
+def crossover(parent1, parent2, col_limits, pdfs, prob=0.5):
     """ Blend the information from two parents to create a new
-    :code:`Individual`. Dimensions are inherited equally from either parent,
-    then column-metadata pairs from each parent are pooled together and sampled
-    uniformly according to :code:`col_limits`. This information is then collated
-    to form a new individual, filling in missing values as necessary. """
+    :code:`Individual`. Dimensions are inherited from either parent according to
+    the cut-off probability :code:`prob`. Then column-metadata pairs from each
+    parent are pooled together and sampled uniformly according to
+    :code:`col_limits`. This information is then collated to form a new
+    individual, filling in missing values as necessary. """
 
     parent_columns, parent_metadata = _collate_parents(parent1, parent2)
     cols, metadata = [], []
 
-    if np.random.random() < 0.5:
+    if np.random.random() < prob:
         nrows = len(parent1.dataframe)
     else:
         nrows = len(parent2.dataframe)
 
-    if np.random.random() < 0.5:
+    if np.random.random() < prob:
         ncols = len(parent1.metadata)
     else:
         ncols = len(parent2.metadata)
@@ -100,7 +101,7 @@ def crossover(parent1, parent2, col_limits, pdfs):
         cols, metadata, ncols, parent_columns, parent_metadata, col_limits, pdfs
     )
 
-    dataframe = pd.DataFrame({f"col_{i}": col for i, col in enumerate(cols)})
+    dataframe = pd.DataFrame({i: col for i, col in enumerate(cols)})
 
     while len(dataframe) != nrows:
         if len(dataframe) > nrows:

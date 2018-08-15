@@ -13,7 +13,7 @@ from hypothesis.strategies import (
 )
 
 SIZE = integers(min_value=2, max_value=10)
-INTS = integers(min_value=1, max_value=10)
+INTS = integers(min_value=1, max_value=5)
 PROB = floats(min_value=0, max_value=1)
 SMALL_PROB = floats(min_value=0, max_value=1e-3)
 TUPS = tuples(
@@ -66,17 +66,19 @@ POPULATION = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
 )
 
-INTEGER_CROSSOVER = given(row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS)
+INTEGER_CROSSOVER = given(row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS,
+        prob=PROB)
 
 INTEGER_TUPLE_CROSSOVER = given(
-    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS
+    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS, prob=PROB
 )
 
 TUPLE_INTEGER_CROSSOVER = given(
-    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS
+    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS, prob=PROB
 )
 
-TUPLE_CROSSOVER = given(row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS)
+TUPLE_CROSSOVER = given(row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS,
+        prob=PROB)
 
 FITNESS = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS

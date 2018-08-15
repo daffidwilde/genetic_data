@@ -103,7 +103,7 @@ def test_selection_raises_error(
 
 @INTEGER_CROSSOVER
 @settings(deadline=None)
-def test_crossover_int_int_lims(row_limits, col_limits, weights):
+def test_crossover_int_int_lims(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual with all integer
     column limits. """
 
@@ -113,7 +113,7 @@ def test_crossover_int_int_lims(row_limits, col_limits, weights):
         for _ in range(2)
     ]
 
-    individual = crossover(parent1, parent2, col_limits, pdfs)
+    individual = crossover(parent1, parent2, col_limits, pdfs, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -132,7 +132,7 @@ def test_crossover_int_int_lims(row_limits, col_limits, weights):
 
 
 @INTEGER_TUPLE_CROSSOVER
-def test_crossover_int_tup_lims(row_limits, col_limits, weights):
+def test_crossover_int_tup_lims(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual where the lower and
     upper column limits are integer and tuple respectively. """
 
@@ -142,7 +142,7 @@ def test_crossover_int_tup_lims(row_limits, col_limits, weights):
         for _ in range(2)
     ]
 
-    individual = crossover(parent1, parent2, col_limits, pdfs)
+    individual = crossover(parent1, parent2, col_limits, pdfs, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -169,7 +169,7 @@ def test_crossover_int_tup_lims(row_limits, col_limits, weights):
 
 
 @TUPLE_INTEGER_CROSSOVER
-def test_crossover_tup_int_lims(row_limits, col_limits, weights):
+def test_crossover_tup_int_lims(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual where the lower and
     upper column limits are tuple and integer respectively. """
 
@@ -179,7 +179,7 @@ def test_crossover_tup_int_lims(row_limits, col_limits, weights):
         for _ in range(2)
     ]
 
-    individual = crossover(parent1, parent2, col_limits, pdfs)
+    individual = crossover(parent1, parent2, col_limits, pdfs, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -206,7 +206,7 @@ def test_crossover_tup_int_lims(row_limits, col_limits, weights):
 
 
 @TUPLE_CROSSOVER
-def test_crossover_tup_tup_lims(row_limits, col_limits, weights):
+def test_crossover_tup_tup_lims(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual with all tuple
     column limits. """
 
@@ -216,7 +216,7 @@ def test_crossover_tup_tup_lims(row_limits, col_limits, weights):
         for _ in range(2)
     ]
 
-    individual = crossover(parent1, parent2, col_limits, pdfs)
+    individual = crossover(parent1, parent2, col_limits, pdfs, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)

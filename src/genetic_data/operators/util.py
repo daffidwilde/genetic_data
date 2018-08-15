@@ -19,7 +19,7 @@ def _rename(dataframe, axis):
     if axis == 0:
         dataframe = dataframe.reset_index(drop=True)
     else:
-        dataframe.columns = [f"col_{i}" for i in range(len(dataframe.columns))]
+        dataframe.columns = range(len(dataframe.columns))
 
     return dataframe
 
@@ -29,6 +29,7 @@ def _fillna(dataframe, metadata):
     associated with it. """
 
     for i, col in enumerate(dataframe.columns):
+        print('i: ', i, 'col: ', col)
         data = dataframe[col]
         pdf = metadata[i]
         if data.isnull().any():
@@ -81,7 +82,7 @@ def _add_line(
 
     if axis == 0:
         dataframe = dataframe.append(
-            {f"col_{i}": pdf.sample(1)[0] for i, pdf in enumerate(metadata)},
+            {i: pdf.sample(1)[0] for i, pdf in enumerate(metadata)},
             ignore_index=True,
         )
 
@@ -92,12 +93,12 @@ def _add_line(
             idx = pdfs.index(pdf_class)
             pdf = pdf_class()
             if pdf_counts[pdf_class] < col_limits[1][idx]:
-                dataframe[f"col_{ncols + 1}"] = pdf.sample(nrows)
+                dataframe[ncols + 1] = pdf.sample(nrows)
                 metadata.append(pdf)
     else:
         pdf_class = np.random.choice(pdfs, p=weights)
         pdf = pdf_class()
-        dataframe[f"col_{ncols + 1}"] = pdf.sample(nrows)
+        dataframe[ncols + 1] = pdf.sample(nrows)
         metadata.append(pdf)
 
     dataframe = _rename(dataframe, axis)

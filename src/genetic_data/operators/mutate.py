@@ -13,12 +13,10 @@ def _mutate_nrows(dataframe, metadata, row_limits, prob):
     dropping a row at random so as not to exceed the bounds of
     :code:`row_limits`. """
 
-    add = np.random.random()
-    if add < prob and dataframe.shape[0] < row_limits[1]:
+    if np.random.random() < prob and dataframe.shape[0] < row_limits[1]:
         dataframe, metadata = _add_line(dataframe, metadata, axis=0)
 
-    remove = np.random.random()
-    if remove < prob and dataframe.shape[0] > row_limits[0]:
+    if np.random.random() < prob and dataframe.shape[0] > row_limits[0]:
         dataframe, metadata = _remove_line(dataframe, metadata, axis=0)
 
     return dataframe, metadata
@@ -29,24 +27,22 @@ def _mutate_ncols(dataframe, metadata, col_limits, pdfs, weights, prob):
     and/or dropping a column at random. In either case, the bounds defined in
     :code:`col_limits` cannot be exceeded. """
 
-    add = np.random.random()
     if isinstance(col_limits[1], tuple):
         condition = dataframe.shape[1] < sum(col_limits[1])
     else:
         condition = dataframe.shape[1] < col_limits[1]
 
-    if add < prob and condition:
+    if np.random.random() < prob and condition:
         dataframe, metadata = _add_line(
             dataframe, metadata, 1, col_limits, pdfs, weights
         )
 
-    remove = np.random.random()
     if isinstance(col_limits[0], tuple):
         condition = dataframe.shape[1] > sum(col_limits[0])
     else:
         condition = dataframe.shape[1] > col_limits[0]
 
-    if remove < prob and condition:
+    if np.random.random() < prob and condition:
         dataframe, metadata = _remove_line(
             dataframe, metadata, 1, col_limits, pdfs
         )

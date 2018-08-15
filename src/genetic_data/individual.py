@@ -45,7 +45,8 @@ def _get_minimum_cols(cols, metadata, nrows, col_limits, pdfs, pdf_counts):
 def _get_remaining_cols(
     cols, metadata, nrows, ncols, col_limits, pdfs, weights, pdf_counts
 ):
-    """ If :code:`col_limits` has a tuple upper limit then sample all remaining
+    """ Sample all remaining columns for the current individual. If
+    :code:`col_limits` has a tuple upper limit then sample all remaining
     columns for the individual without exceeding the bounds. """
 
     while len(cols) < ncols:
@@ -99,5 +100,5 @@ def create_individual(row_limits, col_limits, pdfs, weights=None):
         cols, metadata, nrows, ncols, col_limits, pdfs, weights, pdf_counts
     )
 
-    dataframe = pd.DataFrame({f"col_{i}": col for i, col in enumerate(cols)})
+    dataframe = pd.DataFrame({i: col for i, col in enumerate(cols)})
     return Individual(dataframe, metadata)
