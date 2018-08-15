@@ -7,10 +7,11 @@ import pytest
 
 from hypothesis import settings
 
-from genetic_data.creation import create_individual, create_initial_population
-from genetic_data.individual import Individual
-from genetic_data.operators import crossover, get_fitness, mutation, selection
+from genetic_data.fitness import get_fitness
+from genetic_data.individual import Individual, create_individual
+from genetic_data.operators import crossover, mutation, selection
 from genetic_data.pdfs import Gamma, Normal, Poisson
+from genetic_data.population import create_initial_population
 
 from test_util.parameters import (
     FITNESS,

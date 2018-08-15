@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from .individual import Individual
+from ..individual import Individual
 from .util import _add_line, _fillna, _get_pdf_counts
 
 

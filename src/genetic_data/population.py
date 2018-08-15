@@ -4,8 +4,7 @@ algorithm. """
 import numpy as np
 
 from genetic_data.individual import create_individual
-from genetic_data.cross import crossover
-from genetic_data.mutate import mutation
+from genetic_data.operators import crossover, mutation
 
 
 def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):

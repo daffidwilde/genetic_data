@@ -9,8 +9,6 @@ from collections import namedtuple
 import numpy as np
 import pandas as pd
 
-from .util import _get_ncols
-
 Individual = namedtuple("Individual", ["dataframe", "metadata"])
 
 
@@ -51,7 +49,7 @@ def _get_remaining_cols(
     columns for the individual without exceeding the bounds. """
 
     while len(cols) < ncols:
-        pdf_class = np.random.choice(pdfs, p=weights)[0]
+        pdf_class = np.random.choice(pdfs, p=weights)
         pdf = pdf_class()
         try:
             idx = pdfs.index(pdf_class)

@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from .individual import Individual
+from ..individual import Individual
 from .util import _add_line, _remove_line
 
 

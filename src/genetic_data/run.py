@@ -4,7 +4,7 @@ import numpy as np
 
 from genetic_data.pdfs import Normal
 from genetic_data.fitness import get_fitness
-from genetic_data.select import selection
+from genetic_data.operators import selection
 from genetic_data.population import (
     create_initial_population,
     create_new_population,
