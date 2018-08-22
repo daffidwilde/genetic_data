@@ -12,6 +12,11 @@ class Distribution(object):
         raise NotImplementedError("You must define a sample method.")
 
 
+# ========================
+# CONTINUOUS DISTRIBUTIONS
+# ========================
+
+
 class Gamma(Distribution):
     """ Continuous column pdf given by the gamma distribution. """
 
@@ -57,6 +62,11 @@ class Normal(Distribution):
         return np.random.normal(loc=self.mean, scale=self.std, size=nrows)
 
 
+# ======================
+# DISCRETE DISTRIBUTIONS
+# ======================
+
+
 class Poisson(Distribution):
     """ Discrete column pdf given by the Poisson distribution. """
 
@@ -72,6 +82,27 @@ class Poisson(Distribution):
 
     def sample(self, nrows):
         """ Take a sample of size `nrows` from the Poisson distribution with
-        parameter `lam`. Seeded for reproducibility. """
+        parameter `lam`. """
 
         return np.random.poisson(lam=self.lam, size=nrows)
+
+
+class Bernoulli(Distribution):
+    """ Discrete column pdf given by the Bernoulli distribution. That is, the
+    binomial distribution with 1 trial. """
+
+    prob_limits = [0, 1]
+
+    def __init__(self):
+
+        self.prob = np.random.uniform(*self.prob_limits)
+
+    def __repr__(self):
+
+        return f"Bernoulli(p={self.prob:.2f})"
+
+    def sample(self, nrows):
+        """ Take a sample of size `nrows` from the Bernoulli distribution with
+        parameter `prob`. """
+
+        return np.random.binomial(n=1, p=self.prob, size=nrows)
