@@ -7,7 +7,8 @@ import pytest
 from hypothesis import given
 from hypothesis.strategies import floats, integers, tuples
 
-from genetic_data.pdfs import Distribution, Gamma, Normal, Poisson
+from genetic_data.pdfs import Distribution, Gamma, Normal, Bernoulli, Poisson
+
 
 LIMITS = (
     tuples(floats(min_value=0, max_value=10), floats(min_value=0, max_value=10))
@@ -23,6 +24,11 @@ def test_Distribution_sample():
     with pytest.raises(NotImplementedError):
         dist = Distribution()
         sample = dist.sample()
+
+
+# =====
+# GAMMA
+# =====
 
 
 @given(seed=integers(min_value=0))
@@ -57,6 +63,11 @@ def test_Gamma_set_param_limits(alpha_limits, theta_limits, seed):
     assert gamma.theta >= theta_limits[0] and gamma.theta <= theta_limits[1]
 
 
+# ======
+# NORMAL
+# ======
+
+
 @given(seed=integers(min_value=0))
 def test_Normal_string(seed):
     """ Assert that a Normal object has the correct string representation. """
@@ -87,6 +98,52 @@ def test_Normal_set_param_limits(mean_limits, std_limits, seed):
     normal = Normal()
     assert normal.mean >= mean_limits[0] and normal.mean <= mean_limits[1]
     assert normal.std >= std_limits[0] and normal.std <= std_limits[1]
+
+
+# =========
+# BERNOULLI
+# =========
+
+
+@given(seed=integers(min_value=0))
+def test_Bernoulli_string(seed):
+    """ Assert that a Poisson object has the correct string representation. """
+    np.random.seed(seed)
+    bernoulli = Bernoulli()
+    assert str(bernoulli).startswith("Bernoulli")
+
+
+@given(nrows=integers(min_value=1), seed=integers(min_value=0))
+def test_Bernoulli_sample(nrows, seed):
+    np.random.seed(seed)
+    bernoulli = Bernoulli()
+    sample = bernoulli.sample(nrows)
+    assert sample.shape == (nrows,)
+    assert sample.dtype == "int"
+
+
+@given(
+    prob_limits=tuples(
+        floats(min_value=0, max_value=1), floats(min_value=0, max_value=1)
+    )
+    .map(sorted)
+    .filter(lambda x: x[0] < x[1]),
+    seed=integers(min_value=0),
+)
+def test_Bernoulli_set_param_limits(prob_limits, seed):
+    """ Check that a Bernoulli object can sample its parameters correctly if its
+    class attributes are altered. """
+
+    Bernoulli.prob_limits = prob_limits
+
+    np.random.seed(seed)
+    bernoulli = Bernoulli()
+    assert bernoulli.prob >= prob_limits[0] and bernoulli.prob <= prob_limits[1]
+
+
+# =======
+# POISSON
+# =======
 
 
 @given(seed=integers(min_value=0))

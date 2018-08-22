@@ -67,26 +67,6 @@ class Normal(Distribution):
 # ======================
 
 
-class Poisson(Distribution):
-    """ Discrete column pdf given by the Poisson distribution. """
-
-    lam_limits = [0, 10]
-
-    def __init__(self):
-
-        self.lam = np.random.uniform(*self.lam_limits)
-
-    def __repr__(self):
-
-        return f"Poisson(lambda={self.lam:.2f})"
-
-    def sample(self, nrows):
-        """ Take a sample of size `nrows` from the Poisson distribution with
-        parameter `lam`. """
-
-        return np.random.poisson(lam=self.lam, size=nrows)
-
-
 class Bernoulli(Distribution):
     """ Discrete column pdf given by the Bernoulli distribution. That is, the
     binomial distribution with 1 trial. """
@@ -106,3 +86,23 @@ class Bernoulli(Distribution):
         parameter `prob`. """
 
         return np.random.binomial(n=1, p=self.prob, size=nrows)
+
+
+class Poisson(Distribution):
+    """ Discrete column pdf given by the Poisson distribution. """
+
+    lam_limits = [0, 10]
+
+    def __init__(self):
+
+        self.lam = np.random.uniform(*self.lam_limits)
+
+    def __repr__(self):
+
+        return f"Poisson(lambda={self.lam:.2f})"
+
+    def sample(self, nrows):
+        """ Take a sample of size `nrows` from the Poisson distribution with
+        parameter `lam`. """
+
+        return np.random.poisson(lam=self.lam, size=nrows)

@@ -66,8 +66,9 @@ POPULATION = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
 )
 
-INTEGER_CROSSOVER = given(row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS,
-        prob=PROB)
+INTEGER_CROSSOVER = given(
+    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, prob=PROB
+)
 
 INTEGER_TUPLE_CROSSOVER = given(
     row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS, prob=PROB
@@ -77,8 +78,9 @@ TUPLE_INTEGER_CROSSOVER = given(
     row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS, prob=PROB
 )
 
-TUPLE_CROSSOVER = given(row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS,
-        prob=PROB)
+TUPLE_CROSSOVER = given(
+    row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS, prob=PROB
+)
 
 FITNESS = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
