@@ -4,12 +4,7 @@ import itertools as itr
 import numpy as np
 
 from hypothesis import given
-from hypothesis.strategies import (
-    floats,
-    integers,
-    sampled_from,
-    tuples,
-)
+from hypothesis.strategies import floats, integers, sampled_from, tuples
 
 SIZE = integers(min_value=2, max_value=10)
 

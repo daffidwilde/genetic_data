@@ -3,7 +3,7 @@
 import numpy as np
 
 
-def trivial_fitness(individual):
+def trivial_fitness(individual, arg=None):
     """ A fitness function. """
     return np.nan
 

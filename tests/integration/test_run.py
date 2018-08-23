@@ -64,6 +64,7 @@ def test_run_algorithm(
         mutation_prob,
         maximise=maximise,
         seed=seed,
+        fitness_kwargs={"arg": None},
     )
 
     assert len(pop) == size

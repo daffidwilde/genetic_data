@@ -26,6 +26,7 @@ def run_algorithm(
     mutation_prob=0.01,
     maximise=False,
     seed=None,
+    fitness_kwargs=None,
 ):
     """ Run a genetic algorithm (GA) under the presented constraints, giving a
     population of artificial datasets for which the fitness function performs
@@ -80,6 +81,9 @@ def run_algorithm(
     seed : int
         The seed for a particular run of the genetic algorithm. If :code:`None`,
         no seed is set.
+    fitness_kwargs : dict
+        Any additional parameters needed to be passed to :code:`fitness` should
+        be placed here as a dictionary or suitable mapping.
 
     Returns
     -------
@@ -100,7 +104,7 @@ def run_algorithm(
         size, row_limits, col_limits, pdfs, weights
     )
 
-    pop_fitness = get_fitness(fitness, population)
+    pop_fitness = get_fitness(fitness, population, fitness_kwargs)
 
     converged = False
     if stop:
@@ -125,7 +129,7 @@ def run_algorithm(
             weights,
         )
 
-        pop_fitness = get_fitness(fitness, population)
+        pop_fitness = get_fitness(fitness, population, fitness_kwargs)
 
         all_populations.append(population)
         all_fitnesses.append(pop_fitness)
