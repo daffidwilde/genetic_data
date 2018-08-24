@@ -26,6 +26,17 @@ def test_Distribution_sample():
         sample = dist.sample()
 
 
+def test_to_tuple():
+    """ Verify that objects can pass their information to a tuple of the correct
+    length and form. """
+
+    for pdf_class in [Gamma, Normal, Bernoulli, Poisson]:
+        pdf = pdf_class()
+        out = pdf.to_tuple()
+        assert 2 * len(pdf.__dict__) - len(out) == 1
+        assert out[0] == pdf.name
+
+
 # =====
 # GAMMA
 # =====
