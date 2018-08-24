@@ -1,5 +1,7 @@
-GeneticData
-***********
+EDO
+***
+
+**E**volutionary **D**ataset **O**ptimisation.
 
 A library for generating artificial datasets through genetic evolution.
 =======================================================================
@@ -12,7 +14,7 @@ algorithm performs well on some datasets and not others?
 
 The purpose of this library is to create a population of families of datasets
 for which a specific algorithm performs well with respect to its objective
-function. This function is passed to a genetic algorithm (GA) where each 
+function. This function is passed to a genetic algorithm (GA) where each
 individual represents a family of datasets defined by their dimensions, and the
 statistical shape of each of its columns. The fitness of an individual is taken
 using some amalgamation of the fitnesses from a sample of datasets belonging to
