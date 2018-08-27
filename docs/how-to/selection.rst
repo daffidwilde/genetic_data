@@ -1,24 +1,14 @@
 Customise the selection process
 -------------------------------
 
-It may be be benefitial in your problem to control how parents are selected in
-each iteration. You can do that in two ways here by altering the following
-parameters in :code:`run_algorithm`:
+You can change the selection discipline of the GA using two parameters in
+:code:`run_algorithm` -- :code:`best_prop` and :code:`lucky_prop`. These control
+how many of the best individuals and any lucky (random) individuals should be
+selected respectively.
 
-- :code:`best_prop` -- this is the proportion of the population to skim off
-  the top and take forward as parents.
-- :code:`lucky_prop` -- after the best individuals are chosen, you can take a
-  proportion of "lucky" individuals into the next generation. By default, this
-  doesn't happen.
-
-.. note::
-    Taking lucky individuals should be done sparingly as they are chosen
-    randomly and can throw the GA off. The use of this functionality is only
-    encouraged for particularly complex contexts where you can't obtain good
-    enough results otherwise.
-
-For example, say we wanted to see the effect of selecting parents at random in
-each generation. Then we can set :code:`best_prop` to be zero, and
+For example, say we wanted to see the effect of selecting parents purely at
+random in each generation. Then, using the setting of the :ref:`first tutorial
+<refs-tutorial-i>`, we can set :code:`best_prop` to be zero, and
 :code:`lucky_prop` to be some non-negative value. Let's say that value is 0.25::
 
     >>> import edo

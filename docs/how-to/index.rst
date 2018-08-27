@@ -1,18 +1,15 @@
 .. _how-to:
 
-How-to
-======
+How-to...
+=========
 
-.. include:: seed.rst
+.. toctree::
+   :maxdepth: 2
 
-.. include:: stop.rst
-
-.. include:: selection.rst
-
-.. include:: mutation.rst
-
-.. include:: access_info.rst
-
-.. include:: customise_column.rst
-
-.. include:: new_column.rst
+   seed.rst
+   stop.rst
+   selection.rst
+   mutation.rst
+   access_info.rst
+   customise_column.rst
+   new_column.rst

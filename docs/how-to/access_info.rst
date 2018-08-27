@@ -30,6 +30,6 @@ Then the dataframe can be accessed like this::
 
 And the metadata like this::
 
-    >>> individual.column_metadata
+    >>> individual.metadata
     [Normal(mean=2.06, std=5.45), Poisson(lambda=9.64),
      Poisson(lambda=6.67), Normal(mean=3.13, std=1.38)]

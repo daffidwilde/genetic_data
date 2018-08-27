@@ -11,7 +11,7 @@ def x_squared(df):
 
 
 def main():
-    """ Run the GA in Example 1 and generate a plot of all fitness scores in
+    """ Run the GA in Tutorial 1 and generate a plot of all fitness scores in
     each epoch. """
 
     pop, fit, all_pops, all_fits = edo.run_algorithm(

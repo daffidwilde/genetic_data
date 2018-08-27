@@ -1,69 +1,58 @@
-Finding an optimal dataset
---------------------------
+Approximating the mean
+======================
 
-The problem
-+++++++++++
+Let :math:`X` be a dataset, with one column and :math:`n` rows. We wish to
+approximate the mean of :math:`X` using a sample of five of its elements,
+denoted by :math:`Y`. Therefore, we define the fitness of our dataset :math:`X`
+to be the squared error between the sample mean and the true mean.
 
-Given a set of :math:`n \in \mathbb{N}` numbers, :math:`X`, we can consider
-:math:`X` to be a dataset with a single column (attribute) and :math:`n` rows
-(instances). Let :math:`Y = \{y_1, \ldots y_5\}` be a random sample of five
-elements from :math:`X` -- with replacement. We define the fitness, :math:`\ f
-: \mathbb{R}^n \to \mathbb{R}`, of our dataset :math:`X` to be the square of the
-mean of our sample, :math:`Y`. That is:
-
-.. math::
-    f(X) = \bar Y^2, \quad
-    \text{where} \quad
-    \bar Y = \frac{1}{5} \sum_{i = 1}^{5} y_i
-
-Again, let our objective be to minimise this fitness function. 
-
-In terms of the genetic algorithm, we would expect an optimal solution to this
-problem to be a dataset, :math:`X`, whose entries have a mean of 0. This is due
-to the fact that the sample mean is an unbiased estimator to a population mean:
-
-.. math::
-    \mathbb{E}(\bar Y) = \bar X
+It should be clear that our objective is to minimise this function, and in terms
+of the genetic algorithm, we would expect an optimal solution to this problem to
+be a dataset whose entries have a variance of 0.
 
 For the sake of computational time, we will constrain :math:`n` to be between 5
-and 50. Again, let us assume that each set of numbers is sampled from a normal
-distribution from :math:`\mathcal{N}` as in the previous tutorial.
+and 50. Let us assume that each set of numbers is sampled from a normal
+distribution in the same fashion as the previous tutorial.
 
 Formulation
-+++++++++++
+-----------
 
 This problem is a little more complex than optimising a function like
 :math:`f(x) = x^2` so we'll keep the population size the same but increase the
 maximum number of iterations to 25. Other than that, we'll keep all the other
 settings the same.
 
-Import the libraries::
+First, import the libraries::
 
     >>> import edo
     >>> import matplotlib.pyplot as plt
 
-First we define the new fitness function::
+Now we define the fitness function, incorporating some :ref:`smoothing
+<smoothing>` to help account for the random sampling::
 
-    >>> def sample_mean_squared(df):
-    ...     return df.sample(5, replace=True).mean().mean() ** 2
+    >>> def squared_error(df, num_samples=50):
+    ...     errors = []
+    ...     for _ in range(num_samples):
+    ...        sample_mean = df.sample(5, replace=True).mean().mean()
+    ...        errors.append((df.mean().mean() - sample_mean) ** 2)
+    ...     return sum(errors) / len(errors)
 
 Then we adjust the limits on the number of rows a dataset can take and run the
-GA again with :code:`sample_mean_squared` as its fitness function::
+GA again with our new fitness function::
 
     >>> pop, fit, all_pops, all_fits = edo.run_algorithm(
-    ...     fitness=sample_mean_squared,
+    ...     fitness=squared_error,
     ...     size=100,
     ...     row_limits=[5, 50],
     ...     col_limits=[1, 1],
     ...     max_iter=25,
-    ...     maximise=False,
     ...     seed=0
     ... )
 
-Seems simple enough. Let's have a look at the results.
+Simple enough. Let's have a look at the results.
 
 Visualising results
-+++++++++++++++++++
+-------------------
 
 The fitness function isn't as easily visualised as in the first tutorial. So,
 instead, let us consider how the fitnesses are distributed in each timestep.
@@ -73,12 +62,15 @@ fitnesses in later timesteps, we will use a logarithmic scale::
 
     >>> fig, ax = plt.subplots(1, figsize=(32, 12), dpi=300)
 
-    >>> ax.boxplot(all_fits, positions=range(len(all_fits)), sym='.')
+    >>> ax.boxplot(all_fits, positions=range(len(all_fits)), sym='.', showmeans=True)
 
     >>> ax.set_title(f'Fitness scores in each epoch', size=24, pad=25)
     >>> ax.set_yscale('log')
     >>> ax.set_xlabel('Epoch', size=24)
     >>> ax.set_ylabel(r'$\log(f(X))$', size=24)
+
+    >>> for label in ax.get_xticklabels() + ax.get_yticklabels():
+    ...     label.set_fontsize(20)
 
     >>> plt.tight_layout()
     >>> plt.show()
@@ -90,19 +82,4 @@ Running the above code gives the following plot:
    :align: center
    :alt: Fitness scores over the duration of the GA
 
-The first thing to see is that the median score is settling at around 0.1 which
-is a bit high. That means there is probably scope for some parameter
-optimisation here.
 
-The second thing to note is that individuals don't seem to be being carried
-forward into the next generation. This is seen by the large jumps in the lower
-whiskers of the boxplots. However, the best individuals are taken forward. The
-discrepancy in fitness scores between generations owes to the sampling in the
-fitness function; each time the fitness of an individual is taken, a new sample
-is used, giving a potentially different fitness.
-
-There are issues with convergence and effective parent selection when this
-stochastic behaviour isn't accounted for. As a result, it is recommended that if
-the fitness function of interest has this kind of behaviour then some `smoothing
-<https://en.wikipedia.org/wiki/Smoothing>`_ should be incorporated into the
-function which is passed to :code:`run_algorithm`.

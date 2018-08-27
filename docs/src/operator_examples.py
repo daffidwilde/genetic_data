@@ -10,7 +10,7 @@ row_limits, col_limits = [1, 3], [1, 5]
 pdfs = [Poisson]
 
 parents = [create_individual(row_limits, col_limits, pdfs) for _ in range(2)]
-offspring = crossover(*parents, prob=0.5)
+offspring = crossover(*parents, prob=0.5, col_limits=col_limits, pdfs=pdfs)
 mutant = mutation(
     offspring,
     prob=0.5,

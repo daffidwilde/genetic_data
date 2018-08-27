@@ -1,12 +1,11 @@
+.. _refs-tutorial-i:
+
 Optimising a function
----------------------
+=====================
 
-The problem
-+++++++++++
-
-Suppose we want to optimise the function :math:`f(x) = x^2` for :math:`x \in
-\mathbb{R}`. We can use our GA here by considering each :math:`x` to be a
-dataset with exactly one row and one column like so:
+Suppose we want to optimise the function :math:`f(x) = x^2` across the whole
+real line. We can consider each :math:`x` to be a dataset with exactly one row
+and one column like so:
 
 .. table::
    :align: center
@@ -18,26 +17,17 @@ dataset with exactly one row and one column like so:
    +-----------+-----------+
 
 For the sake of this example, let us assume our initial population has 100
-individuals in it, and each of these :math:`x` values is normally distributed.
-To incorporate some spread in the search space, let us allow these distributions
-to randomly sample their mean and standard deviation within some bounds. By
-default, these bounds are [-10, 10] and [0, 10] respectively for normally
-distributed data.
+individuals in it, each of which is normally distributed.
 
-That is, each initial :math:`x` is sampled from a distribution in the family of
-normal distributions given by:
-
-.. math::
-    \mathcal{N} = \left\{
-        N \left(\mu, \sigma^2\right) | \ \mu \in [-10, 10], \sigma \in [0,10]
-    \right\}
+Let us allow these normal distributions to randomly sample their mean and
+standard deviation within the bounds [-10, 10] and [0, 10] respectively.
 
 The hope is that the GA will converge to something near the optimum of
-:math:`f(x)` relatively quickly, so we will not impose any additional stopping
-conditions except for a maximum number of iterations of 5.
+:math:`f(x)` relatively quickly, so we will only allow the algorithm to run for
+a maximum of 5 iterations.
 
 Formulation
-+++++++++++
+-----------
 
 So, to formulate and solve this problem in Edo we do the following:
 
@@ -45,7 +35,7 @@ First, import the library::
 
     >>> import edo
 
-Define fitness::
+Define our fitness function::
 
     >>> def x_squared(df):
     ...     return df.iloc[0, 0] ** 2
@@ -73,7 +63,7 @@ simulation. These are held in the variables :code:`pop`, :code:`fit`,
     :ref:`how-to` section, and their definitions are listed in :ref:`params`.
 
 Visualising results
-+++++++++++++++++++
+-------------------
 
 To see the results of the GA (and whether it worked as expected) we will plot
 the fitnesses of all the individuals at each epoch (timestep).
@@ -117,7 +107,7 @@ points)::
     ...     if i in [4, 5]:
     ...         axes[j].set_xlabel(r'$x$', size=24)
     ...     if i in [0, 2, 4]:
-    ...         ax.set_ylabel('Fitness', size=24)
+    ...         axes[j].set_ylabel('Fitness', size=24)
 
     >>> plt.tight_layout(pad=5)
     >>> plt.show()
@@ -129,5 +119,4 @@ The above code should give a figure like this:
    :align: center
    :alt: Fitness scores of every individual
 
-So the GA has successfully started converging towards zero but we aren't quite
-there yet. Running the algorithm for a bit longer would help that. Good news!
+So the GA has successfully started converging towards zero. Good news!

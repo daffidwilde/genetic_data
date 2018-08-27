@@ -4,4 +4,9 @@ Discussion
 .. toctree::
    :maxdepth: 2
 
-   representation.rst
+   crossover.rst
+   individual.rst
+   mutation.rst
+   seed.rst
+   selection.rst
+   smoothing.rst
