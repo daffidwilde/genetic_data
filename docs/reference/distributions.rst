@@ -3,7 +3,7 @@
 Implemented distributions
 -------------------------
 
-The following distributions are currently implemented in GeneticData:
+The following distributions are currently implemented in Edo:
 
 Continuous
 ++++++++++

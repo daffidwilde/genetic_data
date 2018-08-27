@@ -21,7 +21,8 @@ For example, say we wanted to see the effect of selecting parents at random in
 each generation. Then we can set :code:`best_prop` to be zero, and
 :code:`lucky_prop` to be some non-negative value. Let's say that value is 0.25::
 
-    >>> pop, fit, all_pops, all_fits = gd.run_algorithm(
+    >>> import edo
+    >>> pop, fit, all_pops, all_fits = edo.run_algorithm(
     ...     fitness=x_squared,
     ...     size=100,
     ...     row_limits=[1, 1],

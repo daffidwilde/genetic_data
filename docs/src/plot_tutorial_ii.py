@@ -1,13 +1,13 @@
 import numpy as np
-import genetic_data as gd
 import matplotlib.pyplot as plt
+import edo
 
 
 def sample_mean_squared(df):
     return df.sample(5, replace=True).mean().mean() ** 2
 
 
-pop, fit, all_pops, all_fits = gd.run_algorithm(
+pop, fit, all_pops, all_fits = edo.run_algorithm(
     fitness=sample_mean_squared,
     size=100,
     row_limits=[5, 50],

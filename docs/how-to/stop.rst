@@ -31,7 +31,8 @@ condition on the mean fitness of a population::
 
 Then we simply pass that function to :code:`run_algorithm`, like so::
 
-    >>> pop, fit, all_pops, all_fits = gd.run_algorithm(
+    >>> import edo
+    >>> pop, fit, all_pops, all_fits = edo.run_algorithm(
     ...     fitness=x_squared,
     ...     size=100,
     ...     row_limits=[1, 1],

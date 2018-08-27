@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import genetic_data as gd
+import edo
 
 
 def x_squared(df):
@@ -14,7 +14,7 @@ def main():
     """ Run the GA in Example 1 and generate a plot of all fitness scores in
     each epoch. """
 
-    pop, fit, all_pops, all_fits = gd.run_algorithm(
+    pop, fit, all_pops, all_fits = edo.run_algorithm(
         fitness=x_squared,
         size=100,
         row_limits=[1, 1],

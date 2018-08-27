@@ -1,29 +1,15 @@
-<<<<<<< HEAD
 Finding an optimal dataset
 --------------------------
-=======
-Optimising a sample mean
-------------------------
->>>>>>> 0bed3846953a5ecf05329ee36048fa1fc65f57b1
 
 The problem
 +++++++++++
 
-<<<<<<< HEAD
-Given a set of :math:`n` numbers, :math:`X`, we can consider :math:`X` to be a
-dataset with a single column (attribute) and :math:`n` rows (instances). Let
-:math:`Y = \{y_1, \ldots y_5\}` be a random sample of five elements from
-:math:`X`. We define the fitness, :math:`\ f : \mathbb{R}^n \to \mathbb{R}`, of
-our dataset :math:`X` to be the square of the mean of our sample, :math:`Y`.
-That is:
-=======
 Given a set of :math:`n \in \mathbb{N}` numbers, :math:`X`, we can consider
 :math:`X` to be a dataset with a single column (attribute) and :math:`n` rows
 (instances). Let :math:`Y = \{y_1, \ldots y_5\}` be a random sample of five
 elements from :math:`X` -- with replacement. We define the fitness, :math:`\ f
 : \mathbb{R}^n \to \mathbb{R}`, of our dataset :math:`X` to be the square of the
 mean of our sample, :math:`Y`. That is:
->>>>>>> 0bed3846953a5ecf05329ee36048fa1fc65f57b1
 
 .. math::
     f(X) = \bar Y^2, \quad
@@ -32,11 +18,6 @@ mean of our sample, :math:`Y`. That is:
 
 Again, let our objective be to minimise this fitness function. 
 
-<<<<<<< HEAD
-In terms of the genetic algorithm, we would expect an optimal solution to be a
-dataset whose entries have a mean of 0. This is due to the fact that the sample
-mean is an unbiased estimator to a population mean.
-=======
 In terms of the genetic algorithm, we would expect an optimal solution to this
 problem to be a dataset, :math:`X`, whose entries have a mean of 0. This is due
 to the fact that the sample mean is an unbiased estimator to a population mean:
@@ -125,4 +106,3 @@ stochastic behaviour isn't accounted for. As a result, it is recommended that if
 the fitness function of interest has this kind of behaviour then some `smoothing
 <https://en.wikipedia.org/wiki/Smoothing>`_ should be incorporated into the
 function which is passed to :code:`run_algorithm`.
->>>>>>> 0bed3846953a5ecf05329ee36048fa1fc65f57b1

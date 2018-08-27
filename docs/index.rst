@@ -1,13 +1,13 @@
-.. GeneticData documentation master file, created by
+.. Edo documentation master file, created by
    sphinx-quickstart on Mon Jul 16 12:37:18 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to GeneticData's documentation!
-=======================================
+Welcome to Edo's documentation!
+===============================
 
-GeneticData provides a framework for generating collections of effective
-artificial datasets through the application of a genetic algorithm (GA).
+Edo provides a framework for optimising the generation of artificial datasets
+through the application of a evolutionary dynamics and genetic algorithms (GAs).
 
 Consider a specific algorithm, and its objective function. This GA can take that
 objective function as its own fitness function to create generations of datasets

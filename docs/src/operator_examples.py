@@ -1,8 +1,8 @@
 import numpy as np
 
-from genetic_data.creation import create_individual
-from genetic_data.operators import crossover, mutation
-from genetic_data.pdfs import Poisson
+from edo.individual import create_individual
+from edo.operators import crossover, mutation
+from edo.pdfs import Poisson
 
 np.random.seed(0)
 
@@ -27,7 +27,7 @@ with open("../reference/parents.rst", "w") as parent_file:
     string = "And their metadata is::\n\n    "
     for parent in parents:
         string += "["
-        for col in parent.column_metadata:
+        for col in parent.metadata:
             string += col.__repr__() + ", "
         string = string[:-2]
         string += "] \n    "
@@ -36,7 +36,7 @@ with open("../reference/parents.rst", "w") as parent_file:
 for ind, name in zip([offspring, mutant], ["offspring", "mutant"]):
     with open(f"../reference/{name}.rst", "w") as ind_file:
         string = "With the following metadata::\n\n    ["
-        for col in ind.column_metadata:
+        for col in ind.metadata:
             string += col.__repr__() + ", "
         string = string[:-2]
         string += "]"

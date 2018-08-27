@@ -11,7 +11,7 @@ You can take any distribution that is :ref:`currently implemented
 algorithm. Consider the family of normal distributions. The default bounds are
 -10 and 10 for the mean, and 0 and 10 for the standard deviation::
 
-    >>> from genetic_data.pdfs import Normal
+    >>> from edo.pdfs import Normal
 
     >>> Normal.mean_limits, Normal.std_limits
     ([-10, 10], [0, 10])

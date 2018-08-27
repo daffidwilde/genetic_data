@@ -7,8 +7,8 @@ word :code:`cow` appears in a column made up of farm animals, then you
 have the freedom to do that.
 
 One of the key benefits of how individuals are represented and operated on in
-GeneticData is that the GA will behave in exactly the same way regardless of
-what's actually in the dataframe its acting on. That means you can use any
+Edo is that the GA will behave in exactly the same way regardless of what's
+actually in the dataframe its acting on. That means you can use any
 distribution(s) to generate individuals -- including one that samples the names
 of farm animals from a list according to some probability distribution.
 
@@ -17,7 +17,7 @@ from the :code:`Distribution` base class::
 
     >>> import numpy as np
     >>> import itertools
-    >>> from genetic_data.pdfs import Distribution
+    >>> from edo.pdfs import Distribution
 
     >>> class FarmAnimal(Distribution):
     ...     """ A distribution for sampling the names of some farm animals. """

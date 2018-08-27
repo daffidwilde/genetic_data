@@ -9,14 +9,15 @@ You can access each of these things in the same way you would class attributes.
 To demonstrate, let's create an individual::
 
     >>> import numpy as np
-    >>> from genetic_data.creation import create_individual
-    >>> from genetic_data.pdfs import Normal, Poisson
+    >>> from edo.individual import create_individual
+    >>> from edo.pdfs import Normal, Poisson
 
     >>> np.random.seed(0)
     >>> individual = create_individual(
     ...     row_limits=[3, 3],
     ...     col_limits=[4, 4],
-    ...     pdfs=[Normal, Poisson]
+    ...     pdfs=[Normal, Poisson],
+    ...     weights=None
     ... )
 
 Then the dataframe can be accessed like this::

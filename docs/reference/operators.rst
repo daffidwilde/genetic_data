@@ -15,7 +15,7 @@ current population to act as the "parents" of the next generation. Almost
 always, selection operators determine whether an individual should become a
 parent based on their fitness.
 
-In GeneticData, a proportion of the best performing datasets are taken from the
+In Edo, a proportion of the best performing datasets are taken from the
 population where the meaning of "best" is controlled by the :code:`maximise`
 parameter. We also allow for the random selection of some "lucky" individuals to
 be carried forward with the fittest members of the population, if there are any
@@ -35,7 +35,7 @@ Crossover
 ---------
 
 Crossover operators take two individuals (parents) and return one or more
-"offspring" individuals. In GeneticData, the crossover operator returns exactly
+"offspring" individuals. In Edo, the crossover operator returns exactly
 one individual from a pair of parents.
 
 An individual is defined by its dimensions and its values. So, in the crossover
@@ -71,9 +71,9 @@ Example
 Import the relative pieces from :code:`genetic_data`::
 
     >>> import numpy as np
-    >>> from genetic_data.creation import create_individual
-    >>> from genetic_data.operators import crossover
-    >>> from genetic_data.pdfs import Poisson
+    >>> from edo.individual import create_individual
+    >>> from edo.operators import crossover
+    >>> from edo.pdfs import Poisson
 
 Set a seed::
 
@@ -124,7 +124,7 @@ process. There are many ways of mutating an individual. The most common is to
 take each individual in the population of offspting and run along their alleles,
 deciding whether or not to mutate that allele according to a small probability.
 
-In GeneticData, this probability is controlled by the parameter
+In Edo, this probability is controlled by the parameter
 :code:`mutation_prob` in :code:`run_algorithm`. However, the method of mutation
 is not quite as simple. An individual is mutated in the following way:
 
@@ -144,7 +144,7 @@ Example
 
 Import the mutation operator::
 
-    >>> from genetic_data.operators import mutation
+    >>> from edo.operators import mutation
 
 Set the mutation probability. This is deliberately large to make for a
 substantial mutation::

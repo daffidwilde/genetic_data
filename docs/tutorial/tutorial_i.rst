@@ -39,7 +39,7 @@ conditions except for a maximum number of iterations of 5.
 Formulation
 +++++++++++
 
-So, to formulate and solve this problem in GeneticData we do the following:
+So, to formulate and solve this problem in Edo we do the following:
 
 First, import the library::
 
