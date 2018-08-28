@@ -1,4 +1,4 @@
-""" Function(s) for the selection operator. """
+""" .. Function(s) for the selection operator. """
 
 from copy import deepcopy
 

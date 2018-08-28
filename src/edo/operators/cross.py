@@ -1,4 +1,4 @@
-""" A script containing all relevant functions for the crossover process. """
+""" .. A script containing all relevant functions for the crossover process. """
 
 import numpy as np
 import pandas as pd
@@ -73,11 +73,31 @@ def _cross_remaining_cols(
 
 def crossover(parent1, parent2, col_limits, pdfs, prob=0.5):
     """ Blend the information from two parents to create a new
-    :code:`Individual`. Dimensions are inherited from either parent according to
-    the cut-off probability :code:`prob`. Then column-metadata pairs from each
-    parent are pooled together and sampled uniformly according to
-    :code:`col_limits`. This information is then collated to form a new
-    individual, filling in missing values as necessary. """
+    :code:`Individual`. Dimensions are inherited first, and then column-metadata
+    pairs are inherited from either parent uniformly. Missing values are filled
+    in as necessary.
+
+    Parameters
+    ----------
+    parent1 : Individual
+        The first individual to be blended.
+    parent2 : Individual
+        The second individual to be blended.
+    col_limits : list
+        Lower and upper bounds on the number of columns :code:`offspring` can
+        have. Used in case of tuple limits.
+    pdfs : list
+        Families of distributions with which to create new columns. Used in case
+        of tuple column limits.
+    prob : float, optional
+        The cut-off probability with which to inherit dimensions from
+        :code:`parent1` over :code:`parent2`.
+
+    Returns
+    -------
+    offspring : Individual
+        A new individual formed from the dimensions and columns of its parents.
+    """
 
     parent_columns, parent_metadata = _collate_parents(parent1, parent2)
     cols, metadata = [], []

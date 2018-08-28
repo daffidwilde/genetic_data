@@ -1,4 +1,4 @@
-""" The main script containing a generic genetic algorithm. """
+""" .. The main script containing a generic genetic algorithm. """
 
 import numpy as np
 
@@ -25,14 +25,14 @@ def run_algorithm(
     seed=None,
     fitness_kwargs=None,
 ):
-    """ Run a genetic algorithm (GA) under the presented constraints, giving a
-    population of artificial datasets for which the fitness function performs
-    well.
+    """ Run a genetic algorithm under the presented constraints, giving a
+    population of artificial datasets for which the given fitness function
+    performs well.
 
     Parameters
     ----------
     fitness : func
-        Any real-valued function that takes one :code:`pandas.DataFrame` as
+        Any real-valued function that takes one :class:`pandas.DataFrame` as
         argument. Use the :code:`maximise` parameter to determine how
         :code:`fitness` should be interpreted.
     size : int
@@ -41,23 +41,27 @@ def run_algorithm(
         Lower and upper bounds on the number of rows a dataset can have.
     col_limits : list
         Lower and upper bounds on the number of columns a dataset can have.
+
         Tuples can also be used to specify the min/maximum number of columns
         there can be of each type in :code:`pdfs`.
     pdfs : list
         Used to create the initial population and instruct the GA how a column
-        should be manipulated in a dataset. These classes represent the
-        distribution each column of a dataset can take. By default, a
-        random-parameter normal distribution is used. For reproducibility, a
-        user-defined class' :code:`sample` method should NumPy as the seed for
-        the GA is set using :code:`np.random.seed`.
+        should be manipulated in a dataset. By default, a random-parameter
+        normal distribution is used.
+
+        .. note::
+            For reproducibility, a user-defined class' :code:`sample` method
+            should use NumPy for any random elements as the seed for the GA is
+            set using :func:`np.random.seed`.
     weights : list
         A probability distribution on how to select columns from
         :code:`pdfs`. If :code:`None`, pdfs will be chosen uniformly.
     stop : func
-        A function which acts as a stopping condition on the GA. Such functions
-        should take only the fitness of the current population as argument.
-        If :code:`None`, the GA will run up until its maximum number of
-        iterations.
+        A function which acts as a stopping condition on the GA.
+
+        Such functions should take only the fitness of the current population as
+        argument. If :code:`None`, the GA will run up until its maximum number
+        of iterations.
     max_iter : int
         The maximum number of iterations to be carried out before terminating.
     best_prop : float

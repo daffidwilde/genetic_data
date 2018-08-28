@@ -1,4 +1,4 @@
-""" Functions related to the mutation operator. """
+""" .. Functions related to the mutation operator. """
 
 from copy import deepcopy
 
@@ -68,7 +68,29 @@ def _mutate_values(dataframe, metadata, prob):
 def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
     """ Mutate an individual. Here, the characteristics of an individual can be
     split into two parts: their dimensions, and their values. Each of these
-    parts is mutated in a different way using the same probability, `prob`. """
+    parts is mutated in a different way using the same probability, `prob`.
+
+    Parameters
+    ----------
+    individual : Individual
+        The individual to be mutated.
+    prob : float
+        The probability with which any characteristic of :code:`individual`
+        should be mutated.
+    row_limits : list
+        Lower and upper limits on the number of rows an individual can have.
+    col_limits : list
+        Lower and upper limits on the number of columns an individual can have.
+    pdfs : list
+        Families of distributions with which to create new columns.
+    weights : list
+        Probability with which to sample a distribution from :code:`pdfs`.
+
+    Returns
+    -------
+    mutant : Individual
+        A (potentially) mutated individual.
+    """
 
     dataframe, metadata = deepcopy(individual)
     dataframe, metadata = _mutate_nrows(dataframe, metadata, row_limits, prob)
