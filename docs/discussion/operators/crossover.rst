@@ -20,7 +20,7 @@ Parameters
 Example
 -------
 
-Import the relative pieces from :code:`edo`::
+Import :mod:`numpy` and the relative pieces from :code:`edo`::
 
     >>> import numpy as np
     >>> from edo.individual import create_individual
@@ -31,15 +31,16 @@ Set a seed::
 
     >>> np.random.seed(0)
 
-Define the constraints and initial parameters of the simulation::
+Define the constraints and parameters of the simulation::
 
     >>> row_limits, col_limits = [1, 3], [1, 5]
     >>> pdfs = [Poisson]
 
 Generate two individuals::
 
-    >>> parents = [create_individual(row_limits, col_limits, pdfs) \
-    ...            for _ in range(2)]
+    >>> parents = [
+    ...     create_individual(row_limits, col_limits, pdfs) for _ in range(2)
+    ... ]
 
 These individuals' dataframes look like this:
 
@@ -53,9 +54,10 @@ These individuals' dataframes look like this:
 
 .. include:: parents.rst
 
-Now, we apply the crossover::
+Now, we set the cut-off probability and apply the crossover::
 
-    >>> offspring = crossover(*parents, prob=0.5)
+    >>> crossover_prob = 0.5
+    >>> offspring = crossover(*parents, col_limits, pdfs, crossover_prob)
 
 Then :code:`offspring` has the following dataset:
 

@@ -5,6 +5,6 @@ Discussion
    :maxdepth: 2
 
    individual.rst
-   operators.rst
+   operators/index.rst
    seed.rst
    smoothing.rst
