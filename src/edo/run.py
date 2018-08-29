@@ -2,7 +2,6 @@
 
 import numpy as np
 
-from .pdfs import Normal
 from .fitness import get_fitness
 from .operators import selection
 from .population import create_initial_population, create_new_population
@@ -13,7 +12,7 @@ def run_algorithm(
     size,
     row_limits,
     col_limits,
-    pdfs=[Normal],
+    pdfs,
     weights=None,
     stop=None,
     max_iter=100,
@@ -46,8 +45,7 @@ def run_algorithm(
         there can be of each type in :code:`pdfs`.
     pdfs : list
         Used to create the initial population and instruct the GA how a column
-        should be manipulated in a dataset. By default, a random-parameter
-        normal distribution is used.
+        should be manipulated in a dataset.
 
         .. note::
             For reproducibility, a user-defined class' :code:`sample` method
