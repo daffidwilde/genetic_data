@@ -65,7 +65,7 @@ def _mutate_values(dataframe, metadata, prob):
     return dataframe
 
 
-def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
+def mutation(individual, prob, row_limits, col_limits, pdfs, weights=None):
     """ Mutate an individual. Here, the characteristics of an individual can be
     split into two parts: their dimensions, and their values. Each of these
     parts is mutated in a different way using the same probability, `prob`.
@@ -83,8 +83,9 @@ def mutation(individual, prob, row_limits, col_limits, pdfs, weights):
         Lower and upper limits on the number of columns an individual can have.
     pdfs : list
         Families of distributions with which to create new columns.
-    weights : list
-        Probability with which to sample a distribution from :code:`pdfs`.
+    weights : list, optional
+        Probability with which to sample a distribution from :code:`pdfs`. If
+        :code:`None`, sample uniformly.
 
     Returns
     -------

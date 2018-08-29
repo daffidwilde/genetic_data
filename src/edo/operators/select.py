@@ -5,12 +5,38 @@ from copy import deepcopy
 import numpy as np
 
 
-def selection(population, pop_fitness, best_prop, lucky_prop, maximise):
-    """ Given a population, select a proportion of the `best` individuals and
-    another of the `lucky` individuals (if they are available) to form a set of
-    potential parents. This mirrors the survival of the fittest paradigm whilst
-    including a number of less-fit individuals to stop the algorithm from
-    converging too early on a suboptimal population. """
+def selection(population, pop_fitness, best_prop, lucky_prop, maximise=False):
+    """ Given a population, select a proportion of the "best"" individuals and
+    another of the "lucky" individuals (if they are available) to form a set of
+    potential parents.
+
+    Parameters
+    ----------
+    population : list
+        All current individuals.
+    pop_fitness : list
+        The fitness of each individual in :code:`population`.
+    best_prop : float
+        The proportion of the fittest individuals in :code:`population` to be
+        selected.
+    lucky_prop : float
+        The proportion of lucky individuals in :code:`population` to be
+        selected.
+    maximise : bool, optional
+        Determines whether an individual's fitness should be minimal or not.
+        Defaults to minimise.
+
+    Returns
+    -------
+    parents : list
+        The individuals chosen to potentially become parents.
+
+    Raises
+    ------
+    ValueError
+        If :code:`int(best_prop * len(population)) == 0` and
+        :code:`int(lucky_prop * len(population)) == 0`.
+    """
 
     size = len(population)
     num_best = int(best_prop * size)
