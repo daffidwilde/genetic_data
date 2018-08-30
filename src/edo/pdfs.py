@@ -6,7 +6,7 @@ import numpy as np
 class Distribution(object):
     """ A base class for the distributions below and those defined by users. """
 
-    name = 'Distribution'
+    name = "Distribution"
 
     def sample(self):
         """ Raise a NotImplementedError by default. """
@@ -15,25 +15,25 @@ class Distribution(object):
 
     def __repr__(self):
 
-        params = ''
+        params = ""
         for key, val in self.__dict__.items():
-            params += f'{key}={val:.2f}, '
+            params += f"{key}={val:.2f}, "
         params = params[:-2]
 
-        return f'{self.name}({params})'
+        return f"{self.name}({params})"
 
     def to_tuple(self):
         """ Returns the type of distribution, and the names and values of all
         parameters as a tuple. This is used for the saving of data and little
         else. """
 
-        out = []
+        out = [self.name]
         for key, val in self.__dict__.items():
-            if key != 'name':
-                out.append(key)
+            out.append(key)
             out.append(val)
 
         return tuple(out)
+
 
 # ========================
 # CONTINUOUS DISTRIBUTIONS
@@ -43,7 +43,8 @@ class Distribution(object):
 class Gamma(Distribution):
     """ Continuous column pdf given by the gamma distribution. """
 
-    name = 'Gamma'
+    name = "Gamma"
+    dtype = "float"
     alpha_limits = [0, 10]
     theta_limits = [0, 10]
 
@@ -63,7 +64,8 @@ class Gamma(Distribution):
 class Normal(Distribution):
     """ Continuous column pdf given by the normal distribution. """
 
-    name = 'Normal'
+    name = "Normal"
+    dtype = "float"
     mean_limits = [-10, 10]
     std_limits = [0, 10]
 
@@ -88,7 +90,8 @@ class Bernoulli(Distribution):
     """ Discrete column pdf given by the Bernoulli distribution. That is, the
     binomial distribution with 1 trial. """
 
-    name = 'Bernoulli'
+    name = "Bernoulli"
+    dtype = "int"
     prob_limits = [0, 1]
 
     def __init__(self):
@@ -105,7 +108,8 @@ class Bernoulli(Distribution):
 class Poisson(Distribution):
     """ Discrete column pdf given by the Poisson distribution. """
 
-    name = 'Poisson'
+    name = "Poisson"
+    dtype = "int"
     lam_limits = [0, 10]
 
     def __init__(self):

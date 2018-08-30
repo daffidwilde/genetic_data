@@ -17,47 +17,53 @@ LIMITS = (
 )
 
 
-def test_Distribution_sample():
+def test_nosamplemethod_error():
     """ Verify Distribution object alone raises an error when trying to sample
     from it. """
 
     with pytest.raises(NotImplementedError):
         dist = Distribution()
-        sample = dist.sample()
+        dist.sample()
 
 
-def test_to_tuple():
+@given(seed=integers(min_value=0))
+def test_repr(seed):
+    """ Assert that Distribution objects have the correct string. """
+
+    np.random.seed(seed)
+    for pdf_class in [Gamma, Normal, Bernoulli, Poisson]:
+        pdf = pdf_class()
+        assert str(pdf).startswith(pdf.name)
+
+
+@given(nrows=integers(min_value=1), seed=integers(min_value=0))
+def test_sample(nrows, seed):
+    """ Verify that Distribution objects can sample correctly. """
+
+    np.random.seed(seed)
+    for pdf_class in [Gamma, Normal, Bernoulli, Poisson]:
+        pdf = pdf_class()
+        sample = pdf.sample(nrows)
+        assert sample.shape == (nrows,)
+        assert sample.dtype == pdf.dtype
+
+
+@given(seed=integers(min_value=0))
+def test_to_tuple(seed):
     """ Verify that objects can pass their information to a tuple of the correct
     length and form. """
 
+    np.random.seed(seed)
     for pdf_class in [Gamma, Normal, Bernoulli, Poisson]:
         pdf = pdf_class()
         out = pdf.to_tuple()
-        assert 2 * len(pdf.__dict__) - len(out) == 1
+        assert len(out) - 2 * len(pdf.__dict__) == 1
         assert out[0] == pdf.name
 
 
 # =====
 # GAMMA
 # =====
-
-
-@given(seed=integers(min_value=0))
-def test_Gamma_string(seed):
-    """ Assert that a Gamma object has the correct string presentation. """
-    np.random.seed(0)
-    gamma = Gamma()
-    assert str(gamma).startswith("Gamma")
-
-
-@given(nrows=integers(min_value=1), seed=integers(min_value=0))
-def test_Gamma_sample(nrows, seed):
-    """ Verify that a Gamma object can sample correctly. """
-    np.random.seed(seed)
-    gamma = Gamma()
-    sample = gamma.sample(nrows)
-    assert sample.shape == (nrows,)
-    assert sample.dtype == "float"
 
 
 @given(alpha_limits=LIMITS, theta_limits=LIMITS, seed=integers(min_value=0))
@@ -79,24 +85,6 @@ def test_Gamma_set_param_limits(alpha_limits, theta_limits, seed):
 # ======
 
 
-@given(seed=integers(min_value=0))
-def test_Normal_string(seed):
-    """ Assert that a Normal object has the correct string representation. """
-    np.random.seed(0)
-    normal = Normal()
-    assert str(normal).startswith("Normal")
-
-
-@given(nrows=integers(min_value=1), seed=integers(min_value=0))
-def test_Normal_sample(nrows, seed):
-    """ Verify that a Normal object can sample correctly. """
-    np.random.seed(seed)
-    normal = Normal()
-    sample = normal.sample(nrows)
-    assert sample.shape == (nrows,)
-    assert sample.dtype == "float"
-
-
 @given(mean_limits=LIMITS, std_limits=LIMITS, seed=integers(min_value=0))
 def test_Normal_set_param_limits(mean_limits, std_limits, seed):
     """ Check that a Normal object can sample its parameters correctly if its
@@ -114,23 +102,6 @@ def test_Normal_set_param_limits(mean_limits, std_limits, seed):
 # =========
 # BERNOULLI
 # =========
-
-
-@given(seed=integers(min_value=0))
-def test_Bernoulli_string(seed):
-    """ Assert that a Poisson object has the correct string representation. """
-    np.random.seed(seed)
-    bernoulli = Bernoulli()
-    assert str(bernoulli).startswith("Bernoulli")
-
-
-@given(nrows=integers(min_value=1), seed=integers(min_value=0))
-def test_Bernoulli_sample(nrows, seed):
-    np.random.seed(seed)
-    bernoulli = Bernoulli()
-    sample = bernoulli.sample(nrows)
-    assert sample.shape == (nrows,)
-    assert sample.dtype == "int"
 
 
 @given(
@@ -155,24 +126,6 @@ def test_Bernoulli_set_param_limits(prob_limits, seed):
 # =======
 # POISSON
 # =======
-
-
-@given(seed=integers(min_value=0))
-def test_Poisson_string(seed):
-    """ Assert that a Poisson object has the correct string representation. """
-    np.random.seed(seed)
-    poisson = Poisson()
-    assert str(poisson).startswith("Poisson")
-
-
-@given(nrows=integers(min_value=1), seed=integers(min_value=0))
-def test_Poisson_sample(nrows, seed):
-    """ Verify that a Poisson object can sample correctly. """
-    np.random.seed(seed)
-    poisson = Poisson()
-    sample = poisson.sample(nrows)
-    assert sample.shape == (nrows,)
-    assert sample.dtype == "int"
 
 
 @given(lam_limits=LIMITS, seed=integers(min_value=0))
