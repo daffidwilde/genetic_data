@@ -124,6 +124,9 @@ def test_crossover_int_int_lims(row_limits, col_limits, weights, prob):
     for pdf in metadata:
         assert pdf in parent1.metadata + parent2.metadata
 
+    for dtype, pdf in zip(dataframe.dtypes, metadata):
+        assert dtype == pdf.dtype
+
     for i in range(2):
         assert dataframe.shape[i] in [
             parent1.dataframe.shape[i],

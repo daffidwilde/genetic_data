@@ -28,13 +28,14 @@ def _fillna(dataframe, metadata):
     """ Fill in `NaN` values of a column by sampling from the distribution
     associated with it. """
 
-    for i, col in enumerate(dataframe.columns):
+    for col, pdf in zip(dataframe.columns, metadata):
         data = dataframe[col]
-        pdf = metadata[i]
         if data.isnull().any():
             nulls = data.isnull()
             samples = pdf.sample(nulls.sum())
             dataframe.loc[nulls, col] = samples
+
+        dataframe[col] = dataframe[col].astype(pdf.dtype)
 
     return dataframe
 
