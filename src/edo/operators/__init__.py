@@ -1,3 +1,5 @@
-from .cross import crossover
-from .mutate import mutation
-from .select import selection
+""" .. All bio-operators. """
+
+from .crossover import crossover
+from .mutation import mutation
+from .selection import selection
