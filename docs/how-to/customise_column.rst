@@ -1,17 +1,20 @@
 Customise column distributions
 ------------------------------
 
-As is discussed in the :ref:`tutorials <refs-tutorials>`, the distribution
-classes that are passed to the :code:`pdfs` parameter are actually families of
-distributions. The limits on the parameters of those distributions can be
-altered.
+As is discussed in :ref:`representation`, the distribution classes that are
+passed to the algorithm are actually families of distributions.
 
-You can take any distribution that is :ref:`currently implemented
-<dists>` and set the limits on its parameters before running the genetic
-algorithm. Consider the family of normal distributions. The default bounds are
--10 and 10 for the mean, and 0 and 10 for the standard deviation::
+In addition to using different distributions, the limits on the parameters of
+existing distributions can be altered before passing them to the algorithm.
 
-    >>> from edo.pdfs import Normal
+You can check out `dists` for a list of all the currently implemented
+distributions and their default parameters. But for now, let's consider the
+family of normal distributions::
+
+>>> from edo.pdfs import Normal
+
+The default bounds are -10 and 10 for the mean, and 0 and 10 for the standard
+deviation::
 
     >>> Normal.mean_limits, Normal.std_limits
     ([-10, 10], [0, 10])

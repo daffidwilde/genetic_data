@@ -1,6 +1,8 @@
 Individuals
 -----------
 
+.. _representation:
+
 Representation
 ++++++++++++++
 
