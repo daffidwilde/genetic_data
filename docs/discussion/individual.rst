@@ -6,27 +6,25 @@ Individuals
 Representation
 ++++++++++++++
 
-At the beginning of any GA, an initial population of individuals is generated.
-Typically, these individuals are created by sampling from a parameter space at
+At the beginning of a GA, an population of individuals is generated. Typically,
+these individuals are created by randomly sampling parameters from a space at
 random -- though `other methods exist
-<https://en.wikipedia.org/wiki/Latin_hypercube_sampling>`_ to get the most out
-of the parameter space.
+<https://en.wikipedia.org/wiki/Latin_hypercube_sampling>`_. Each individual
+represents a solution to the problem at hand and would
+classically be given in the form of a bit string to imitate a genetic
+chromosome. This traditional approach is what many would consider the defining
+feature of a genetic algorithm over some other evolutionary process but we
+believe that the inclusion of the biological operators (selection, crossover and
+mutation) are the most important features of a genetic algorithm.
 
-Each individual represents a solution to the problem at hand and would
-classically be given in the form of a bit string to imitate genetics more
-closely. Some people would say that this implimentation is not a genetic
-algorithm as this convention is not followed here.
-
-We believe that more meaningful manipulation of datasets can be done when they
-are left as such rather than compressing the information to obtain a bit string.
-We also believe that what makes an evolutionary algorithm genetic is the
-inclusion of biological operators for selection, crossover and mutation.
-
-So, in Edo, we represent individuals by both a physical dataset with rows and
-columns, and a list of probability distributions. Each distribution acts a set
-of instructions on how to create and mutate the values of the corresponding
-column in the dataset. More specifically, these quantities are contained in a
-single :code:`namedtuple` object.
+Since Edo deals with the creation of datasets, more meaningful manipulation of
+individuals can be done when they are left as datasets -- as opposed to
+converting the information to obtain a bit string. For computational reasons,
+individuals are represented by both a physical dataset with rows and columns,
+and a list of probability distributions. Each of these distributions acts a set
+of instructions on how to create, inherit from and mutate the values of the
+corresponding column in the dataset. These quantities are contained in a single
+:code:`namedtuple` object.
 
 .. note::
 
