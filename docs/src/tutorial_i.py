@@ -7,6 +7,7 @@ from edo.pdfs import Normal
 
 
 def x_squared(df):
+    """ Squared-value fitness. """
     return df.iloc[0, 0] ** 2
 
 
@@ -57,7 +58,9 @@ def main():
             label.set_fontsize(20)
 
     plt.tight_layout(pad=5)
-    plt.savefig("../_static/tutorial_i_plot.png")
+    plt.savefig(
+        "../_static/tutorial_i_plot.svg", format='svg', transparent=True
+    )
 
 
 if __name__ == "__main__":
