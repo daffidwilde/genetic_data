@@ -64,7 +64,7 @@ beneficial to not use a logarithmic scale::
 
    >>> plt.show()
 
-.. image:: ../_static/tutorial_iii_plot.png
+.. image:: ../_static/tutorial_iii_plot.svg
    :width: 100 %
    :align: center
    :alt: Fitness scores over the duration of the GA
@@ -92,7 +92,7 @@ We can also take a look at the best individual in the final population::
 
    >>> plt.show()
 
-.. image:: ../_static/tutorial_iii_ind.png
+.. image:: ../_static/tutorial_iii_ind.svg
    :width: 100 %
    :align: center
    :alt: The best individual in the final population

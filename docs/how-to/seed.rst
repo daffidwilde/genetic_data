@@ -94,7 +94,7 @@ For further verification, we can look at the fitness progression::
 
    >>> plt.show()
 
-.. image:: ../_static/seed.png
+.. image:: ../_static/seed.svg
    :width: 100 %
    :align: center
    :alt: Results for two different seeds

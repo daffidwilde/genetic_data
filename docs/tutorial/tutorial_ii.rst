@@ -80,7 +80,7 @@ fitnesses in later timesteps, we will use a logarithmic scale::
 
 Running the above code gives the following plot:
 
-.. image:: ../_static/tutorial_ii_plot.png
+.. image:: ../_static/tutorial_ii_plot.svg
    :width: 100 %
    :align: center
    :alt: Fitness scores over the duration of the GA
