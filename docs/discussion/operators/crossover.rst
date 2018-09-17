@@ -3,13 +3,27 @@
 Crossover
 =========
 
-Crossover operators allow the preservation of preferable characteristics in
-genetic algorithms. They take two individuals (parents) and return one or more
-"offspring" individuals.
+A crossover operator defines how two individuals should be combined to create a
+new individual (or individuals). Importantly, the crossover operator allows for
+the preservation of preferable characteristics found by the genetic algorithm.
 
 In Edo, the crossover operator returns exactly one individual from a pair of
-parents. Since an individual is defined by its dimensions and its values, an
-offspring inherits these characteristics in turn from its parents.
+parents. An individual is defined first, structurally, by its dimensions
+and then, qualitively, by its values, and so a new offspring inherits these
+characteristics in this order from its parents:
+
+1. Inherit a number of rows and a number of columns from either parent,
+   independently, and according to a cut-off probability. This gives an empty
+   dataset effectively.
+
+2. Pool together the columns (and respective column information) from both
+   parents and sample from them uniformly (and without replacement) to fill in 
+   the columns of the offspring's dataset. Whilst doing this, keep track of the
+   column information. Now the dataset has values and instructions on how to
+   manipulate it.
+
+3. Remove surplus rows as required, and fill in any missing values using the
+   corresponding column information. This is now a complete individual.
 
 Parameters for the crossover operator and their definitions can be found
 :ref:`here <params-crossover>`.

@@ -1,5 +1,7 @@
+.. :orphan:
+
 And their metadata is::
 
-    [Poisson(lambda=6.03)]
-    [Poisson(lambda=0.20), Poisson(lambda=4.61), Poisson(lambda=6.18), Poisson(lambda=5.70), Poisson(lambda=1.10)]
+    [Poisson(lam=6.03)]
+    [Poisson(lam=0.20), Poisson(lam=4.61), Poisson(lam=6.18), Poisson(lam=5.70), Poisson(lam=1.10)]
     

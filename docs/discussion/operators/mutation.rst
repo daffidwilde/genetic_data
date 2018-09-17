@@ -3,22 +3,25 @@
 Mutation
 ========
 
-To maintain a level of variety in a population and to force a GA to explore more
-of the search space, new individuals are mutated immediately after the crossover
-process.
+To maintain a level of variety in a population and to force the genetic
+algorithm to explore more of the search space, new individuals are mutated
+immediately after their creation during the crossover process.
 
-There are many ways of mutating an individual. The most common is to
-take each individual in the population of offspring and run along their alleles,
-deciding whether or not to mutate that allele according to a small probability.
-However, the method of mutation in Edo is not quite as simple. An individual is
+There are many ways of mutating an individual but the most common is to take
+each new offspring and run along their alleles, deciding whether or not to
+mutate that allele according to a small probability. For the chromosome
+representation of individuals, this means turning a 0 into a 1, and vice versa.
+
+The method of mutation in Edo is not quite as simple. An individual is
 mutated in the following way:
 
 1. Mutate the number of rows and columns by adding and/or removing a line
-   from each axis with equal probability. Lines are removed at random. Rows are
-   added by sampling a new value from each column distribution and adding this
-   vector to the bottom of the dataset. Columns are added in the same way as the 
-   :ref:`creation <create-ind>` process. Note that the number of rows and
-   columns will not mutate beyond the bounds passed to the genetic algorithm.
+   from each axis with the same probability. Lines are removed at random. Rows
+   are added by sampling a new value from each current column distribution and
+   adding them to the bottom of the dataset. Columns are added in the same way
+   as in the :ref:`creation process <create-ind>`. Note that the number of rows
+   and columns will not mutate beyond the bounds passed to the genetic
+   algorithm.
 
 2. Then, with the dimensions of the dataset mutated, each value in the dataset
    is mutated using the same mutation probability. A value is mutated by

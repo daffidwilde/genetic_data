@@ -2,5 +2,5 @@
 
 And their metadata is::
 
-    [Poisson(lambda=6.03)]
+    [Poisson(lam=6.03)]
     
