@@ -96,7 +96,7 @@ def run_algorithm(
         Every individual's fitness in each generation.
     """
 
-    if isinstance(seed, int):
+    if seed is not None:
         np.random.seed(seed)
 
     population = create_initial_population(
