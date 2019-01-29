@@ -36,7 +36,7 @@ def test_init(seed):
         assert pdf.name == pdf_class.name
         assert pdf.param_limits == pdf_class.param_limits
 
-        for param_name, param_value in vars(pdf):
+        for param_name, param_value in vars(pdf).items():
             param_limit = pdf.param_limits[param_name]
             assert (
                 param_value >= param_limit[0] and param_value <= param_limit[1]

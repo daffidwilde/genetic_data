@@ -70,7 +70,7 @@ POPULATION = given(
 
 COMPACT_SPACE = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS,
-    props=PROPS, compaction_ratio=UNIT, itr=INTS
+    props=PROPS, maximise=booleans(), compaction_ratio=UNIT, itr=INTS
 )
 
 INTEGER_CROSSOVER = given(
