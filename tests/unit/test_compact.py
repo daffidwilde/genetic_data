@@ -36,12 +36,12 @@ def test_compact_search_space(
     if compaction_ratio == 1:
         with pytest.raises(ValueError):
             compacted_pdfs = compact_search_space(
-                pdfs, itr, max_iter, compaction_ratio
+                parents, pdfs, itr, max_iter, compaction_ratio
             )
 
     else:
         compacted_pdfs = compact_search_space(
-            pdfs, itr, max_iter, compaction_ratio
+            parents, pdfs, itr, max_iter, compaction_ratio
         )
 
         if compaction_ratio == 0:
