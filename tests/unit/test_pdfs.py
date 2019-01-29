@@ -90,6 +90,7 @@ def test_to_tuple(seed):
 # GAMMA
 # =====
 
+
 @given(
     alpha_limits=LIMITS,
     theta_limits=LIMITS,
@@ -110,6 +111,7 @@ def test_gamma_set_param_limits(alpha_limits, theta_limits, seed):
 # ======
 # NORMAL
 # ======
+
 
 @given(
     mean_limits=LIMITS,

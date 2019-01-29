@@ -14,8 +14,14 @@ from .util.trivials import trivial_fitness
 
 @COMPACT_SPACE
 def test_compact_search_space(
-    size, row_limits, col_limits, weights, props, maximise, compaction_ratio,
-    itr
+    size,
+    row_limits,
+    col_limits,
+    weights,
+    props,
+    maximise,
+    compaction_ratio,
+    itr,
 ):
     """ Test that the search space (the space of pdf parameter limits) of a
     hypothetical GA is reduced and centred around the best individuals'
