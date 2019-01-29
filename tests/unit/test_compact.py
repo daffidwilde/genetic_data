@@ -5,8 +5,8 @@ import pytest
 from edo.compact import compact_search_space
 from edo.fitness import get_fitness
 from edo.operators import selection
-from edo.population import create_initial_population
 from edo.pdfs import Gamma, Normal, Poisson
+from edo.population import create_initial_population
 
 from .util.parameters import COMPACT_SPACE
 from .util.trivials import trivial_fitness

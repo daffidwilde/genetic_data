@@ -9,7 +9,7 @@ from edo.individual import Individual
 from edo.pdfs import Gamma, Normal, Poisson
 
 from .util.parameters import PROB, SHAPES, SIZE, WEIGHTS
-from .util.trivials import trivial_fitness, trivial_stop, trivial_dwindle
+from .util.trivials import trivial_dwindle, trivial_fitness, trivial_stop
 
 HALF_PROB = PROB.filter(lambda x: x > 0.5)
 
