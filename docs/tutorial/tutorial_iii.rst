@@ -81,7 +81,7 @@ We can also take a look at the best individual in the final population::
 
    >>> ax.scatter(df.select_dtypes('int'), df.select_dtypes('float'))
    >>> ax.annotate(
-   ...     f'r = {np.round(fit[best], 4)}',
+   ...     s=r'$r^2$ + f' = {np.round(fit[best], 4)}',
    ...     xy=[2, -2],
    ...     fontsize=20,
    ...     bbox=dict(boxstyle='round', fc='0.9')

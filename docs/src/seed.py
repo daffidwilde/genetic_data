@@ -36,11 +36,23 @@ def main():
         seed=1,
     )
 
+    with open("../how-to/seed_inds.rst", "w") as inds:
+        string = ".. :orphan:\n\n"
+        string += (
+            "Now, by looking at the first individual in the final "
+            "population for each run, we see they are different::\n\n    "
+        )
+        string += ">>> pop[0]\n    "
+        string += str(pop[0]).replace("\n", "\n    ") + "\n    "
+        string += ">>> new_pop[0]\n    "
+        string += str(new_pop[0]).replace("\n", "\n    ") + "\n    "
+        inds.write(string)
+
     fig, ax = plt.subplots(1, figsize=(32, 12), dpi=300)
 
     width, epsilon = 0.3, 0.01
     positions = np.arange(len(all_fits))
-    shift = .5 * width + epsilon
+    shift = 0.5 * width + epsilon
 
     old = ax.boxplot(
         all_fits, positions=positions - shift, widths=width, patch_artist=True

@@ -1,0 +1,37 @@
+\documentclass[border=5pt,convert={outfile=../_static/\jobname.svg}]{standalone}
+
+\usepackage[T1]{fontenc}
+\usepackage[default]{raleway}
+
+\usepackage{tikz}
+    \usetikzlibrary{%
+        arrows,
+        positioning,
+        shapes,
+        shapes.geometric
+    }
+
+\tikzstyle{every picture} += [remember picture]
+
+\tikzset{%
+    column/.pic={%
+        code{%
+            \draw[line width=1pt]
+                (0, 0) -- ++(0, 4cm) -- ++(-2cm, 0) -- ++(0, -4cm);
+            \foreach \val in {0, ..., #1}{%
+                \draw[rotate=90] ([xshift=-\val*10pt] 4cm, 2cm) -- ++(0, 2cm);
+            };
+        }
+    }
+}
+
+\begin{document}
+
+\begin{tikzpicture}
+
+    \path (0, 0) pic {column=4}
+          (2, 0) pic {column=4};
+
+\end{tikzpicture}
+
+\end{document}

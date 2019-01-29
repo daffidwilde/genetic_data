@@ -8,8 +8,8 @@ from edo.pdfs import Gamma, Normal, Poisson
 from .util.parameters import (
     INTEGER_INDIVIDUAL,
     INTEGER_TUPLE_INDIVIDUAL,
-    TUPLE_INTEGER_INDIVIDUAL,
     TUPLE_INDIVIDUAL,
+    TUPLE_INTEGER_INDIVIDUAL,
 )
 
 

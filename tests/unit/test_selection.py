@@ -1,7 +1,7 @@
 """ Tests for the selection operator. """
 
-import pytest
 import pandas as pd
+import pytest
 
 from edo.fitness import get_fitness
 from edo.individual import Individual

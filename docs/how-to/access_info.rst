@@ -13,6 +13,7 @@ To demonstrate, let's create an individual::
     >>> from edo.pdfs import Normal, Poisson
 
     >>> np.random.seed(0)
+
     >>> individual = create_individual(
     ...     row_limits=[3, 3],
     ...     col_limits=[4, 4],
@@ -20,12 +21,6 @@ To demonstrate, let's create an individual::
     ...     weights=None
     ... )
 
-Then the dataframe can be accessed like this::
-
-    >>> individual.dataframe
-
-.. csv-table::
-   :file: access_dataframe.csv
-   :align: center
+.. include:: access_dataframe.rst
 
 .. include:: access_metadata.rst

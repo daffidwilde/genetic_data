@@ -1,0 +1,28 @@
+\begin{tikzpicture}
+    \node[draw, circle, fill=orange!25] (start) at (0, 0) {Start};
+    \node[draw, fill=cyan!25] (initial) at (0, -2) {Generate initial
+        population};
+    \node[draw, fill=cyan!25] (init-fitness) at (0, -4) {Calculate fitness};
+    \node[draw, diamond, thick, aspect=3, fill=magenta!25] (stop) at (0, -7)
+        {Stopping condition met};
+    \node[draw, circle, fill=orange!25] (end) at (-4, -9) {End};
+    \node[draw, fill=cyan!25] (selection) at (8, 0) {Select parents by
+        fitness};
+    \node[draw, fill=cyan!25] (crossover) at (8, -2) {Crossover to produce
+        offspring};
+    \node[draw, fill=cyan!25] (mutation) at (8, -4) {Mutate small number of
+        offspring};
+    \node[draw, fill=cyan!25] (fitness) at (8, -6) {Calculate fitness};
+
+    \draw[->, thick] (start) -- (initial);
+    \draw[->, thick] (initial) -- (init-fitness);
+    \draw[->, thick] (init-fitness) -- (stop);
+    \draw[->, thick] (stop) -- (-4, -7) node[above] {\textit{yes}} -- (end);
+    \draw[->, thick] (stop) -- (4, -7) node[below] {\textit{no}} -- (4, 1)
+        -- (8, 1) node[above left] {\textit{old population}} -- (selection);
+    \draw[->, thick] (selection) to (crossover);
+    \draw[->, thick] (crossover) to (mutation);
+    \draw[->, thick] (mutation) to (fitness);
+    \draw[->, thick] (fitness) -- (8, -9) node[below left] {\textit{new
+        population}} -- (0, -9) -- (stop);
+\end{tikzpicture}

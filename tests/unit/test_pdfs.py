@@ -1,14 +1,11 @@
-""" Unit tests for the standard columns pdf's. """
+""" Unit tests for the standard column classes. """
 
 import numpy as np
-
 import pytest
-
 from hypothesis import given
 from hypothesis.strategies import floats, integers, tuples
 
-from edo.pdfs import Distribution, Gamma, Normal, Bernoulli, Poisson
-
+from edo.pdfs import Bernoulli, Distribution, Gamma, Normal, Poisson, all_pdfs
 
 LIMITS = (
     tuples(floats(min_value=0, max_value=10), floats(min_value=0, max_value=10))
@@ -26,39 +23,51 @@ def test_nosamplemethod_error():
         dist.sample()
 
 
-@given(seed=integers(min_value=0))
+@given(seed=integers(min_value=0, max_value=2 ** 32 - 1))
 def test_repr(seed):
     """ Assert that Distribution objects have the correct string. """
 
     np.random.seed(seed)
-    for pdf_class in [Gamma, Normal, Bernoulli, Poisson]:
+    for pdf_class in all_pdfs:
         pdf = pdf_class()
         assert str(pdf).startswith(pdf.name)
 
 
-@given(nrows=integers(min_value=1), seed=integers(min_value=0))
+@given(
+    nrows=integers(min_value=1, max_value=1000),
+    seed=integers(min_value=0, max_value=2 ** 32 - 1),
+)
 def test_sample(nrows, seed):
     """ Verify that Distribution objects can sample correctly. """
 
     np.random.seed(seed)
-    for pdf_class in [Gamma, Normal, Bernoulli, Poisson]:
+    print("Set seed.")
+    for pdf_class in all_pdfs:
+        print("Starting", pdf_class)
         pdf = pdf_class()
+        print("Made instance.")
         sample = pdf.sample(nrows)
+        print("Sampled.")
         assert sample.shape == (nrows,)
         assert sample.dtype == pdf.dtype
 
 
-@given(seed=integers(min_value=0))
+@given(seed=integers(min_value=0, max_value=2 ** 32 - 1))
 def test_to_tuple(seed):
     """ Verify that objects can pass their information to a tuple of the correct
     length and form. """
 
     np.random.seed(seed)
-    for pdf_class in [Gamma, Normal, Bernoulli, Poisson]:
+    for pdf_class in all_pdfs:
         pdf = pdf_class()
         out = pdf.to_tuple()
         assert len(out) - 2 * len(pdf.__dict__) == 1
         assert out[0] == pdf.name
+        for i, item in enumerate(out[1:]):
+            if i % 2 == 0:
+                assert isinstance(item, str)
+            else:
+                assert item == list(pdf.__dict__.values())[int((i - 1) / 2)]
 
 
 # =====
@@ -66,8 +75,12 @@ def test_to_tuple(seed):
 # =====
 
 
-@given(alpha_limits=LIMITS, theta_limits=LIMITS, seed=integers(min_value=0))
-def test_Gamma_set_param_limits(alpha_limits, theta_limits, seed):
+@given(
+    alpha_limits=LIMITS,
+    theta_limits=LIMITS,
+    seed=integers(min_value=0, max_value=2 ** 32 - 1),
+)
+def test_gamma_set_param_limits(alpha_limits, theta_limits, seed):
     """ Check that a Gamma object can sample its parameters correctly if its
     class attributes are altered. """
 
@@ -85,8 +98,12 @@ def test_Gamma_set_param_limits(alpha_limits, theta_limits, seed):
 # ======
 
 
-@given(mean_limits=LIMITS, std_limits=LIMITS, seed=integers(min_value=0))
-def test_Normal_set_param_limits(mean_limits, std_limits, seed):
+@given(
+    mean_limits=LIMITS,
+    std_limits=LIMITS,
+    seed=integers(min_value=0, max_value=2 ** 32 - 1),
+)
+def test_normal_set_param_limits(mean_limits, std_limits, seed):
     """ Check that a Normal object can sample its parameters correctly if its
     class attributes are altered. """
 
@@ -110,9 +127,9 @@ def test_Normal_set_param_limits(mean_limits, std_limits, seed):
     )
     .map(sorted)
     .filter(lambda x: x[0] < x[1]),
-    seed=integers(min_value=0),
+    seed=integers(min_value=0, max_value=2 ** 32 - 1),
 )
-def test_Bernoulli_set_param_limits(prob_limits, seed):
+def test_bernoulli_set_param_limits(prob_limits, seed):
     """ Check that a Bernoulli object can sample its parameters correctly if its
     class attributes are altered. """
 
@@ -128,8 +145,8 @@ def test_Bernoulli_set_param_limits(prob_limits, seed):
 # =======
 
 
-@given(lam_limits=LIMITS, seed=integers(min_value=0))
-def test_Poisson_set_param_limits(lam_limits, seed):
+@given(lam_limits=LIMITS, seed=integers(min_value=0, max_value=2 ** 32 - 1))
+def test_poisson_set_param_limits(lam_limits, seed):
     """ Check that a Poisson object can sample its parameters correctly if its
     class attributes are altered. """
 

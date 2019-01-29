@@ -1,0 +1,8 @@
+numpy
+numpydoc
+matplotlib>=2.2
+pandas
+
+# sphinx fixed at 1.6.7 due to breaking builds with numpydoc
+# github.com/rtfd/readthedocs.org/issues/4057
+sphinx==1.6.7

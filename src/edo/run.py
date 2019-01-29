@@ -15,6 +15,7 @@ def run_algorithm(
     pdfs,
     weights=None,
     stop=None,
+    dwindle=None,
     max_iter=100,
     best_prop=0.25,
     lucky_prop=0,
@@ -32,8 +33,8 @@ def run_algorithm(
     ----------
     fitness : func
         Any real-valued function that takes one :class:`pandas.DataFrame` as
-        argument. Use the :code:`maximise` parameter to determine how
-        :code:`fitness` should be interpreted.
+        argument. Any further arguments should be passed to
+        :code:`fitness_kwargs`.
     size : int
         The size of the population to create.
     row_limits : list
@@ -55,11 +56,16 @@ def run_algorithm(
         A probability distribution on how to select columns from
         :code:`pdfs`. If :code:`None`, pdfs will be chosen uniformly.
     stop : func
-        A function which acts as a stopping condition on the GA.
-
-        Such functions should take only the fitness of the current population as
-        argument. If :code:`None`, the GA will run up until its maximum number
-        of iterations.
+        A function which acts as a stopping condition on the GA. Such functions
+        should take only the fitness of the current population as argument, and
+        should return a boolean variable. If :code:`None`, the GA will run up
+        until its maximum number of iterations.
+    dwindle : func
+        A function which acts as a means of dwindling the mutation probability.
+        Such functions should take the current mutation probability and the
+        current iteration as argument, and should return a new mutation
+        probability. If :code:`None`, the GA will run with a constant mutation
+        probability.
     max_iter : int
         The maximum number of iterations to be carried out before terminating.
     best_prop : float
@@ -73,7 +79,8 @@ def run_algorithm(
         over the second in a crossover operation. Defaults to 0.5.
     mutation_prob : float
         The probability of a particular characteristic in an individual's
-        dataset being mutated.
+        dataset being mutated. If using :code:`dwindle`, this is an initial
+        probability.
     maximise : bool
         Determines whether :code:`fitness` is a function to be maximised or not.
         Fitness scores are minimised by default.
@@ -81,7 +88,7 @@ def run_algorithm(
         The seed for a particular run of the genetic algorithm. If :code:`None`,
         no seed is set.
     fitness_kwargs : dict
-        Any additional parameters needed to be passed to :code:`fitness` should
+        Any additional parameters that need to be passed to :code:`fitness` should
         be placed here as a dictionary or suitable mapping.
 
     Returns
@@ -96,7 +103,7 @@ def run_algorithm(
         Every individual's fitness in each generation.
     """
 
-    if isinstance(seed, int):
+    if seed is not None:
         np.random.seed(seed)
 
     population = create_initial_population(
@@ -135,6 +142,8 @@ def run_algorithm(
 
         if stop:
             converged = stop(pop_fitness)
+        if dwindle:
+            mutation_prob = dwindle(mutation_prob, itr)
         itr += 1
 
     return population, pop_fitness, all_populations, all_fitnesses

@@ -12,11 +12,17 @@ random in each generation. Then, using the setting of the :ref:`first tutorial
 :code:`lucky_prop` to be some non-negative value. Let's say that value is 0.25::
 
     >>> import edo
+    >>> from edo.pdfs import Normal
+
+    >>> def x_squared(df):
+    ...     return df.iloc[0, 0] ** 2
+
     >>> pop, fit, all_pops, all_fits = edo.run_algorithm(
     ...     fitness=x_squared,
     ...     size=100,
     ...     row_limits=[1, 1],
     ...     col_limits=[1, 1],
+    ...     pdfs=[Normal],
     ...     max_iter=100,
     ...     best_prop=0,
     ...     lucky_prop=0.25,

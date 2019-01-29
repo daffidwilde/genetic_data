@@ -1,17 +1,15 @@
 """ Test the algorithm as a whole. """
 
+import pandas as pd
 from hypothesis import given, settings
 from hypothesis.strategies import booleans
 
-import pandas as pd
-
 import edo
-
 from edo.individual import Individual
 from edo.pdfs import Gamma, Normal, Poisson
 
-from .util.trivials import trivial_fitness, trivial_stop
 from .util.parameters import PROB, SHAPES, SIZE, WEIGHTS
+from .util.trivials import trivial_fitness, trivial_stop, trivial_dwindle
 
 HALF_PROB = PROB.filter(lambda x: x > 0.5)
 
@@ -47,21 +45,21 @@ def test_run_algorithm(
     of them/their fitnesses correctly. """
 
     pdfs = [Gamma, Normal, Poisson]
-    stop = trivial_stop
 
     pop, fit, all_pops, all_fits = edo.run_algorithm(
-        trivial_fitness,
-        size,
-        row_limits,
-        col_limits,
-        pdfs,
-        weights,
-        stop,
-        max_iter,
-        best_prop,
-        lucky_prop,
-        crossover_prob,
-        mutation_prob,
+        fitness=trivial_fitness,
+        size=size,
+        row_limits=row_limits,
+        col_limits=col_limits,
+        pdfs=pdfs,
+        weights=weights,
+        stop=trivial_stop,
+        dwindle=trivial_dwindle,
+        max_iter=max_iter,
+        best_prop=best_prop,
+        lucky_prop=lucky_prop,
+        crossover_prob=crossover_prob,
+        mutation_prob=mutation_prob,
         maximise=maximise,
         seed=seed,
         fitness_kwargs={"arg": None},
