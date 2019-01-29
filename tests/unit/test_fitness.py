@@ -25,6 +25,7 @@ def test_get_fitness(size, row_limits, col_limits, weights):
     assert len(pop_fitness) == size
     assert np.array(pop_fitness).dtype == "float"
 
+
 @FITNESS
 def test_get_fitness_kwargs(size, row_limits, col_limits, weights):
     """ Create a population and get its fitness with keyword arguments. Then
