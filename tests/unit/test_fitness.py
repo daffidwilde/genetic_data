@@ -24,3 +24,19 @@ def test_get_fitness(size, row_limits, col_limits, weights):
 
     assert len(pop_fitness) == size
     assert np.array(pop_fitness).dtype == "float"
+
+@FITNESS
+def test_get_fitness_kwargs(size, row_limits, col_limits, weights):
+    """ Create a population and get its fitness with keyword arguments. Then
+    verify that the fitness is of the correct size and data type. """
+
+    fitness_kwargs = {"arg": None}
+    pdfs = [Gamma, Normal, Poisson]
+    population = create_initial_population(
+        size, row_limits, col_limits, pdfs, weights
+    )
+
+    pop_fitness = get_fitness(trivial_fitness, population, fitness_kwargs)
+
+    assert len(pop_fitness) == size
+    assert np.array(pop_fitness).dtype == "float"
