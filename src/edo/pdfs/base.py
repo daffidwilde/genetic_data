@@ -12,6 +12,7 @@ class Distribution:
     """
 
     name = "Distribution"
+    param_limits = None
 
     def __repr__(self):
 

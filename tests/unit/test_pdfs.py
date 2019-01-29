@@ -14,9 +14,12 @@ LIMITS = (
 )
 
 
-def test_nosamplemethod_error():
-    """ Verify Distribution object alone raises an error when trying to sample
-    from it. """
+def test_distribution_init():
+    """ Verify defaults of Distribution instance. """
+
+    dist = Distribution()
+    assert dist.name == "Distribution"
+    assert dist.param_limits is None
 
     with pytest.raises(NotImplementedError):
         dist = Distribution()
@@ -24,8 +27,25 @@ def test_nosamplemethod_error():
 
 
 @given(seed=integers(min_value=0, max_value=2 ** 32 - 1))
+def test_init(seed):
+    """ Check defaults of distribution objects. """
+
+    np.random.seed(seed)
+    for pdf_class in all_pdfs:
+        pdf = pdf_class()
+        assert pdf.name == pdf_class.name
+        assert pdf.param_limits == pdf_class.param_limits
+
+        for param_name, param_value in vars(pdf):
+            param_limit = pdf.param_limits[param_name]
+            assert (
+                param_value >= param_limit[0] and param_value <= param_limit[1]
+            )
+
+
+@given(seed=integers(min_value=0, max_value=2 ** 32 - 1))
 def test_repr(seed):
-    """ Assert that Distribution objects have the correct string. """
+    """ Assert that distribution objects have the correct string. """
 
     np.random.seed(seed)
     for pdf_class in all_pdfs:
@@ -38,16 +58,12 @@ def test_repr(seed):
     seed=integers(min_value=0, max_value=2 ** 32 - 1),
 )
 def test_sample(nrows, seed):
-    """ Verify that Distribution objects can sample correctly. """
+    """ Verify that distribution objects can sample correctly. """
 
     np.random.seed(seed)
-    print("Set seed.")
     for pdf_class in all_pdfs:
-        print("Starting", pdf_class)
         pdf = pdf_class()
-        print("Made instance.")
         sample = pdf.sample(nrows)
-        print("Sampled.")
         assert sample.shape == (nrows,)
         assert sample.dtype == pdf.dtype
 
@@ -74,7 +90,6 @@ def test_to_tuple(seed):
 # GAMMA
 # =====
 
-
 @given(
     alpha_limits=LIMITS,
     theta_limits=LIMITS,
@@ -84,8 +99,7 @@ def test_gamma_set_param_limits(alpha_limits, theta_limits, seed):
     """ Check that a Gamma object can sample its parameters correctly if its
     class attributes are altered. """
 
-    Gamma.alpha_limits = alpha_limits
-    Gamma.theta_limits = theta_limits
+    Gamma.param_limits = {"alpha": alpha_limits, "theta": theta_limits}
 
     np.random.seed(seed)
     gamma = Gamma()
@@ -97,7 +111,6 @@ def test_gamma_set_param_limits(alpha_limits, theta_limits, seed):
 # NORMAL
 # ======
 
-
 @given(
     mean_limits=LIMITS,
     std_limits=LIMITS,
@@ -107,8 +120,7 @@ def test_normal_set_param_limits(mean_limits, std_limits, seed):
     """ Check that a Normal object can sample its parameters correctly if its
     class attributes are altered. """
 
-    Normal.mean_limits = mean_limits
-    Normal.std_limits = std_limits
+    Normal.param_limits = {"mean": mean_limits, "std": std_limits}
 
     np.random.seed(seed)
     normal = Normal()
@@ -133,7 +145,7 @@ def test_bernoulli_set_param_limits(prob_limits, seed):
     """ Check that a Bernoulli object can sample its parameters correctly if its
     class attributes are altered. """
 
-    Bernoulli.prob_limits = prob_limits
+    Bernoulli.param_limits = {"prob": prob_limits}
 
     np.random.seed(seed)
     bernoulli = Bernoulli()
@@ -150,7 +162,7 @@ def test_poisson_set_param_limits(lam_limits, seed):
     """ Check that a Poisson object can sample its parameters correctly if its
     class attributes are altered. """
 
-    Poisson.lam_limits = lam_limits
+    Poisson.param_limits = {"lam": lam_limits}
 
     np.random.seed(seed)
     poisson = Poisson()
