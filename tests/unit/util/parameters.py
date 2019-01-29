@@ -1,8 +1,8 @@
 """ Parameters for hypothesis testing, etc. """
 
 import itertools as itr
-import numpy as np
 
+import numpy as np
 from hypothesis import given
 from hypothesis.strategies import (
     booleans,

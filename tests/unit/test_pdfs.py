@@ -1,14 +1,11 @@
-""" Unit tests for the standard columns pdf's. """
+""" Unit tests for the standard column classes. """
 
 import numpy as np
-
 import pytest
-
 from hypothesis import given
 from hypothesis.strategies import floats, integers, tuples
 
-from edo.pdfs import Distribution, Gamma, Normal, Bernoulli, Poisson
-
+from edo.pdfs import Bernoulli, Distribution, Gamma, Normal, Poisson, all_pdfs
 
 LIMITS = (
     tuples(floats(min_value=0, max_value=10), floats(min_value=0, max_value=10))
@@ -31,7 +28,7 @@ def test_repr(seed):
     """ Assert that Distribution objects have the correct string. """
 
     np.random.seed(seed)
-    for pdf_class in [Gamma, Normal, Bernoulli, Poisson]:
+    for pdf_class in all_pdfs:
         pdf = pdf_class()
         assert str(pdf).startswith(pdf.name)
 
@@ -41,7 +38,7 @@ def test_sample(nrows, seed):
     """ Verify that Distribution objects can sample correctly. """
 
     np.random.seed(seed)
-    for pdf_class in [Gamma, Normal, Bernoulli, Poisson]:
+    for pdf_class in all_pdfs:
         pdf = pdf_class()
         sample = pdf.sample(nrows)
         assert sample.shape == (nrows,)
@@ -54,7 +51,7 @@ def test_to_tuple(seed):
     length and form. """
 
     np.random.seed(seed)
-    for pdf_class in [Gamma, Normal, Bernoulli, Poisson]:
+    for pdf_class in all_pdfs:
         pdf = pdf_class()
         out = pdf.to_tuple()
         assert len(out) - 2 * len(pdf.__dict__) == 1

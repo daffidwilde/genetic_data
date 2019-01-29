@@ -1,17 +1,15 @@
 """ Test the algorithm as a whole. """
 
+import pandas as pd
 from hypothesis import given, settings
 from hypothesis.strategies import booleans
 
-import pandas as pd
-
 import edo
-
 from edo.individual import Individual
 from edo.pdfs import Gamma, Normal, Poisson
 
-from .util.trivials import trivial_fitness, trivial_stop
 from .util.parameters import PROB, SHAPES, SIZE, WEIGHTS
+from .util.trivials import trivial_fitness, trivial_stop
 
 HALF_PROB = PROB.filter(lambda x: x > 0.5)
 

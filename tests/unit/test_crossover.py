@@ -1,8 +1,7 @@
 """ Tests for the crossover operator. """
 
-from hypothesis import settings
-
 import pandas as pd
+from hypothesis import settings
 
 from edo.individual import Individual, create_individual
 from edo.operators import crossover
@@ -11,8 +10,8 @@ from edo.pdfs import Gamma, Normal, Poisson
 from .util.parameters import (
     INTEGER_CROSSOVER,
     INTEGER_TUPLE_CROSSOVER,
-    TUPLE_INTEGER_CROSSOVER,
     TUPLE_CROSSOVER,
+    TUPLE_INTEGER_CROSSOVER,
 )
 
 

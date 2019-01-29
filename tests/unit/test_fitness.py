@@ -2,12 +2,12 @@
 
 import numpy as np
 
-from edo.population import create_initial_population
 from edo.fitness import get_fitness
 from edo.pdfs import Gamma, Normal, Poisson
+from edo.population import create_initial_population
 
-from .util.trivials import trivial_fitness
 from .util.parameters import FITNESS
+from .util.trivials import trivial_fitness
 
 
 @FITNESS
