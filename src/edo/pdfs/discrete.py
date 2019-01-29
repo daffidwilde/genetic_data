@@ -15,12 +15,12 @@ class Bernoulli(Distribution):
         Name of the distribution, :code:`"Bernoulli"`.
     dtype : str
         Preferred datatype of distribution, :code:`"int"`.
-    prob_limits : list
-        Limits on the success probability parameter, :code:`prob`. Defaults to
-        :code:`[0, 1]`.
+    param_limits : dict
+        A dictionary of the limits on the distribution parameter. Defaults to
+        :code:`[0, 1]` for :code:`prob`.
     prob : float
-        The success probability, sampled from :code:`prob_limits`. `Instance
-        attribute.`
+        The success probability, sampled from :code:`param_limits["prob"]`.
+        `Instance attribute.`
     """
 
     name = "Bernoulli"
@@ -48,10 +48,11 @@ class Poisson(Distribution):
         Name of distribution, :code:`"Poisson"`.
     dtype : str
         Preferred datatype of distribution, :code:`"int"`.
-    lam_limits : list
-        Limits on the rate parameter, :code:`lam`. Defaults to :code:`[0, 10]`.
+    param_limits : dict
+        A dictionary of the limits of the distribution parameter. Defaults to
+        :code:`[0, 10]` for :code:`lam`.
     lam : float
-        The rate parameter, sampled from :code:`lam_limits`. `Instance
+        The rate parameter, sampled from :code:`param_limits["lam"]`. `Instance
         attribute.`
     """
 

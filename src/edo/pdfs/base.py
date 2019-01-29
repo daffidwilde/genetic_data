@@ -11,6 +11,8 @@ class Distribution:
     ----------
     name : str
         The name of the distribution, "Distribution".
+    param_limits : None
+        A placeholder for a distribution parameter limit dictionary.
     """
 
     name = "Distribution"
