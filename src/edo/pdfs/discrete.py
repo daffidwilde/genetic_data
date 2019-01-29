@@ -25,11 +25,11 @@ class Bernoulli(Distribution):
 
     name = "Bernoulli"
     dtype = "int"
-    prob_limits = [0, 1]
+    param_limits = {"prob": [0, 1]}
 
     def __init__(self):
 
-        self.prob = np.random.uniform(*self.prob_limits)
+        self.prob = np.random.uniform(*self.param_limits["prob"])
 
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the Bernoulli distribution
@@ -56,11 +56,11 @@ class Poisson(Distribution):
 
     name = "Poisson"
     dtype = "int"
-    lam_limits = [0, 10]
+    param_limits = {"lam": [0, 10]}
 
     def __init__(self):
 
-        self.lam = np.random.uniform(*self.lam_limits)
+        self.lam = np.random.uniform(*self.param_limits["lam"])
 
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the Poisson distribution

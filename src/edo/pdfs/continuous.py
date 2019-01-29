@@ -30,13 +30,12 @@ class Gamma(Distribution):
 
     name = "Gamma"
     dtype = "float"
-    alpha_limits = [0, 10]
-    theta_limits = [0, 10]
+    param_limits = {"alpha": [0, 10], "theta": [0, 10]}
 
     def __init__(self):
 
-        self.alpha = np.random.uniform(*self.alpha_limits)
-        self.theta = np.random.uniform(*self.theta_limits)
+        self.alpha = np.random.uniform(*self.param_limits["alpha"])
+        self.theta = np.random.uniform(*self.param_limits["theta"])
 
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the gamma distribution with
@@ -69,13 +68,12 @@ class Normal(Distribution):
 
     name = "Normal"
     dtype = "float"
-    mean_limits = [-10, 10]
-    std_limits = [0, 10]
+    param_limits = {"mean": [-10, 10], "std": [0, 10]}
 
     def __init__(self):
 
-        self.mean = np.random.uniform(*self.mean_limits)
-        self.std = np.random.uniform(*self.std_limits)
+        self.mean = np.random.uniform(*self.param_limits["mean"])
+        self.std = np.random.uniform(*self.param_limits["std"])
 
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the normal distribution
