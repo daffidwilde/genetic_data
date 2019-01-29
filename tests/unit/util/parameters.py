@@ -43,6 +43,8 @@ TUPLES = tuples(TUPS, TUPS).filter(
 
 UNIT = np.linspace(0.01, 1, 100)
 
+PROPS = tuples(PROB, PROB).filter(lambda x: x[0] > 0.5 or x[1] > 0.5)
+
 WEIGHTS = sampled_from(
     [dist for dist in itr.product(UNIT, repeat=3) if sum(dist) == 1.0]
 )
@@ -64,6 +66,11 @@ TUPLE_INDIVIDUAL = given(row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS)
 
 POPULATION = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
+)
+
+COMPACT_SPACE = given(
+    size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS,
+    props=PROPS, compaction_ratio=UNIT, itr=INTS
 )
 
 INTEGER_CROSSOVER = given(
@@ -107,7 +114,7 @@ OFFSPRING = given(
     row_limits=SHAPES,
     col_limits=SHAPES,
     weights=WEIGHTS,
-    props=tuples(PROB, PROB).filter(lambda x: x[0] > 0.5 or x[1] > 0.5),
+    props=PROPS,
     crossover_prob=PROB,
     mutation_prob=PROB,
     maximise=booleans(),
@@ -118,7 +125,7 @@ SELECTION = given(
     row_limits=SHAPES,
     col_limits=SHAPES,
     weights=WEIGHTS,
-    props=tuples(PROB, PROB).filter(lambda x: x[0] > 0.5 or x[1] > 0.5),
+    props=PROPS,
     maximise=booleans(),
 )
 
