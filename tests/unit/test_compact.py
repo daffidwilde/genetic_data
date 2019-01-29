@@ -13,15 +13,8 @@ from .util.trivials import trivial_fitness
 
 
 @COMPACT_SPACE
-def test_compact_search_space(
-    size,
-    row_limits,
-    col_limits,
-    weights,
-    props,
-    maximise,
-    compaction_ratio,
-    itr,
+def test_compacting_search_space(
+    size, row_limits, col_limits, weights, props, maximise, compact_ratio, itr
 ):
     """ Test that the search space (the space of pdf parameter limits) of a
     hypothetical GA is reduced and centred around the best individuals'
@@ -39,16 +32,15 @@ def test_compact_search_space(
         population, pop_fitness, best_prop, lucky_prop, maximise
     )
 
-    if compaction_ratio == 1:
+    if compact_ratio == 1:
         with pytest.raises(ValueError):
-            compacted_pdfs = compact_search_space(
-                parents, pdfs, itr, max_iter, compaction_ratio
-            )
+            compact_search_space(parents, pdfs, itr, max_iter, compact_ratio)
 
     else:
+        original_param_limits = {pdf: pdf.param_limits for pdf in pdfs}
         compacted_pdfs = compact_search_space(
-            parents, pdfs, itr, max_iter, compaction_ratio
+            parents, pdfs, itr, max_iter, compact_ratio
         )
 
-        if compaction_ratio == 0:
-            assert set(compacted_pdfs) == set(pdfs)
+        if compact_ratio == 0:
+            pass

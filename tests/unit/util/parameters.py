@@ -68,17 +68,6 @@ POPULATION = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
 )
 
-COMPACT_SPACE = given(
-    size=SIZE,
-    row_limits=SHAPES,
-    col_limits=SHAPES,
-    weights=WEIGHTS,
-    props=PROPS,
-    maximise=booleans(),
-    compaction_ratio=UNIT,
-    itr=INTS,
-)
-
 INTEGER_CROSSOVER = given(
     row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, prob=PROB
 )
@@ -113,6 +102,17 @@ TUPLE_INTEGER_MUTATION = given(
 
 TUPLE_MUTATION = given(
     row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS, prob=PROB
+)
+
+COMPACT_SPACE = given(
+    size=SIZE,
+    row_limits=SHAPES,
+    col_limits=SHAPES,
+    weights=WEIGHTS,
+    props=PROPS,
+    maximise=booleans(),
+    compact_ratio=PROB,
+    itr=INTS,
 )
 
 OFFSPRING = given(
