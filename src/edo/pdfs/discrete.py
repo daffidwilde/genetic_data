@@ -26,6 +26,7 @@ class Bernoulli(Distribution):
     name = "Bernoulli"
     dtype = "int"
     param_limits = {"prob": [0, 1]}
+    _param_limits = param_limits
 
     def __init__(self):
 
@@ -57,6 +58,7 @@ class Poisson(Distribution):
     name = "Poisson"
     dtype = "int"
     param_limits = {"lam": [0, 10]}
+    _param_limits = param_limits
 
     def __init__(self):
 

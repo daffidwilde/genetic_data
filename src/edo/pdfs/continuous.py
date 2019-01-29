@@ -31,6 +31,7 @@ class Gamma(Distribution):
     name = "Gamma"
     dtype = "float"
     param_limits = {"alpha": [0, 10], "theta": [0, 10]}
+    _param_limits = param_limits
 
     def __init__(self):
 
@@ -69,6 +70,7 @@ class Normal(Distribution):
     name = "Normal"
     dtype = "float"
     param_limits = {"mean": [-10, 10], "std": [0, 10]}
+    _param_limits = param_limits
 
     def __init__(self):
 
