@@ -17,7 +17,7 @@ class Distribution:
 
     name = "Distribution"
     hard_limits = None
-    param_limits = hard_limits
+    param_limits = None
 
     def __repr__(self):
 

@@ -26,7 +26,7 @@ def compact_search_space(parents, pdfs, itr, max_iter, compaction_ratio):
     if (
         compaction_ratio in [0, 1]
         or compaction_ratio < 0
-        or compaction_ratio >1
+        or compaction_ratio > 1
     ):
         raise ValueError("Compaction ratio, s, must satisfy 0 < s < 1.")
 
