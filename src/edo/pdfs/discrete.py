@@ -25,8 +25,8 @@ class Bernoulli(Distribution):
 
     name = "Bernoulli"
     dtype = "int"
+    hard_limits = {"prob": [0, 1]}
     param_limits = {"prob": [0, 1]}
-    _param_limits = {"prob": [0, 1]}
 
     def __init__(self):
 
@@ -58,8 +58,8 @@ class Poisson(Distribution):
 
     name = "Poisson"
     dtype = "int"
+    hard_limits = {"lam": [0, 10]}
     param_limits = {"lam": [0, 10]}
-    _param_limits = {"lam": [0, 10]}
 
     def __init__(self):
 

@@ -16,8 +16,8 @@ class Distribution:
     """
 
     name = "Distribution"
-    param_limits = None
-    _param_limits = None
+    hard_limits = None
+    param_limits = hard_limits
 
     def __repr__(self):
 
@@ -33,7 +33,7 @@ class Distribution:
         """ Reset the class to have its original parameter limits, given in the
         hidden class attribute :code:`_param_limits`. """
 
-        cls.param_limits = deepcopy(cls._param_limits)
+        cls.param_limits = deepcopy(cls.hard_limits)
 
     def sample(self):
         """ Raise a :code:`NotImplementedError` by default. """
