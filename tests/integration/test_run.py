@@ -12,7 +12,7 @@ from .util.parameters import PROB, SHAPES, SIZE, WEIGHTS
 from .util.trivials import trivial_dwindle, trivial_fitness, trivial_stop
 
 HALF_PROB = PROB.filter(lambda x: x > 0.5)
-
+OPEN_UNIT = PROB.filter(lambda x: x not in [0, 1])
 
 @given(
     size=SIZE,
@@ -24,6 +24,7 @@ HALF_PROB = PROB.filter(lambda x: x > 0.5)
     lucky_prop=HALF_PROB,
     crossover_prob=PROB,
     mutation_prob=PROB,
+    compact=OPEN_UNIT,
     maximise=booleans(),
     seed=SIZE,
 )
@@ -38,6 +39,7 @@ def test_run_algorithm(
     lucky_prop,
     crossover_prob,
     mutation_prob,
+    compact,
     maximise,
     seed,
 ):
@@ -60,6 +62,7 @@ def test_run_algorithm(
         lucky_prop=lucky_prop,
         crossover_prob=crossover_prob,
         mutation_prob=mutation_prob,
+        compact=compact,
         maximise=maximise,
         seed=seed,
         fitness_kwargs={"arg": None},

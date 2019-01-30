@@ -2,6 +2,7 @@
 
 import numpy as np
 
+from .compact import compact_search_space
 from .fitness import get_fitness
 from .operators import selection
 from .population import create_initial_population, create_new_population
@@ -21,6 +22,7 @@ def run_algorithm(
     lucky_prop=0,
     crossover_prob=0.5,
     mutation_prob=0.01,
+    compact=None,
     maximise=False,
     seed=None,
     fitness_kwargs=None,
@@ -81,6 +83,10 @@ def run_algorithm(
         The probability of a particular characteristic in an individual's
         dataset being mutated. If using :code:`dwindle`, this is an initial
         probability.
+    compact : float
+        The proportion of the maximum iterations to reduce and focus the
+        mutation search space. Defaults to `None` but must be between 0 and 1
+        (not inclusive).
     maximise : bool
         Determines whether :code:`fitness` is a function to be maximised or not.
         Fitness scores are minimised by default.
@@ -144,6 +150,8 @@ def run_algorithm(
             converged = stop(pop_fitness)
         if dwindle:
             mutation_prob = dwindle(mutation_prob, itr)
+        if compact is not None:
+            pdfs = compact_search_space(parents, pdfs, itr, max_iter, compact)
         itr += 1
 
     return population, pop_fitness, all_populations, all_fitnesses
