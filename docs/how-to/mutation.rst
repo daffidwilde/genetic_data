@@ -54,6 +54,8 @@ iteration as argument, and must return the new mutation probability::
     ...     dwindle=half_mutation_prob
     ... )
 
+.. _compact:
+
 Compacting the mutation space
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

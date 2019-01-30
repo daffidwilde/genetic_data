@@ -19,6 +19,9 @@ class. The only requirements and constraints on your class are that:
 
 - there must be class attribute :code:`name` giving the name of the
   distribution;
+- there must be two class attributes :code:`hard_limits` and
+  :code:`param_limits` giving name and limits of the parameters in the
+  distribution;
 - it must have a :code:`sample` method that takes itself and :code:`nrows` as
   argument;
 - the only attributes defined in its :code:`__init__` are the parameters of that
@@ -33,12 +36,14 @@ like this::
    ...     distribution. """
    ... 
    ...     name = 'Triangular'
-   ...     limits = [-10, 10]
+   ...     hard_limits = {"bounds": [-10, 10]}
+   ...     param_limits = {"bounds": [-10, 10]}
    ... 
    ...     def __init__(self):
    ... 
-   ...         self.left = np.random.uniform(*self.limits)
-   ...         self.right = np.random.uniform(self.left, self.limits[1])
+   ...         limits = self.param_limits["bounds"]
+   ...         self.left = np.random.uniform(*limits)
+   ...         self.right = np.random.uniform(self.left, limits[1])
    ...         self.mode = np.random.uniform(self.left, self.right)
    ... 
    ...     def sample(self, nrows):

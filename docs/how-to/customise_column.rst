@@ -16,15 +16,34 @@ family of normal distributions::
 The default bounds are -10 and 10 for the mean, and 0 and 10 for the standard
 deviation::
 
-    >>> Normal.mean_limits, Normal.std_limits
-    ([-10, 10], [0, 10])
+    >>> Normal.param_limits
+    {"mean": [-10, 10], "std": [0, 10]}
 
 Changing these bounds is as simple as redefining the class attributes::
 
-    >>> Normal.mean_limits = [-5, 5]
-    >>> Normal.std_limits = [0, 1]
-    >>> Normal.mean_limits, Normal.std_limits
-    ([-5, 5], [0, 1])
+    >>> Normal.param_limits["mean"] = [-5, 5]
+    >>> Normal.param_limits["std"] = [0, 1]
+    >>> Normal.param_limits
+    {"mean": [-5, 5], "std": [0, 1]}
 
 Now all instances of normally distributed columns will have mean between -5 and
 5, and have standard deviation between 0 and 1.
+
+They can be reset to their original limits by calling the :code:`reset` method::
+
+    >>> Normal.reset()
+    >>> Normal.param_limits
+    {"mean": [-10, 10], "std": [0, 10]}
+
+In addition to this, hard bounds on the parameters can be set::
+
+    >>> Normal.hard_limits["mean"] = [-100, 100]
+
+.. note::
+    These hard limits will stop the GA from :ref:`adjusting the search space
+    <compact>` beyond them, and will give the new values to reset the parameter
+    limits to::
+
+        >>> Normal.reset()
+        >>> Normal.param_limits
+        {"mean": [-100, 100], "std": [0, 10]}
