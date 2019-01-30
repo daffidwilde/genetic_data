@@ -33,9 +33,8 @@ def test_init(seed):
 
         for param_name, param_value in vars(pdf).items():
             param_limit = pdf.param_limits[param_name]
-            assert (
-                param_value >= min(param_limit) and param_value <=
-                max(param_limit)
+            assert param_value >= min(param_limit) and param_value <= max(
+                param_limit
             )
 
 
