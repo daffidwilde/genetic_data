@@ -32,14 +32,8 @@ condition on the mean fitness of a population::
 Then we simply pass that function to :code:`run_algorithm`, like so::
 
     >>> import edo
-    >>> from edo.pdfs import Normal
     >>> pop, fit, all_pops, all_fits = edo.run_algorithm(
     ...     fitness=x_squared,
-    ...     size=100,
-    ...     row_limits=[1, 1],
-    ...     col_limits=[1, 1],
-    ...     pdfs=[Normal],
-    ...     stop=mean_stopping,
-    ...     max_iter=100,
-    ...     seed=0
+    ...     ...
+    ...     stop=mean_stopping
     ... )

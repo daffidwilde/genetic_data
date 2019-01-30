@@ -14,18 +14,14 @@ obtain inconsistent results by running the algorithm twice using two values of
 
 Run the algorithm with one seed::
 
+   >>> import edo
+   
    >>> def x_squared(df):
    ...     return df.iloc[0, 0] ** 2
 
-   >>> import edo
-   >>> from edo.pdfs import Normal
    >>> pop, fit, all_pops, all_fits = edo.run_algorithm(
    ...     x_squared,
-   ...     size=100,
-   ...     row_limits=[1, 1],
-   ...     col_limits=[1, 1],
-   ...     pdfs=[Normal],
-   ...     max_iter=5,
+   ...     ...
    ...     seed=0
    ... )
 
