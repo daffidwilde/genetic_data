@@ -36,12 +36,17 @@ def compact_search_space(parents, pdfs, itr, max_iter, compaction_ratio):
     for pdf, params in all_param_vals.items():
         for name, vals in params.items():
 
-            lower, upper = min(vals), max(vals)
             midpoint = sum(vals) / len(vals)
-            shift = (upper - lower) * compact_factor / 2
+            shift = (max(vals) - min(vals)) * compact_factor / 2
 
-            lower = max([pdf.hard_limits[name][0], midpoint - shift])
-            upper = min([pdf.hard_limits[name][1], midpoint + shift])
+            lower = midpoint - shift
+            upper = midpoint + shift
+
+            if shift < 0:
+                lower, upper = upper, lower
+
+            lower = max([pdf.hard_limits[name][0], lower])
+            upper = min([pdf.hard_limits[name][1], upper])
 
             pdf.param_limits[name] = [lower, upper]
 
