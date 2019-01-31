@@ -4,7 +4,7 @@
 .. image:: https://travis-ci.com/daffidwilde/edo.svg?branch=master
     :target: https://travis-ci.com/daffidwilde/edo
 
-.. image:: https://coveralls.io/repos/github/daffidwilde/edo/badge.svg?branch=master
+.. image:: https://coveralls.io/repos/github/daffidwilde/edo/badge.svg?branch=master&service=github
    :target: https://coveralls.io/github/daffidwilde/edo?branch=master
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
