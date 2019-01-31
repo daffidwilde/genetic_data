@@ -15,6 +15,7 @@ setup(
     version=__version__,
     description="Generating artificial datasets through genetic evolution.",
     long_description=README,
+    long_description_content_type="text/x-rst",
     url="https://github.com/daffidwilde/edo",
     author="Henry Wilde",
     author_email="henrydavidwilde@gmail.com",
