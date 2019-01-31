@@ -112,9 +112,6 @@ def run_algorithm(
     if seed is not None:
         np.random.seed(seed)
 
-    for pdf in pdfs:
-        print(pdf.name, pdf.param_limits)
-
     population = create_initial_population(
         size, row_limits, col_limits, pdfs, weights
     )
