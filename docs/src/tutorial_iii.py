@@ -60,7 +60,7 @@ def main():
     ax.set_xlabel("Discrete column")
     ax.set_ylabel("Continuous column")
     ax.annotate(
-        s=r"$r^2$ " + f"= {np.round(fit[best], 4)}",
+        r"$r^2$ " + f"= {np.round(fit[best], 4)}",
         xy=[2, -2],
         fontsize=20,
         bbox=dict(boxstyle="round", fc="0.9"),
