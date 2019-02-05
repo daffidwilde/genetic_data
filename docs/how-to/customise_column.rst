@@ -39,11 +39,5 @@ In addition to this, hard bounds on the parameters can be set::
 
     >>> Normal.hard_limits["mean"] = [-100, 100]
 
-.. note::
-    These hard limits will stop the GA from :ref:`adjusting the search space
-    <compact>` beyond them, and will give the new values to reset the parameter
-    limits to::
-
-        >>> Normal.reset()
-        >>> Normal.param_limits
-        {"mean": [-100, 100], "std": [0, 10]}
+These hard limits are meant to stop the parameter limits from :ref:`shrinking
+<compact>` too far.

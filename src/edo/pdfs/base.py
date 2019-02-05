@@ -33,8 +33,9 @@ class Distribution:
 
     @classmethod
     def reset(cls):
-        """ Reset the class to have its widest parameter limits, given in the
-        class attribute :code:`hard_limits`. """
+        """ Reset the class to have its original parameter limits, i.e. those
+        given in the class attribute :code:`param_limits` when the first
+        instance is made. """
 
         cls.param_limits = deepcopy(cls.hard_limits)
 

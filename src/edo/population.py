@@ -35,8 +35,7 @@ def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
 
     if size <= 1:
         raise ValueError(
-            "There must be more than one individual in a \
-                          population"
+            "There must be more than one individual in a population"
         )
 
     population = [
