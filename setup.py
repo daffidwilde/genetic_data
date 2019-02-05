@@ -4,7 +4,6 @@
 
 from setuptools import find_packages, setup
 
-
 with open("README.rst", "r") as readme_file:
     README = readme_file.read()
 

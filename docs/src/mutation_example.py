@@ -6,7 +6,6 @@ from edo.individual import create_individual
 from edo.operators import mutation
 from edo.pdfs import Poisson
 
-
 np.random.seed(0)
 
 row_limits, col_limits = [1, 3], [1, 5]

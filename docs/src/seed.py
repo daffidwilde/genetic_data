@@ -1,7 +1,7 @@
 """ .. How and why to set a seed. """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.patches import Patch
 
 import edo

@@ -1,9 +1,8 @@
 """ Script for plots in third tutorial. """
 
-from scipy.stats import linregress
-
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import linregress
 
 import edo
 from edo.pdfs import Normal, Poisson
