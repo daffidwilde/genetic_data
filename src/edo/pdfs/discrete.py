@@ -32,6 +32,8 @@ class Bernoulli(Distribution):
 
         self.prob = np.random.uniform(*self.param_limits["prob"])
 
+        super().__init__()
+
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the Bernoulli distribution
         with success probability :code:`prob`. """
@@ -64,6 +66,8 @@ class Poisson(Distribution):
     def __init__(self):
 
         self.lam = np.random.uniform(*self.param_limits["lam"])
+
+        super().__init__()
 
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the Poisson distribution

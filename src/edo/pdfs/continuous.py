@@ -35,6 +35,8 @@ class Gamma(Distribution):
         self.alpha = np.random.uniform(*self.param_limits["alpha"])
         self.theta = np.random.uniform(*self.param_limits["theta"])
 
+        super().__init__()
+
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the gamma distribution with
         shape and scale parameters given by :code:`alpha` and :code:`theta`
@@ -72,6 +74,8 @@ class Normal(Distribution):
 
         self.mean = np.random.uniform(*self.param_limits["mean"])
         self.std = np.random.uniform(*self.param_limits["std"])
+
+        super().__init__()
 
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the normal distribution

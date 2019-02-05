@@ -85,6 +85,7 @@ def test_reset():
     """ Check distribution classes can be reset to default parameter limits. """
 
     for pdf_class in all_pdfs:
+        pdf_class()
         for param_name in pdf_class.param_limits:
             pdf_class.param_limits[param_name] = None
 

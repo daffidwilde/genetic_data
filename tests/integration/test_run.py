@@ -48,9 +48,6 @@ def test_run_algorithm(
 
     pdfs = [Gamma, Normal, Poisson]
 
-    for pdf in pdfs:  # make sure the classes are as normal
-        pdf.reset()
-
     pop, fit, all_pops, all_fits = edo.run_algorithm(
         fitness=trivial_fitness,
         size=size,

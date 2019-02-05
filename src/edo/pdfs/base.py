@@ -10,17 +10,22 @@ class Distribution:
     Attributes
     ----------
     name : str
-        The name of the distribution, "Distribution".
+        The name of the distribution, :code:`"Distribution"`.
     hard_limits : None
-        A placeholder for a dictionary with hard bounds the parameters. Also
-        acts as the default limits when resetting an individual.
+        A placeholder for a dictionary with hard bounds the parameters.
     param_limits : None
-        A placeholder for a distribution parameter limit dictionary.
+        A placeholder for a distribution parameter limit dictionary. These are
+        considered the original limits and the class can be reset to them using
+        the :code:`reset` class method.
     """
 
     name = "Distribution"
     hard_limits = None
     param_limits = None
+
+    def __init__(self):
+
+        self._store_limits()
 
     def __repr__(self):
 
@@ -32,11 +37,18 @@ class Distribution:
         return f"{self.name}({params})"
 
     @classmethod
+    def _store_limits(cls):
+        """ Store the original parameter limits in a hidden attribute. """
+
+        if "_param_limits" not in vars(cls):
+            cls._param_limits = deepcopy(cls.param_limits)
+
+    @classmethod
     def reset(cls):
         """ Reset the class to have its widest parameter limits, given in the
         class attribute :code:`hard_limits`. """
 
-        cls.param_limits = deepcopy(cls.hard_limits)
+        cls.param_limits = cls._param_limits
 
     def sample(self):
         """ Raise a :code:`NotImplementedError` by default. """
