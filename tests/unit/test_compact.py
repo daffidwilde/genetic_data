@@ -50,4 +50,4 @@ def test_compact_search_space(
                         limits[0] >= pdf.hard_limits[name][0]
                         and limits[1] <= pdf.hard_limits[name][1]
                     )
-                    pdf.reset()
+            pdf.reset()

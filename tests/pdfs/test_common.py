@@ -88,7 +88,7 @@ def test_reset():
         for param_name in pdf_class.param_limits:
             pdf_class.param_limits[param_name] = None
 
-        assert pdf_class.param_limits != pdf_class.hard_limits
+        assert pdf_class.param_limits != pdf_class._param_limits
 
         pdf_class.reset()
-        assert pdf_class.param_limits == pdf_class.hard_limits
+        assert pdf_class.param_limits == pdf_class._param_limits
