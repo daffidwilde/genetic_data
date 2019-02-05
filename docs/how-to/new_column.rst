@@ -19,14 +19,17 @@ class. The only requirements and constraints on your class are that:
 
 - there must be class attribute :code:`name` giving the name of the
   distribution;
-- there must be two class attributes :code:`hard_limits` and
-  :code:`param_limits` giving name and limits of the parameters in the
-  distribution;
+- there must be a class attribute :code:`hard_limits` that gives extreme limits
+  on the parameters of the distribution;
+- the must be a class attribute :code:`param_limits` that gives the original
+  limits on the parameters of the distribution;
 - it must have a :code:`sample` method that takes itself and :code:`nrows` as
   argument;
 - the only attributes defined in its :code:`__init__` are the parameters of that
-  particular instance of the distribution, not the limits on its parameters as
-  they should be class attributes.
+  particular instance of the distribution;
+- a call to :code:`Distribution`'s initialisation is made, e.g. through
+  :code:`super().__init__`. This deals with a bunch of helpful things such as
+  storing your original parameter limits safely.
 
 So, bearing that in mind, a triangular distribution class would look something
 like this::
@@ -35,7 +38,7 @@ like this::
    ...     """ A continuous column distribution given by the triangular
    ...     distribution. """
    ... 
-   ...     name = 'Triangular'
+   ...     name = "Triangular"
    ...     hard_limits = {"bounds": [-10, 10]}
    ...     param_limits = {"bounds": [-10, 10]}
    ... 
@@ -45,6 +48,8 @@ like this::
    ...         self.left = np.random.uniform(*limits)
    ...         self.right = np.random.uniform(self.left, limits[1])
    ...         self.mode = np.random.uniform(self.left, self.right)
+   ... 
+   ...         super().__init__()
    ... 
    ...     def sample(self, nrows):
    ...         """ Take a sample of size :code:`nrows` from the triangular
