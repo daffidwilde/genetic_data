@@ -53,5 +53,5 @@ def test_uniform_set_param_limits(first_limits, second_limits, seed):
 
     np.random.seed(seed)
     uniform = Uniform()
-    assert uniform.a >= first_limits[0] and uniform.a <= first_limits[1]
-    assert uniform.b >= uniform.a and uniform.b <= first_limits[1]
+    assert uniform.lower >= first_limits[0] and uniform.lower <= first_limits[1]
+    assert uniform.upper >= uniform.lower and uniform.upper <= first_limits[1]
