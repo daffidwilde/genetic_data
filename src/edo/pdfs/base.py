@@ -30,9 +30,16 @@ class Distribution:
     def __repr__(self):
 
         params = ""
-        for key, val in self.__dict__.items():
-            params += f"{key}={val:.2f}, "
-        params = params[:-2]
+        for name, value in vars(self).items():
+            if isinstance(value, list):
+                params += f"{name}=["
+                for val in value:
+                    params += f"{val:.2f}, "
+                params = params[:2]
+                params += "], "
+            else:
+                params += f"{name}={value:.2f}, "
+            params = params[:-2]
 
         return f"{self.name}({params})"
 

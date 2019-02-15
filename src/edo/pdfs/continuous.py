@@ -97,22 +97,22 @@ class Uniform(Distribution):
     param_limits : dict
         A dictionary of limits on the distribution parameters. Defaults to
         :code:`[-10, 10]` for :code:`bounds`.
-    a : float
+    lower : float
         The lower bound of the distribution.
-    b : float
+    upper : float
         The upper bound of the distribution.
     """
 
     name = "Uniform"
     dtype = "float"
     hard_limits = {"bounds": [-10, 10]}
-    param_limits = {"bounds": [-10, 10]}
+    param_limits = {'bounds': [-10, 10]}
 
     def __init__(self):
 
-        bounds = self.param_limits["bounds"]
-        self.lower = np.random.uniform(*bounds)
-        self.upper = np.random.uniform(self.lower, bounds[1])
+        lower = np.random.uniform(*self.param_limits["bounds"])
+        upper = np.random.uniform(lower, self.param_limits["bounds"][1])
+        self.bounds = [lower, upper]
 
         super().__init__()
 
@@ -121,4 +121,4 @@ class Uniform(Distribution):
         with lower and upper limits given by :code:`lower` and :code:`upper`
         respectively. """
 
-        return np.random.uniform(self.lower, self.upper, size=nrows)
+        return np.random.uniform(*self.bounds, size=nrows)
