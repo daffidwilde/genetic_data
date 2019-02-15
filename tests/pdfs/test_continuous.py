@@ -4,7 +4,7 @@ import numpy as np
 from hypothesis import given
 from hypothesis.strategies import floats, integers, tuples
 
-from edo.pdfs.continuous import Gamma, Normal
+from edo.pdfs.continuous import Gamma, Normal, Uniform
 
 LIMITS = (
     tuples(floats(min_value=0, max_value=10), floats(min_value=0, max_value=10))
@@ -43,3 +43,15 @@ def test_normal_set_param_limits(first_limits, second_limits, seed):
     normal = Normal()
     assert normal.mean >= first_limits[0] and normal.mean <= first_limits[1]
     assert normal.std >= second_limits[0] and normal.std <= second_limits[1]
+
+@CONTINUOUS
+def test_uniform_set_param_limits(first_limits, second_limits, seed):
+    """ Check that a Uniform object can sample its parameters correctly if its
+    class attributes are altered. """
+
+    Uniform.param_limits = {"bounds": first_limits}
+
+    np.random.seed(seed)
+    uniform = Uniform()
+    assert uniform.a >= first_limits[0] and uniform.a <= first_limits[1]
+    assert uniform.b >= uniform.a and uniform.b <= first_limits[1]
