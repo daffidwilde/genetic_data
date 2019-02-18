@@ -1,7 +1,5 @@
 """ Tests for the compacting of the search space. """
 
-import pytest
-
 from edo.compact import compact_search_space
 from edo.fitness import get_fitness
 from edo.operators import selection
@@ -31,22 +29,16 @@ def test_compact_search_space(
         population, pop_fitness, best_prop, lucky_prop, maximise
     )
 
-    if compact_ratio in [0, 1]:
-        with pytest.raises(ValueError):
-            compact_search_space(parents, pdfs, itr, compact_ratio)
+    compacted_pdfs = compact_search_space(
+        parents, pdfs, itr, compact_ratio
+    )
 
-    else:
-        compacted_pdfs = compact_search_space(
-            parents, pdfs, itr, compact_ratio
-        )
+    for pdf in compacted_pdfs:
+        assert pdf.param_limits.keys() == vars(pdf()).keys()
 
-        for pdf in compacted_pdfs:
-            assert pdf.param_limits.keys() == vars(pdf()).keys()
-
-            if not pdf.param_limits == pdf.hard_limits:
-                for name, limits in pdf.param_limits.items():
-                    assert (
-                        limits[0] >= pdf.hard_limits[name][0]
-                        and limits[1] <= pdf.hard_limits[name][1]
-                    )
-            pdf.reset()
+        for name, limits in pdf.param_limits.items():
+            assert (
+                limits[0] >= pdf.hard_limits[name][0]
+                and limits[1] <= pdf.hard_limits[name][1]
+            )
+        pdf.reset()
