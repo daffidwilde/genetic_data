@@ -1,17 +1,16 @@
-""" Tests for the compacting of the search space. """
+""" Tests for the shrinking of the search space. """
 
-from edo.compact import compact_search_space
 from edo.fitness import get_fitness
-from edo.operators import selection
+from edo.operators import selection, shrink
 from edo.pdfs import Gamma, Normal, Poisson
 from edo.population import create_initial_population
 
-from .util.parameters import COMPACT_SPACE
+from .util.parameters import SHRINK
 from .util.trivials import trivial_fitness
 
 
-@COMPACT_SPACE
-def test_compact_search_space(
+@SHRINK
+def test_shrink(
     size, row_limits, col_limits, weights, props, maximise, compact_ratio, itr
 ):
     """ Test that the search space (the space of pdf parameter limits) of a
@@ -29,16 +28,14 @@ def test_compact_search_space(
         population, pop_fitness, best_prop, lucky_prop, maximise
     )
 
-    compacted_pdfs = compact_search_space(
+    pdfs = shrink(
         parents, pdfs, itr, compact_ratio
     )
 
-    for pdf in compacted_pdfs:
+    for pdf in pdfs:
         assert pdf.param_limits.keys() == vars(pdf()).keys()
-
         for name, limits in pdf.param_limits.items():
-            assert (
-                limits[0] >= pdf.hard_limits[name][0]
-                and limits[1] <= pdf.hard_limits[name][1]
-            )
+            assert min(limits) >= min(pdf.hard_limits[name])
+            assert max(limits) <= max(pdf.hard_limits[name])
+
         pdf.reset()
