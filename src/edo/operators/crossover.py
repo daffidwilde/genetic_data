@@ -3,8 +3,8 @@
 import numpy as np
 import pandas as pd
 
-from ..individual import Individual
-from .util import _add_line, _fillna, _get_pdf_counts
+from edo.individual import Individual
+from .util import _add_row, _fillna, _get_pdf_counts, _remove_row
 
 
 def _collate_parents(parent1, parent2):
@@ -25,7 +25,7 @@ def _cross_minimum_cols(parent_columns, parent_metadata, col_limits, pdfs):
     number of columns from two parents to satisfy this limit. Return part of a
     whole individual and the adjusted parent information. """
 
-    all_idxs, cols, metadata = [], [], []
+    cols, metadata = [], []
     for limit, pdf_class in zip(col_limits[0], pdfs):
         if limit:
             pdf_class_idxs = np.where(
@@ -36,11 +36,13 @@ def _cross_minimum_cols(parent_columns, parent_metadata, col_limits, pdfs):
             for idx in idxs:
                 metadata.append(parent_metadata[idx])
                 cols.append(parent_columns[idx])
-                all_idxs.append(idx)
 
-    for idx in sorted(all_idxs, reverse=True):
-        parent_columns.pop(idx)
-        parent_metadata.pop(idx)
+            parent_columns = [
+                c for i, c in enumerate(parent_columns) if i not in idxs
+            ]
+            parent_metadata = [
+                m for i, m in enumerate(parent_metadata) if i not in idxs
+            ]
 
     return cols, metadata, parent_columns, parent_metadata
 
@@ -125,9 +127,9 @@ def crossover(parent1, parent2, col_limits, pdfs, prob=0.5):
 
     while len(dataframe) != nrows:
         if len(dataframe) > nrows:
-            dataframe = dataframe.iloc[:nrows, :]
+            dataframe = _remove_row(dataframe)
         elif len(dataframe) < nrows:
-            dataframe, metadata = _add_line(dataframe, metadata, axis=0)
+            dataframe = _add_row(dataframe, metadata)
 
     dataframe = _fillna(dataframe, metadata)
     return Individual(dataframe, metadata)
