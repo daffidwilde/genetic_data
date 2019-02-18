@@ -4,8 +4,8 @@ from copy import deepcopy
 
 import numpy as np
 
-from ..individual import Individual
-from .util import _add_line, _remove_line
+from edo.individual import Individual
+from .util import _add_col, _add_row, _remove_col, _remove_row
 
 
 def _mutate_nrows(dataframe, metadata, row_limits, prob):
@@ -14,10 +14,10 @@ def _mutate_nrows(dataframe, metadata, row_limits, prob):
     :code:`row_limits`. """
 
     if np.random.random() < prob and dataframe.shape[0] < row_limits[1]:
-        dataframe, metadata = _add_line(dataframe, metadata, axis=0)
+        dataframe = _add_row(dataframe, metadata)
 
     if np.random.random() < prob and dataframe.shape[0] > row_limits[0]:
-        dataframe, metadata = _remove_line(dataframe, metadata, axis=0)
+        dataframe = _remove_row(dataframe)
 
     return dataframe, metadata
 
@@ -33,8 +33,8 @@ def _mutate_ncols(dataframe, metadata, col_limits, pdfs, weights, prob):
         condition = dataframe.shape[1] < col_limits[1]
 
     if np.random.random() < prob and condition:
-        dataframe, metadata = _add_line(
-            dataframe, metadata, 1, col_limits, pdfs, weights
+        dataframe, metadata = _add_col(
+            dataframe, metadata, col_limits, pdfs, weights
         )
 
     if isinstance(col_limits[0], tuple):
@@ -43,11 +43,22 @@ def _mutate_ncols(dataframe, metadata, col_limits, pdfs, weights, prob):
         condition = dataframe.shape[1] > col_limits[0]
 
     if np.random.random() < prob and condition:
-        dataframe, metadata = _remove_line(
-            dataframe, metadata, 1, col_limits, pdfs
-        )
+        dataframe, metadata = _remove_col(dataframe, metadata, col_limits, pdfs)
 
     return dataframe, metadata
+
+
+def _mutate_params(metadata, prob):
+    """ Mutate the parameters of each column in the metadata of an individual.
+    Each mutation has probability :code:`prob`. """
+
+    for pdf in metadata:
+        limits = pdf.param_limits
+        for param in limits:
+            if np.random.random() < prob:
+                vars(pdf)[param] = np.random.uniform(*limits[param])
+
+    return metadata
 
 
 def _mutate_values(dataframe, metadata, prob):
@@ -99,6 +110,7 @@ def mutation(individual, prob, row_limits, col_limits, pdfs, weights=None):
     dataframe, metadata = _mutate_ncols(
         dataframe, metadata, col_limits, pdfs, weights, prob
     )
+    metadata = _mutate_params(metadata, prob)
 
     dataframe = _mutate_values(dataframe, metadata, prob)
     return Individual(dataframe, metadata)
