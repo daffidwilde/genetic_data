@@ -111,7 +111,7 @@ class Uniform(Distribution):
     def __init__(self):
 
         lower = np.random.uniform(*self.param_limits["bounds"])
-        upper = np.random.uniform(lower, self.param_limits["bounds"][1])
+        upper = np.random.uniform(lower, max(self.param_limits["bounds"]))
         self.bounds = [lower, upper]
 
         super().__init__()
