@@ -77,7 +77,7 @@ def _add_row(dataframe, metadata):
 
     dataframe = dataframe.append(
         {i: pdf.sample(1)[0] for i, pdf in enumerate(metadata)},
-        ignore_index=True
+        ignore_index=True,
     )
 
     return dataframe
@@ -109,4 +109,3 @@ def _add_col(dataframe, metadata, col_limits, pdfs, weights):
 
     dataframe = _rename(dataframe)
     return dataframe, metadata
-
