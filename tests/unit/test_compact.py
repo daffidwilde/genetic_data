@@ -22,7 +22,6 @@ def test_compact_search_space(
 
     best_prop, lucky_prop = props
     pdfs = [Gamma, Normal, Poisson]
-    max_iter = 100
     population = create_initial_population(
         size, row_limits, col_limits, pdfs, weights
     )
@@ -34,11 +33,11 @@ def test_compact_search_space(
 
     if compact_ratio in [0, 1]:
         with pytest.raises(ValueError):
-            compact_search_space(parents, pdfs, itr, max_iter, compact_ratio)
+            compact_search_space(parents, pdfs, itr, compact_ratio)
 
     else:
         compacted_pdfs = compact_search_space(
-            parents, pdfs, itr, max_iter, compact_ratio
+            parents, pdfs, itr, compact_ratio
         )
 
         for pdf in compacted_pdfs:

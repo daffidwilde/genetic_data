@@ -19,34 +19,26 @@ def _get_all_param_values(parents):
     return all_param_vals
 
 
-def compact_search_space(parents, pdfs, itr, max_iter, compaction_ratio):
+def compact_search_space(parents, pdfs, itr, compaction_ratio):
     """ Given the current progress of the GA, compact the search space, i.e. the
     parameter spaces for each of the distribution classes in :code:`pdfs`. """
 
-    if (
-        compaction_ratio in [0, 1]
-        or compaction_ratio < 0
-        or compaction_ratio > 1
-    ):
-        raise ValueError("Compaction ratio, s, must satisfy 0 < s < 1.")
-
-    compact_factor = 1 - (itr / (compaction_ratio * max_iter))
     all_param_vals = _get_all_param_values(parents)
-
     for pdf, params in all_param_vals.items():
         for name, vals in params.items():
 
+            limits = pdf.param_limits[name]
+            hard_limits = pdf.hard_limits[name]
+
             midpoint = sum(vals) / len(vals)
-            shift = (max(vals) - min(vals)) * compact_factor / 2
+            shift = (max(limits) - min(limits)) * (compaction_ratio ** itr) / 2
 
-            lower = midpoint - shift
-            upper = midpoint + shift
-
-            if shift < 0:
-                lower, upper = upper, lower
-
-            lower = max([pdf.hard_limits[name][0], lower])
-            upper = min([pdf.hard_limits[name][1], upper])
+            lower = max(
+                (hard_limits[0], min(limits), midpoint - shift)
+            )
+            upper = min(
+                (hard_limits[1], max(limits), midpoint + shift)
+            )
 
             pdf.param_limits[name] = [lower, upper]
 
