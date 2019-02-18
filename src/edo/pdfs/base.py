@@ -35,7 +35,7 @@ class Distribution:
                 params += f"{name}=["
                 for val in value:
                     params += f"{val:.2f}, "
-                params = params[:2]
+                params = params[:-2]
                 params += "], "
             else:
                 params += f"{name}={value:.2f}, "
