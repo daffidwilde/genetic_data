@@ -53,10 +53,11 @@ def _mutate_params(metadata, prob):
     Each mutation has probability :code:`prob`. """
 
     for pdf in metadata:
+        pdf_class = pdf.__class__
         limits = pdf.param_limits
         for param in limits:
             if np.random.random() < prob:
-                vars(pdf)[param] = np.random.uniform(*limits[param])
+                vars(pdf)[param] = vars(pdf_class())[param]
 
     return metadata
 

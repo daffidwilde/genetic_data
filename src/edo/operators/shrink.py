@@ -8,7 +8,11 @@ def _get_param_values(parents, pdf, name):
     for _, metadata in parents:
         for column in metadata:
             if isinstance(column, pdf):
-                values.append(vars(column)[name])
+                try:
+                    for val in vars(column)[name]:
+                        values.append(val)
+                except TypeError:
+                    values.append(vars(column)[name])
 
     return values
 
