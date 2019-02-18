@@ -104,17 +104,6 @@ TUPLE_MUTATION = given(
     row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS, prob=PROB
 )
 
-COMPACT_SPACE = given(
-    size=SIZE,
-    row_limits=SHAPES,
-    col_limits=SHAPES,
-    weights=WEIGHTS,
-    props=PROPS,
-    maximise=booleans(),
-    compact_ratio=PROB,
-    itr=INTS,
-)
-
 OFFSPRING = given(
     size=SIZE,
     row_limits=SHAPES,
@@ -133,6 +122,17 @@ SELECTION = given(
     weights=WEIGHTS,
     props=PROPS,
     maximise=booleans(),
+)
+
+SHRINK = given(
+    size=SIZE,
+    row_limits=SHAPES,
+    col_limits=SHAPES,
+    weights=WEIGHTS,
+    props=PROPS,
+    maximise=booleans(),
+    compact_ratio=PROB,
+    itr=INTS,
 )
 
 SMALL_PROPS = given(
