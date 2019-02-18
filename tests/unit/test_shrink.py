@@ -28,9 +28,7 @@ def test_shrink(
         population, pop_fitness, best_prop, lucky_prop, maximise
     )
 
-    pdfs = shrink(
-        parents, pdfs, itr, compact_ratio
-    )
+    pdfs = shrink(parents, pdfs, itr, compact_ratio)
 
     for pdf in pdfs:
         assert pdf.param_limits.keys() == vars(pdf()).keys()

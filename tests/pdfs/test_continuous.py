@@ -44,6 +44,7 @@ def test_normal_set_param_limits(first_limits, second_limits, seed):
     assert normal.mean >= first_limits[0] and normal.mean <= first_limits[1]
     assert normal.std >= second_limits[0] and normal.std <= second_limits[1]
 
+
 @CONTINUOUS
 def test_uniform_set_param_limits(first_limits, second_limits, seed):
     """ Check that a Uniform object can sample its parameters correctly if its

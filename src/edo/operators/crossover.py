@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from edo.individual import Individual
+
 from .util import _add_row, _fillna, _get_pdf_counts, _remove_row
 
 

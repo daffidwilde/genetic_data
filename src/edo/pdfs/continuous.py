@@ -106,7 +106,7 @@ class Uniform(Distribution):
     name = "Uniform"
     dtype = "float"
     hard_limits = {"bounds": [-10, 10]}
-    param_limits = {'bounds': [-10, 10]}
+    param_limits = {"bounds": [-10, 10]}
 
     def __init__(self):
 

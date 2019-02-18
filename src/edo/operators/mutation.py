@@ -5,6 +5,7 @@ from copy import deepcopy
 import numpy as np
 
 from edo.individual import Individual
+
 from .util import _add_col, _add_row, _remove_col, _remove_row
 
 
