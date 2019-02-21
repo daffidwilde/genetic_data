@@ -39,8 +39,8 @@ class Distribution:
                 params += "], "
             else:
                 params += f"{name}={value:.2f}, "
-            params = params[:-2]
 
+        params = params[:-2]
         return f"{self.name}({params})"
 
     @classmethod
