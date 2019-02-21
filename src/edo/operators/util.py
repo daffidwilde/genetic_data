@@ -21,22 +21,6 @@ def _rename(dataframe):
     return dataframe
 
 
-def _fillna(dataframe, metadata):
-    """ Fill in `NaN` values of a column by sampling from the distribution
-    associated with it. """
-
-    for col, pdf in zip(dataframe.columns, metadata):
-        data = dataframe[col]
-        if data.isnull().any():
-            nulls = data.isnull()
-            samples = pdf.sample(nulls.sum())
-            dataframe.loc[nulls, col] = samples
-
-        dataframe[col] = dataframe[col].astype(pdf.dtype)
-
-    return dataframe
-
-
 def _remove_row(dataframe):
     """ Remove a row from a dataframe at random. """
 
