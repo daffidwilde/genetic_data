@@ -77,6 +77,7 @@ def _adjust_column_lengths(cols, metadata, nrows):
     for col, pdf in zip(cols, metadata):
         difference = len(col) - nrows
         size = abs(difference)
+
         if difference > 0:
             idxs = np.random.choice(col.index, size=size, replace=False)
             col = col.drop(idxs, axis=0).reset_index(drop=True)
@@ -84,7 +85,9 @@ def _adjust_column_lengths(cols, metadata, nrows):
             col = col.append(
                 pd.Series(pdf.sample(size)), ignore_index=False
             ).reset_index(drop=True)
+
         adjusted_cols.append(col)
+
     return adjusted_cols
 
 
