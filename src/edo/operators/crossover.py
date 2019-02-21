@@ -5,7 +5,7 @@ import pandas as pd
 
 from edo.individual import Individual
 
-from .util import _add_row, _fillna, _get_pdf_counts, _remove_row
+from .util import _get_pdf_counts
 
 
 def _collate_parents(parent1, parent2):
@@ -13,43 +13,38 @@ def _collate_parents(parent1, parent2):
     lists form a pool from which information is inherited during the crossover
     process. """
 
-    parent_columns, parent_metadata = [], []
+    parent_cols, parent_metadata = [], []
     for dataframe, metadata in [parent1, parent2]:
-        parent_columns += [dataframe[col] for col in dataframe.columns]
+        parent_cols += [dataframe[col] for col in dataframe.columns]
         parent_metadata += metadata
 
-    return parent_columns, parent_metadata
+    return parent_cols, parent_metadata
 
 
-def _cross_minimum_cols(parent_columns, parent_metadata, col_limits, pdfs):
+def _cross_minimum_columns(parent_cols, parent_metadata, col_limits, pdfs):
     """ If :code:`col_limits` has a tuple lower limit, inherit the minimum
     number of columns from two parents to satisfy this limit. Return part of a
     whole individual and the adjusted parent information. """
 
     cols, metadata = [], []
     for limit, pdf_class in zip(col_limits[0], pdfs):
-        if limit:
-            pdf_class_idxs = np.where(
-                [isinstance(pdf, pdf_class) for pdf in parent_metadata]
-            )
+        pdf_instances = [
+            (col, pdf)
+            for col, pdf in zip(parent_cols, parent_metadata)
+            if isinstance(pdf, pdf_class)
+        ]
 
-            idxs = np.random.choice(*pdf_class_idxs, size=limit, replace=False)
-            for idx in idxs:
-                metadata.append(parent_metadata[idx])
-                cols.append(parent_columns[idx])
+        for _ in range(limit):
+            idx = np.random.choice(len(pdf_instances))
+            col, pdf = pdf_instances.pop(idx)
+            cols.append(col)
+            metadata.append(pdf)
 
-            parent_columns = [
-                c for i, c in enumerate(parent_columns) if i not in idxs
-            ]
-            parent_metadata = [
-                m for i, m in enumerate(parent_metadata) if i not in idxs
-            ]
-
-    return cols, metadata, parent_columns, parent_metadata
+    return cols, metadata, parent_cols, parent_metadata
 
 
-def _cross_remaining_cols(
-    cols, metadata, ncols, parent_columns, parent_metadata, col_limits, pdfs
+def _cross_remaining_columns(
+    cols, metadata, ncols, parent_cols, parent_metadata, col_limits, pdfs
 ):
     """ Regardless of whether :code:`col_limits` has a tuple upper limit or not,
     inherit all remaining columns from the two parents so as not to exceed these
@@ -57,21 +52,40 @@ def _cross_remaining_cols(
 
     pdf_counts = _get_pdf_counts(metadata, pdfs)
     while len(cols) < ncols:
-        idx = np.random.randint(len(parent_columns))
+        idx = np.random.choice(len(parent_cols))
         pdf = parent_metadata[idx]
-        pdf_idx = pdfs.index(pdf.__class__)
+        pdf_class = pdf.__class__
+        pdf_class_idx = pdfs.index(pdf_class)
 
         try:
-            if pdf_counts[pdf.__class__] < col_limits[1][pdf_idx]:
-                cols.append(parent_columns.pop(idx))
+            if pdf_counts[pdf_class] < col_limits[1][pdf_class_idx]:
+                cols.append(parent_cols.pop(idx))
                 metadata.append(parent_metadata.pop(idx))
-                pdf_counts[pdf.__class__] += 1
+                pdf_counts[pdf_class] += 1
 
         except TypeError:
-            cols.append(parent_columns.pop(idx))
+            cols.append(parent_cols.pop(idx))
             metadata.append(parent_metadata.pop(idx))
 
     return cols, metadata
+
+
+def _adjust_column_lengths(cols, metadata, nrows):
+    """ Trim or fill in the values of each column as needed. """
+
+    adjusted_cols = []
+    for col, pdf in zip(cols, metadata):
+        difference = len(col) - nrows
+        size = abs(difference)
+        if difference > 0:
+            idxs = np.random.choice(col.index, size=size, replace=False)
+            col = col.drop(idxs, axis=0).reset_index(drop=True)
+        elif difference < 0:
+            col = col.append(
+                pd.Series(pdf.sample(size)), ignore_index=False
+            ).reset_index(drop=True)
+        adjusted_cols.append(col)
+    return adjusted_cols
 
 
 def crossover(parent1, parent2, col_limits, pdfs, prob=0.5):
@@ -102,7 +116,7 @@ def crossover(parent1, parent2, col_limits, pdfs, prob=0.5):
         A new individual formed from the dimensions and columns of its parents.
     """
 
-    parent_columns, parent_metadata = _collate_parents(parent1, parent2)
+    parent_cols, parent_metadata = _collate_parents(parent1, parent2)
     cols, metadata = [], []
 
     if np.random.random() < prob:
@@ -116,21 +130,14 @@ def crossover(parent1, parent2, col_limits, pdfs, prob=0.5):
         ncols = len(parent2.metadata)
 
     if isinstance(col_limits[0], tuple):
-        cols, metadata, parent_columns, parent_metadata = _cross_minimum_cols(
-            parent_columns, parent_metadata, col_limits, pdfs
+        cols, metadata, parent_cols, parent_metadata = _cross_minimum_columns(
+            parent_cols, parent_metadata, col_limits, pdfs
         )
 
-    cols, metadata = _cross_remaining_cols(
-        cols, metadata, ncols, parent_columns, parent_metadata, col_limits, pdfs
+    cols, metadata = _cross_remaining_columns(
+        cols, metadata, ncols, parent_cols, parent_metadata, col_limits, pdfs
     )
+    cols = _adjust_column_lengths(cols, metadata, nrows)
 
-    dataframe = pd.DataFrame({i: col for i, col in enumerate(cols)})
-
-    while len(dataframe) != nrows:
-        if len(dataframe) > nrows:
-            dataframe = _remove_row(dataframe)
-        elif len(dataframe) < nrows:
-            dataframe = _add_row(dataframe, metadata)
-
-    dataframe = _fillna(dataframe, metadata)
+    dataframe = pd.DataFrame({i: col.values for i, col in enumerate(cols)})
     return Individual(dataframe, metadata)
