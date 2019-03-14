@@ -72,6 +72,8 @@ def create_new_population(
         mutant = mutation(
             offspring, mutation_prob, row_limits, col_limits, pdfs, weights
         )
+        for col, meta in zip(*mutant):
+            mutant.dataframe[col] = mutant.dataframe[col].astype(meta.dtype)
         population.append(mutant)
 
     return population

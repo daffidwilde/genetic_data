@@ -13,7 +13,7 @@ def _get_pdf_counts(metadata, pdfs):
 
 
 def _rename(dataframe):
-    """ Rename metadata or reindex to make sense after deletion or addition of a
+    """ Rename columns or reindex to make sense after deletion or addition of a
     new line. """
 
     dataframe = dataframe.reset_index(drop=True)
