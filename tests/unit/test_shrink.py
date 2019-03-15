@@ -32,8 +32,4 @@ def test_shrink(
 
     for pdf in pdfs:
         assert pdf.param_limits.keys() == vars(pdf()).keys()
-        for name, limits in pdf.param_limits.items():
-            assert min(limits) >= min(pdf.hard_limits[name])
-            assert max(limits) <= max(pdf.hard_limits[name])
-
         pdf.reset()

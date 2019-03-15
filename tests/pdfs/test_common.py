@@ -84,15 +84,22 @@ def test_to_tuple(seed):
                 assert item == list(pdf.__dict__.values())[int((i - 1) / 2)]
 
 
-def test_reset():
-    """ Check distribution classes can be reset to default parameter limits. """
+def test_set_param_limits():
+    """ Check distribution classes can have their default parameter limits
+    changed. """
 
     for pdf_class in all_pdfs:
-        pdf_class()
+        param_limits = dict(pdf_class.param_limits)
         for param_name in pdf_class.param_limits:
             pdf_class.param_limits[param_name] = None
 
-        assert pdf_class.param_limits != pdf_class._param_limits
+        assert pdf_class.param_limits != param_limits
 
+
+def test_reset():
+    """ Test that distribution classes can be reset. """
+
+    for pdf_class in all_pdfs:
+        pdf_class.subtypes = ["foo"]
         pdf_class.reset()
-        assert pdf_class.param_limits == pdf_class._param_limits
+        assert pdf_class.subtypes is None

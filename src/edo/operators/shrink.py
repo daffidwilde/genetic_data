@@ -33,12 +33,11 @@ def _adjust_pdf_params(parents, pdf, itr, shrinkage):
     for name, limits in pdf.param_limits.items():
         values = _get_param_values(parents, pdf, name)
         if values:
-            hard_limits = pdf.hard_limits[name]
             midpoint = sum(values) / len(values)
             shift = (max(limits) - min(limits)) * (shrinkage ** itr) / 2
 
-            lower = max(min(hard_limits), min(limits), midpoint - shift)
-            upper = min(min(hard_limits), min(limits), midpoint + shift)
+            lower = max(min(limits), midpoint - shift)
+            upper = min(min(limits), midpoint + shift)
 
             pdf.param_limits[name] = sorted([lower, upper])
 
