@@ -11,8 +11,6 @@ class Distribution:
     ----------
     name : str
         The name of the distribution, :code:`"Distribution"`.
-    hard_limits : None
-        A placeholder for a dictionary with hard bounds the parameters.
     param_limits : None
         A placeholder for a distribution parameter limit dictionary. These are
         considered the original limits and the class can be reset to them using
@@ -20,12 +18,8 @@ class Distribution:
     """
 
     name = "Distribution"
-    hard_limits = None
+    subtypes = None
     param_limits = None
-
-    def __init__(self):
-
-        self._store_limits()
 
     def __repr__(self):
 
@@ -58,7 +52,7 @@ class Distribution:
 
         cls.param_limits = cls._param_limits
 
-    def sample(self):
+    def sample(self, nrows=None):
         """ Raise a :code:`NotImplementedError` by default. """
 
         raise NotImplementedError("You must define a sample method.")
