@@ -113,8 +113,9 @@ def test_create_new_population(
         assert isinstance(dataframe, pd.DataFrame)
         assert len(metadata) == len(dataframe.columns)
 
-        for pdf in metadata:
+        for dtype, pdf in zip(dataframe.dtypes, metadata):
             assert isinstance(pdf, tuple(pdfs))
+            assert dtype == pdf.dtype
 
         for i, limits in enumerate([row_limits, col_limits]):
             assert (
