@@ -2,8 +2,10 @@
 
 from hypothesis import given
 from hypothesis.strategies import sampled_from
+
 from edo.pdfs import all_pdfs
 from edo.pdfs.subtypes import build_class
+
 
 @given(cls=sampled_from(all_pdfs))
 def test_make_subtype(cls):

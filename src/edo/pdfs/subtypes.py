@@ -3,6 +3,7 @@ the `Uniform` distribution may be present in the population. """
 
 import copy
 
+
 def build_class(cls):
     """ Build a new version of `cls` with identical properties that is
     independent of the original. """
