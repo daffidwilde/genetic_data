@@ -15,6 +15,7 @@ def test_distribution_init():
 
     dist = Distribution()
     assert dist.name == "Distribution"
+    assert dist.subtypes is None
     assert dist.param_limits is None
 
     with pytest.raises(NotImplementedError):
