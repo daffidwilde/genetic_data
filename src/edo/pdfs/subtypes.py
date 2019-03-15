@@ -8,9 +8,7 @@ def build_class(cls):
     independent of the original. """
 
     class Class:
-
-        def __repr__(self):
-            return cls.__repr__(self)
+        pass
 
     for key, value in vars(cls).items():
         if "key" != "subtypes":

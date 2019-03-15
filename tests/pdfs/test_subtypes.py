@@ -11,8 +11,8 @@ def test_make_subtype(cls):
 
     subtype = build_class(cls)
     for key, value in vars(subtype).items():
-        if key in vars(cls) and key != "__repr__":
-            assert getattr(subtype, key) == value
+        if key in vars(cls) and key != "subtypes":
+            assert getattr(cls, key) == value
 
     sub = subtype()
     assert isinstance(sub, subtype)
