@@ -88,10 +88,7 @@ def test_run_algorithm(
                 assert isinstance(pdf, tuple(pdfs))
 
             for i, limits in enumerate([row_limits, col_limits]):
-                assert (
-                    dataframe.shape[i] >= limits[0]
-                    and dataframe.shape[i] <= limits[1]
-                )
+                assert limits[0] <= dataframe.shape[i] <= limits[1]
 
             for score in scores:
                 assert isinstance(score, float)

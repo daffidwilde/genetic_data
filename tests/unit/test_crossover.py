@@ -165,4 +165,4 @@ def test_tup_tup_lims(row_limits, col_limits, weights, prob):
     }
 
     for i, count in enumerate(pdf_counts.values()):
-        assert count >= col_limits[0][i] and count <= col_limits[1][i]
+        assert col_limits[0][i] <= count <= col_limits[1][i]

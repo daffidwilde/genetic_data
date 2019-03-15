@@ -29,7 +29,7 @@ def test_bernoulli_set_param_limits(prob_limits, seed):
 
     np.random.seed(seed)
     bernoulli = Bernoulli()
-    assert bernoulli.prob >= prob_limits[0] and bernoulli.prob <= prob_limits[1]
+    assert prob_limits[0] <= bernoulli.prob <= prob_limits[1]
 
 
 @given(lam_limits=LIMITS, seed=integers(min_value=0, max_value=2 ** 32 - 1))
@@ -41,4 +41,4 @@ def test_poisson_set_param_limits(lam_limits, seed):
 
     np.random.seed(seed)
     poisson = Poisson()
-    assert poisson.lam >= lam_limits[0] and poisson.lam <= lam_limits[1]
+    assert lam_limits[0] <= poisson.lam <= lam_limits[1]

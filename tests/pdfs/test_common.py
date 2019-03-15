@@ -33,13 +33,11 @@ def test_init(seed):
 
         for name, value in vars(pdf).items():
             limits = pdf.param_limits[name]
-            if isinstance(value, list):
+            try:
                 for val in value:
-                    assert val >= min(limits)
-                    assert val <= max(limits)
-            else:
-                assert value >= min(limits)
-                assert value <= max(limits)
+                    assert min(limits) <= val <= max(limits)
+            except TypeError:
+                assert min(limits) <= value <= max(limits)
 
 
 @given(seed=integers(min_value=0, max_value=2 ** 32 - 1))

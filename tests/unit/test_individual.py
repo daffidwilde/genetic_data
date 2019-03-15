@@ -32,9 +32,7 @@ def test_create_individual_int_int_lims(row_limits, col_limits, weights):
         assert isinstance(pdf, tuple(pdfs))
 
     for i, limits in enumerate([row_limits, col_limits]):
-        assert (
-            dataframe.shape[i] >= limits[0] and dataframe.shape[i] <= limits[1]
-        )
+        assert limits[0] <= dataframe.shape[i] <= limits[1]
 
 
 @INTEGER_TUPLE_INDIVIDUAL
@@ -55,22 +53,15 @@ def test_create_individual_int_tup_lims(row_limits, col_limits, weights):
     for pdf in metadata:
         assert isinstance(pdf, tuple(pdfs))
 
-    assert (
-        dataframe.shape[0] >= row_limits[0]
-        and dataframe.shape[0] <= row_limits[1]
-    )
-    assert dataframe.shape[1] >= col_limits[0] and dataframe.shape[1] <= sum(
-        col_limits[1]
-    )
+    assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
+    assert col_limits[0] <= dataframe.shape[1] <= sum(col_limits[1])
 
-    counts = {}
-    for pdf_class in pdfs:
-        counts[pdf_class] = 0
-        for pdf in metadata:
-            if isinstance(pdf, pdf_class):
-                counts[pdf_class] += 1
+    pdf_counts = {
+        pdf_class: sum([isinstance(pdf, pdf_class) for pdf in metadata])
+        for pdf_class in pdfs
+    }
 
-    for i, count in enumerate(counts.values()):
+    for i, count in enumerate(pdf_counts.values()):
         assert count <= col_limits[1][i]
 
 
@@ -92,23 +83,15 @@ def test_create_individual_tup_int_lims(row_limits, col_limits, weights):
     for pdf in metadata:
         assert isinstance(pdf, tuple(pdfs))
 
-    assert (
-        dataframe.shape[0] >= row_limits[0]
-        and dataframe.shape[0] <= row_limits[1]
-    )
-    assert (
-        dataframe.shape[1] >= sum(col_limits[0])
-        and dataframe.shape[1] <= col_limits[1]
-    )
+    assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
+    assert sum(col_limits[0]) <= dataframe.shape[1] <= col_limits[1]
 
-    counts = {}
-    for pdf_class in pdfs:
-        counts[pdf_class] = 0
-        for pdf in metadata:
-            if isinstance(pdf, pdf_class):
-                counts[pdf_class] += 1
+    pdf_counts = {
+        pdf_class: sum([isinstance(pdf, pdf_class) for pdf in metadata])
+        for pdf_class in pdfs
+    }
 
-    for i, count in enumerate(counts.values()):
+    for i, count in enumerate(pdf_counts.values()):
         assert count >= col_limits[0][i]
 
 
@@ -130,20 +113,13 @@ def test_create_individual_tup_tup_lims(row_limits, col_limits, weights):
     for pdf in metadata:
         assert isinstance(pdf, tuple(pdfs))
 
-    assert (
-        dataframe.shape[0] >= row_limits[0]
-        and dataframe.shape[0] <= row_limits[1]
-    )
-    assert dataframe.shape[1] >= sum(col_limits[0]) and dataframe.shape[
-        1
-    ] <= sum(col_limits[1])
+    assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
+    assert sum(col_limits[0]) <= dataframe.shape[1] <= sum(col_limits[1])
 
-    counts = {}
-    for pdf_class in pdfs:
-        counts[pdf_class] = 0
-        for pdf in metadata:
-            if isinstance(pdf, pdf_class):
-                counts[pdf_class] += 1
+    pdf_counts = {
+        pdf_class: sum([isinstance(pdf, pdf_class) for pdf in metadata])
+        for pdf_class in pdfs
+    }
 
-    for i, count in enumerate(counts.values()):
-        assert count >= col_limits[0][i] and count <= col_limits[1][i]
+    for i, count in enumerate(pdf_counts.values()):
+        assert col_limits[0][i] <= count <= col_limits[1][i]

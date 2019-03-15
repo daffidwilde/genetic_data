@@ -28,8 +28,8 @@ def test_gamma_set_param_limits(first_limits, second_limits, seed):
 
     np.random.seed(seed)
     gamma = Gamma()
-    assert gamma.alpha >= first_limits[0] and gamma.alpha <= first_limits[1]
-    assert gamma.theta >= second_limits[0] and gamma.theta <= second_limits[1]
+    assert first_limits[0] <= gamma.alpha <= first_limits[1]
+    assert second_limits[0] <= gamma.theta <= second_limits[1]
 
 
 @CONTINUOUS
@@ -41,8 +41,8 @@ def test_normal_set_param_limits(first_limits, second_limits, seed):
 
     np.random.seed(seed)
     normal = Normal()
-    assert normal.mean >= first_limits[0] and normal.mean <= first_limits[1]
-    assert normal.std >= second_limits[0] and normal.std <= second_limits[1]
+    assert first_limits[0] <= normal.mean <= first_limits[1]
+    assert second_limits[0] <= normal.std <= second_limits[1]
 
 
 @CONTINUOUS
@@ -55,5 +55,4 @@ def test_uniform_set_param_limits(first_limits, second_limits, seed):
     np.random.seed(seed)
     uniform = Uniform()
     for bound in uniform.bounds:
-        assert bound >= first_limits[0]
-        assert bound <= first_limits[1]
+        assert first_limits[0] <= bound <= first_limits[1]

@@ -45,10 +45,7 @@ def test_parents(size, row_limits, col_limits, weights, props, maximise):
             assert isinstance(pdf, tuple(pdfs))
 
         for i, limits in enumerate([row_limits, col_limits]):
-            assert (
-                dataframe.shape[i] >= limits[0]
-                and dataframe.shape[i] <= limits[1]
-            )
+            assert limits[0] <= dataframe.shape[i] <= limits[1]
 
 
 @SMALL_PROPS
