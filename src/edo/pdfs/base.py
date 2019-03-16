@@ -16,7 +16,7 @@ class Distribution:
     """
 
     name = "Distribution"
-    subtypes = None
+    subtypes = []
     param_limits = None
 
     def __repr__(self):
@@ -41,7 +41,7 @@ class Distribution:
         given in the class attribute :code:`param_limits` when the first
         instance is made. """
 
-        cls.subtypes = None
+        cls.subtypes = []
 
     def sample(self, nrows=None):
         """ Raise a :code:`NotImplementedError` by default. """

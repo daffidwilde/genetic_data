@@ -15,7 +15,7 @@ def test_distribution_init():
 
     dist = Distribution()
     assert dist.name == "Distribution"
-    assert dist.subtypes is None
+    assert dist.subtypes == []
     assert dist.param_limits is None
 
     with pytest.raises(NotImplementedError):
@@ -102,4 +102,4 @@ def test_reset():
     for pdf_class in all_pdfs:
         pdf_class.subtypes = ["foo"]
         pdf_class.reset()
-        assert pdf_class.subtypes is None
+        assert pdf_class.subtypes == []
