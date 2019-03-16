@@ -17,17 +17,17 @@ from .util.parameters import (
 
 @INTEGER_CROSSOVER
 @settings(deadline=None)
-def test_int_int_lims(row_limits, col_limits, weights, prob):
+def test_integer_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual with all integer
     column limits. """
 
-    pdfs = [Gamma, Normal, Poisson]
+    families = [Gamma, Normal, Poisson]
     parent1, parent2 = [
-        create_individual(row_limits, col_limits, pdfs, weights)
-        for _ in range(2)
+        create_individual(row_limits, col_limits, families, weights)
+        for _ in [0, 1]
     ]
 
-    individual = crossover(parent1, parent2, col_limits, pdfs, prob)
+    individual = crossover(parent1, parent2, col_limits, families, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -41,7 +41,7 @@ def test_int_int_lims(row_limits, col_limits, weights, prob):
     for dtype, pdf in zip(dataframe.dtypes, metadata):
         assert dtype == pdf.dtype
 
-    for i in range(2):
+    for i in [0, 1]:
         assert dataframe.shape[i] in [
             parent1.dataframe.shape[i],
             parent2.dataframe.shape[i],
@@ -49,17 +49,17 @@ def test_int_int_lims(row_limits, col_limits, weights, prob):
 
 
 @INTEGER_TUPLE_CROSSOVER
-def test_int_tup_lims(row_limits, col_limits, weights, prob):
+def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual where the lower and
     upper column limits are integer and tuple respectively. """
 
-    pdfs = [Gamma, Normal, Poisson]
+    families = [Gamma, Normal, Poisson]
     parent1, parent2 = [
-        create_individual(row_limits, col_limits, pdfs, weights)
-        for _ in range(2)
+        create_individual(row_limits, col_limits, families, weights)
+        for _ in [0, 1]
     ]
 
-    individual = crossover(parent1, parent2, col_limits, pdfs, prob)
+    individual = crossover(parent1, parent2, col_limits, families, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -73,33 +73,29 @@ def test_int_tup_lims(row_limits, col_limits, weights, prob):
     for dtype, pdf in zip(dataframe.dtypes, metadata):
         assert dtype == pdf.dtype
 
-    for i in range(2):
+    for i in [0, 1]:
         assert dataframe.shape[i] in [
             parent1.dataframe.shape[i],
             parent2.dataframe.shape[i],
         ]
 
-    pdf_counts = {
-        pdf_class: sum([isinstance(pdf, pdf_class) for pdf in metadata])
-        for pdf_class in pdfs
-    }
-
-    for i, count in enumerate(pdf_counts.values()):
-        assert count <= col_limits[1][i]
+    for family, upper_limit in zip(families, col_limits[1]):
+        count = sum([pdf.name == family.name for pdf in metadata])
+        assert count <= upper_limit
 
 
 @TUPLE_INTEGER_CROSSOVER
-def test_tup_int_lims(row_limits, col_limits, weights, prob):
+def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual where the lower and
     upper column limits are tuple and integer respectively. """
 
-    pdfs = [Gamma, Normal, Poisson]
+    families = [Gamma, Normal, Poisson]
     parent1, parent2 = [
-        create_individual(row_limits, col_limits, pdfs, weights)
-        for _ in range(2)
+        create_individual(row_limits, col_limits, families, weights)
+        for _ in [0, 1]
     ]
 
-    individual = crossover(parent1, parent2, col_limits, pdfs, prob)
+    individual = crossover(parent1, parent2, col_limits, families, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -113,33 +109,32 @@ def test_tup_int_lims(row_limits, col_limits, weights, prob):
     for dtype, pdf in zip(dataframe.dtypes, metadata):
         assert dtype == pdf.dtype
 
-    for i in range(2):
+    for i in [0, 1]:
         assert dataframe.shape[i] in [
             parent1.dataframe.shape[i],
             parent2.dataframe.shape[i],
         ]
 
-    pdf_counts = {
-        pdf_class: sum([isinstance(pdf, pdf_class) for pdf in metadata])
-        for pdf_class in pdfs
-    }
-
-    for i, count in enumerate(pdf_counts.values()):
-        assert count >= col_limits[0][i]
+    for family, lower_limit in zip(families, col_limits[0]):
+        count = sum([pdf.name == family.name for pdf in metadata])
+        assert count >= lower_limit
 
 
 @TUPLE_CROSSOVER
-def test_tup_tup_lims(row_limits, col_limits, weights, prob):
+def test_tuple_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual with all tuple
     column limits. """
 
-    pdfs = [Gamma, Normal, Poisson]
+    families = [Gamma, Normal, Poisson]
+    for family in families:
+        family.reset()
+
     parent1, parent2 = [
-        create_individual(row_limits, col_limits, pdfs, weights)
-        for _ in range(2)
+        create_individual(row_limits, col_limits, families, weights)
+        for _ in [0, 1]
     ]
 
-    individual = crossover(parent1, parent2, col_limits, pdfs, prob)
+    individual = crossover(parent1, parent2, col_limits, families, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -153,16 +148,12 @@ def test_tup_tup_lims(row_limits, col_limits, weights, prob):
     for dtype, pdf in zip(dataframe.dtypes, metadata):
         assert dtype == pdf.dtype
 
-    for i in range(2):
+    for i in [0, 1]:
         assert dataframe.shape[i] in [
             parent1.dataframe.shape[i],
             parent2.dataframe.shape[i],
         ]
 
-    pdf_counts = {
-        pdf_class: sum([isinstance(pdf, pdf_class) for pdf in metadata])
-        for pdf_class in pdfs
-    }
-
-    for i, count in enumerate(pdf_counts.values()):
+    for i, family in enumerate(families):
+        count = sum([pdf.name == family.name for pdf in metadata])
         assert col_limits[0][i] <= count <= col_limits[1][i]
