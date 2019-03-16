@@ -9,7 +9,21 @@ from collections import namedtuple
 import numpy as np
 import pandas as pd
 
+from edo.pdfs.subtypes import build_class
+
+
 Individual = namedtuple("Individual", ["dataframe", "metadata"])
+
+
+def _make_pdf_instance(family):
+    """ Choose one of the existing pdf family subtypes, or choose to create a
+    new one. Create an instance and return it. """
+
+    pdf = np.random.choice(family.subtypes + [build_class])
+    if pdf is build_class:
+        pdf = build_class(family)
+
+    return pdf()
 
 
 def _sample_ncols(col_limits):
@@ -27,45 +41,47 @@ def _sample_ncols(col_limits):
     return np.random.randint(integer_limits[0], integer_limits[1] + 1)
 
 
-def _get_minimum_cols(cols, metadata, nrows, col_limits, pdfs, pdf_counts):
+def _get_minimum_cols(nrows, col_limits, families, family_counts):
     """ If :code:`col_limits` has a tuple lower limit then sample columns of the
-    correct class from :code:`pdfs` as needed to satisfy this bound. """
+    correct class from :code:`families` as needed to satisfy this bound. """
 
-    for i, min_limit in enumerate(col_limits[0]):
-        pdf_class = pdfs[i]
+    cols, metadata = [], []
+    for family, min_limit in zip(families, col_limits[0]):
         for _ in range(min_limit):
-            pdf = pdf_class()
-            cols.append(pdf.sample(nrows))
-            metadata.append(pdf)
-            pdf_counts[pdf_class] += 1
+            meta = _make_pdf_instance(family)
+            cols.append(meta.sample(nrows))
+            metadata.append(meta)
+            family_counts[family.name] += 1
 
-    return cols, metadata, pdf_counts
+    return cols, metadata, family_counts
 
 
 def _get_remaining_cols(
-    cols, metadata, nrows, ncols, col_limits, pdfs, weights, pdf_counts
+    cols, metadata, nrows, ncols, col_limits, families, weights, family_counts
 ):
     """ Sample all remaining columns for the current individual. If
     :code:`col_limits` has a tuple upper limit then sample all remaining
     columns for the individual without exceeding the bounds. """
 
     while len(cols) < ncols:
-        pdf_class = np.random.choice(pdfs, p=weights)
-        pdf = pdf_class()
+        family = np.random.choice(families, p=weights)
+        idx = families.index(family)
         try:
-            idx = pdfs.index(pdf_class)
-            if pdf_counts[pdf_class] < col_limits[1][idx]:
-                cols.append(pdf.sample(nrows))
-                metadata.append(pdf)
-                pdf_counts[pdf_class] += 1
+            if family_counts[family.name] < col_limits[1][idx]:
+                meta = _make_pdf_instance(family)
+                cols.append(meta.sample(nrows))
+                metadata.append(meta)
+                family_counts[family.name] += 1
+
         except TypeError:
-            cols.append(pdf.sample(nrows))
-            metadata.append(pdf)
+            meta = _make_pdf_instance(family)
+            cols.append(meta.sample(nrows))
+            metadata.append(meta)
 
     return cols, metadata
 
 
-def create_individual(row_limits, col_limits, pdfs, weights=None):
+def create_individual(row_limits, col_limits, families, weights=None):
     """ Create an individual dataset-metadata representation within the limits
     provided. An individual is contained within a :code:`namedtuple` object.
 
@@ -76,11 +92,11 @@ def create_individual(row_limits, col_limits, pdfs, weights=None):
     col_limits : list
         Lower and upper bounds on the number of columns a dataset can have.
         Tuples can be used to indicate limits on the number of columns needed to
-    pdfs : list
-        A list of potential column pdf classes to select from such as those
-        found in :code:`genetic_data.pdfs`.
+    families : list
+        A list of potential column pdf family classes to select from such as
+        those found in :code:`edo.pdfs`.
     weights : list
-        A sequence of relative weights the same length as :code:`pdfs`. This
+        A sequence of relative weights the same length as :code:`families`. This
         acts as a probability distribution from which to sample column classes.
         If :code:`None`, column classes are sampled uniformly.
     """
@@ -89,15 +105,15 @@ def create_individual(row_limits, col_limits, pdfs, weights=None):
     ncols = _sample_ncols(col_limits)
 
     cols, metadata = [], []
-    pdf_counts = {pdf_class: 0 for pdf_class in pdfs}
+    pdf_counts = {pdf_family.name: 0 for pdf_family in families}
 
     if isinstance(col_limits[0], tuple):
         cols, metadata, pdf_counts = _get_minimum_cols(
-            cols, metadata, nrows, col_limits, pdfs, pdf_counts
+            nrows, col_limits, families, pdf_counts
         )
 
     cols, metadata = _get_remaining_cols(
-        cols, metadata, nrows, ncols, col_limits, pdfs, weights, pdf_counts
+        cols, metadata, nrows, ncols, col_limits, families, weights, pdf_counts
     )
 
     dataframe = pd.DataFrame({i: col for i, col in enumerate(cols)})
