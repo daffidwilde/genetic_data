@@ -22,6 +22,7 @@ def test_integer_limits(row_limits, col_limits, weights, prob):
     families = [Gamma, Normal, Poisson]
     for family in families:
         family.reset()
+
     individual = create_individual(row_limits, col_limits, families, weights)
 
     mutant = mutation(individual, prob, row_limits, col_limits, families, weights)

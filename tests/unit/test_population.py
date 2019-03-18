@@ -22,6 +22,9 @@ def test_create_initial_population(size, row_limits, col_limits, weights):
     of the correct length with valid individuals. """
 
     families = [Gamma, Normal, Poisson]
+    for family in families:
+        family.reset()
+
     population = create_initial_population(
         size, row_limits, col_limits, families, weights
     )
@@ -70,6 +73,9 @@ def test_create_new_population(
 
     best_prop, lucky_prop = props
     families = [Gamma, Normal, Poisson]
+    for family in families:
+        family.reset()
+
     population = create_initial_population(
         size, row_limits, col_limits, families, weights
     )
