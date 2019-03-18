@@ -2,6 +2,7 @@
 
 import numpy as np
 
+from edo.individual import _make_pdf_instance
 
 def _get_pdf_counts(metadata, families):
     """ Get the count of each pdf class present in metadata. """
@@ -29,21 +30,21 @@ def _remove_row(dataframe):
     return dataframe
 
 
-def _remove_col(dataframe, metadata, col_limits, pdfs):
+def _remove_col(dataframe, metadata, col_limits, families):
     """ Remove a column (and its metadata) from a dataframe at random. """
 
     if isinstance(col_limits[0], tuple):
         ncols = dataframe.shape[1]
-        pdf_counts = _get_pdf_counts(metadata, pdfs)
+        family_counts = _get_pdf_counts(metadata, families)
         while len(dataframe.columns) != ncols - 1:
             col = np.random.choice(dataframe.columns)
-            col_idx = dataframe.columns.get_loc(col)
-            pdf = metadata[col_idx]
-            pdf_class = pdf.__class__
-            pdf_idx = pdfs.index(pdf_class)
-            if pdf_counts[pdf_class] > col_limits[0][pdf_idx]:
+            idx = dataframe.columns.get_loc(col)
+            pdf = metadata[idx]
+            family = pdf.parent
+            family_idx = families.index(family)
+            if family_counts[family] > col_limits[0][family_idx]:
                 dataframe = _rename(dataframe.drop(col, axis=1))
-                metadata.pop(col_idx)
+                metadata.pop(idx)
 
         return dataframe, metadata
 
@@ -67,27 +68,27 @@ def _add_row(dataframe, metadata):
     return dataframe
 
 
-def _add_col(dataframe, metadata, col_limits, pdfs, weights):
+def _add_col(dataframe, metadata, col_limits, families, weights):
     """ Add a new column to the end of the dataframe by sampling a distribution
-    from :code:`pdfs` according to the column limits and distribution weights.
+    from :code:`families` according to the column limits and distribution weights.
     """
 
     nrows, ncols = dataframe.shape
     if isinstance(col_limits[1], tuple):
-        pdf_counts = _get_pdf_counts(metadata, pdfs)
+        family_counts = _get_pdf_counts(metadata, families)
         while len(dataframe.columns) != ncols + 1:
-            pdf_class = np.random.choice(pdfs, p=weights)
-            idx = pdfs.index(pdf_class)
-            if pdf_counts[pdf_class] < col_limits[1][idx]:
-                pdf = pdf_class()
+            family = np.random.choice(families, p=weights)
+            idx = families.index(family)
+            if family_counts[family] < col_limits[1][idx]:
+                pdf = _make_pdf_instance(family)
                 dataframe[ncols] = pdf.sample(nrows)
                 metadata.append(pdf)
 
         dataframe = _rename(dataframe)
         return dataframe, metadata
 
-    pdf_class = np.random.choice(pdfs, p=weights)
-    pdf = pdf_class()
+    family = np.random.choice(families, p=weights)
+    pdf = _make_pdf_instance(family)
     dataframe[ncols] = pdf.sample(nrows)
     metadata.append(pdf)
 
