@@ -3,12 +3,12 @@
 import numpy as np
 
 
-def _get_pdf_counts(metadata, pdfs):
+def _get_pdf_counts(metadata, families):
     """ Get the count of each pdf class present in metadata. """
 
     return {
-        pdf_class: sum([isinstance(pdf, pdf_class) for pdf in metadata])
-        for pdf_class in pdfs
+        family: sum([pdf.name == family.name for pdf in metadata])
+        for family in families
     }
 
 
@@ -17,7 +17,7 @@ def _rename(dataframe):
     new line. """
 
     dataframe = dataframe.reset_index(drop=True)
-    dataframe.columns = range(len(dataframe.columns))
+    dataframe.columns = (i for i, _ in enumerate(dataframe.columns))
     return dataframe
 
 

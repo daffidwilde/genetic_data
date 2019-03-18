@@ -12,6 +12,7 @@ def build_class(cls):
         pass
 
     setattr(Class, "__repr__", cls.__repr__)
+    setattr(Class, "parent", cls)
     for key, value in vars(cls).items():
         if "key" != "subtypes":
             setattr(Class, key, copy.deepcopy(value))

@@ -22,6 +22,9 @@ def test_integer_limits(row_limits, col_limits, weights, prob):
     column limits. """
 
     families = [Gamma, Normal, Poisson]
+    for family in families:
+        family.reset()
+
     parent1, parent2 = [
         create_individual(row_limits, col_limits, families, weights)
         for _ in [0, 1]
@@ -54,6 +57,9 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
     upper column limits are integer and tuple respectively. """
 
     families = [Gamma, Normal, Poisson]
+    for family in families:
+        family.reset()
+
     parent1, parent2 = [
         create_individual(row_limits, col_limits, families, weights)
         for _ in [0, 1]
@@ -90,6 +96,9 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
     upper column limits are tuple and integer respectively. """
 
     families = [Gamma, Normal, Poisson]
+    for family in families:
+        family.reset()
+
     parent1, parent2 = [
         create_individual(row_limits, col_limits, families, weights)
         for _ in [0, 1]
