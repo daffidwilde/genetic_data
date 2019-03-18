@@ -47,14 +47,16 @@ def test_run_algorithm(
     """ Verify that the algorithm produces a valid population, and keeps track
     of them/their fitnesses correctly. """
 
-    pdfs = [Normal, Poisson, Uniform]
+    families = [Normal, Poisson, Uniform]
+    for family in families:
+        family.reset()
 
     pop, fit, all_pops, all_fits = edo.run_algorithm(
         fitness=trivial_fitness,
         size=size,
         row_limits=row_limits,
         col_limits=col_limits,
-        pdfs=pdfs,
+        pdfs=families,
         weights=weights,
         stop=trivial_stop,
         dwindle=trivial_dwindle,
@@ -85,7 +87,9 @@ def test_run_algorithm(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert isinstance(pdf, tuple(pdfs))
+                assert sum(
+                    [pdf.name == family.name for family in families]
+                ) == 1
 
             for i, limits in enumerate([row_limits, col_limits]):
                 assert limits[0] <= dataframe.shape[i] <= limits[1]
