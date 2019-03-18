@@ -17,9 +17,5 @@ def build_class(cls):
         if "key" != "subtypes":
             setattr(Class, key, copy.deepcopy(value))
 
-    try:
-        cls.subtypes.append(Class)
-    except AttributeError:
-        cls.subtypes = [Class]
-
+    cls.subtypes.append(Class)
     return Class

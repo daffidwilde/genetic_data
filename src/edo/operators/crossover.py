@@ -31,7 +31,7 @@ def _cross_minimum_columns(parent_cols, parent_meta, col_limits, families):
         family_instances = [
             (col, pdf)
             for col, pdf in zip(parent_cols, parent_meta)
-            if pdf.__class__ in family.subtypes
+            if pdf.name == family.name
         ]
 
         for _ in range(limit):
@@ -48,16 +48,16 @@ def _cross_remaining_columns(
 ):
     """ Regardless of whether :code:`col_limits` has a tuple upper limit or not,
     inherit all remaining columns from the two parents so as not to exceed these
-    bounds. Return the components of a full inidividual. """
+    bounds. Return the components of a full individual. """
 
     family_counts = _get_pdf_counts(metadata, families)
     while len(columns) < ncols:
         idx = np.random.choice(len(parent_cols))
-        pdf = parent_meta[idx]
-        family = pdf.parent
-        family_idx = families.index(family)
 
         try:
+            pdf = parent_meta[idx]
+            family = pdf.parent
+            family_idx = families.index(family)
             if family_counts[family] < col_limits[1][family_idx]:
                 columns.append(parent_cols.pop(idx))
                 metadata.append(parent_meta.pop(idx))
