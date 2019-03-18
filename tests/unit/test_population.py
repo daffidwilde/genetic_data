@@ -21,9 +21,9 @@ def test_create_initial_population(size, row_limits, col_limits, weights):
     """ Create an initial population of individuals and verify it is a list
     of the correct length with valid individuals. """
 
-    pdfs = [Gamma, Normal, Poisson]
+    families = [Gamma, Normal, Poisson]
     population = create_initial_population(
-        size, row_limits, col_limits, pdfs, weights
+        size, row_limits, col_limits, families, weights
     )
 
     assert isinstance(population, list)
@@ -38,7 +38,7 @@ def test_create_initial_population(size, row_limits, col_limits, weights):
         assert len(metadata) == len(dataframe.columns)
 
         for pdf in metadata:
-            assert isinstance(pdf, tuple(pdfs))
+            assert sum([pdf.name == family.name for family in families]) == 1
 
         for i, limits in enumerate([row_limits, col_limits]):
             assert limits[0] <= dataframe.shape[i] <= limits[1]
@@ -69,9 +69,9 @@ def test_create_new_population(
     the correct number of them. """
 
     best_prop, lucky_prop = props
-    pdfs = [Gamma, Normal, Poisson]
+    families = [Gamma, Normal, Poisson]
     population = create_initial_population(
-        size, row_limits, col_limits, pdfs, weights
+        size, row_limits, col_limits, families, weights
     )
     pop_fitness = get_fitness(trivial_fitness, population)
     parents = selection(
@@ -85,7 +85,7 @@ def test_create_new_population(
         mutation_prob,
         row_limits,
         col_limits,
-        pdfs,
+        families,
         weights,
     )
 
@@ -111,7 +111,7 @@ def test_create_new_population(
         assert len(metadata) == len(dataframe.columns)
 
         for dtype, pdf in zip(dataframe.dtypes, metadata):
-            assert isinstance(pdf, tuple(pdfs))
+            assert sum([pdf.name == family.name for family in families])
             assert dtype == pdf.dtype
 
         for i, limits in enumerate([row_limits, col_limits]):
