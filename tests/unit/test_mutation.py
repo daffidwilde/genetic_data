@@ -15,14 +15,16 @@ from .util.parameters import (
 
 
 @INTEGER_MUTATION
-def test_int_int_lims(row_limits, col_limits, weights, prob):
+def test_integer_limits(row_limits, col_limits, weights, prob):
     """ Verify that `mutation` creates a valid individual with all integer
     column limits. """
 
-    pdfs = [Gamma, Normal, Poisson]
-    individual = create_individual(row_limits, col_limits, pdfs, weights)
+    families = [Gamma, Normal, Poisson]
+    for family in families:
+        family.reset()
+    individual = create_individual(row_limits, col_limits, families, weights)
 
-    mutant = mutation(individual, prob, row_limits, col_limits, pdfs, weights)
+    mutant = mutation(individual, prob, row_limits, col_limits, families, weights)
     dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)
@@ -31,21 +33,24 @@ def test_int_int_lims(row_limits, col_limits, weights, prob):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert isinstance(pdf, tuple(pdfs))
+        assert sum([pdf.name == family.name for family in families]) == 1
 
     for i, limits in enumerate([row_limits, col_limits]):
         assert limits[0] <= dataframe.shape[i] <= limits[1]
 
 
 @INTEGER_TUPLE_MUTATION
-def test_int_tup_lims(row_limits, col_limits, weights, prob):
+def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
     """ Verify that `mutation` creates a valid individual where the lower and
     upper column limits are integer and tuple respectively. """
 
-    pdfs = [Gamma, Normal, Poisson]
-    individual = create_individual(row_limits, col_limits, pdfs, weights)
+    families = [Gamma, Normal, Poisson]
+    for family in families:
+        family.reset()
 
-    mutant = mutation(individual, prob, row_limits, col_limits, pdfs, weights)
+    individual = create_individual(row_limits, col_limits, families, weights)
+
+    mutant = mutation(individual, prob, row_limits, col_limits, families, weights)
     dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)
@@ -54,29 +59,32 @@ def test_int_tup_lims(row_limits, col_limits, weights, prob):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert isinstance(pdf, tuple(pdfs))
+        assert sum([pdf.name == family.name for family in families]) == 1
 
     assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
     assert col_limits[0] <= dataframe.shape[1] <= sum(col_limits[1])
 
-    pdf_counts = {
-        pdf_class: sum([isinstance(pdf, pdf_class) for pdf in metadata])
-        for pdf_class in pdfs
+    family_counts = {
+        family: sum([pdf.name == family.name for pdf in metadata])
+        for family in families
     }
 
-    for i, count in enumerate(pdf_counts.values()):
+    for i, count in enumerate(family_counts.values()):
         assert count <= col_limits[1][i]
 
 
 @TUPLE_INTEGER_MUTATION
-def test_tup_int_lims(row_limits, col_limits, weights, prob):
+def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
     """ Verify that `mutation` creates a valid individual where the lower and
     upper column limits and tuple and integer respectively. """
 
-    pdfs = [Gamma, Normal, Poisson]
-    individual = create_individual(row_limits, col_limits, pdfs, weights)
+    families = [Gamma, Normal, Poisson]
+    for family in families:
+        family.reset()
 
-    mutant = mutation(individual, prob, row_limits, col_limits, pdfs, weights)
+    individual = create_individual(row_limits, col_limits, families, weights)
+
+    mutant = mutation(individual, prob, row_limits, col_limits, families, weights)
     dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)
@@ -85,29 +93,32 @@ def test_tup_int_lims(row_limits, col_limits, weights, prob):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert isinstance(pdf, tuple(pdfs))
+        assert sum([pdf.name == family.name for family in families]) == 1
 
     assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
     assert sum(col_limits[0]) <= dataframe.shape[1] <= col_limits[1]
 
-    pdf_counts = {
-        pdf_class: sum([isinstance(pdf, pdf_class) for pdf in metadata])
-        for pdf_class in pdfs
+    family_counts = {
+        family: sum([pdf.name == family.name for pdf in metadata])
+        for family in families
     }
 
-    for i, count in enumerate(pdf_counts.values()):
+    for i, count in enumerate(family_counts.values()):
         assert count >= col_limits[0][i]
 
 
 @TUPLE_MUTATION
-def test_tup_tup_lims(row_limits, col_limits, weights, prob):
+def test_tuple_limits(row_limits, col_limits, weights, prob):
     """ Verify that `mutation` creates a valid individual with all tuple column
     limits. """
 
-    pdfs = [Gamma, Normal, Poisson]
-    individual = create_individual(row_limits, col_limits, pdfs, weights)
+    families = [Gamma, Normal, Poisson]
+    for family in families:
+        family.reset()
 
-    mutant = mutation(individual, prob, row_limits, col_limits, pdfs, weights)
+    individual = create_individual(row_limits, col_limits, families, weights)
+
+    mutant = mutation(individual, prob, row_limits, col_limits, families, weights)
     dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)
@@ -116,15 +127,15 @@ def test_tup_tup_lims(row_limits, col_limits, weights, prob):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert isinstance(pdf, tuple(pdfs))
+        assert sum([pdf.name == family.name for family in families])
 
     assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
     assert sum(col_limits[0]) <= dataframe.shape[1] <= sum(col_limits[1])
 
-    pdf_counts = {
-        pdf_class: sum([isinstance(pdf, pdf_class) for pdf in metadata])
-        for pdf_class in pdfs
+    family_counts = {
+        family: sum([pdf.name == family.name for pdf in metadata])
+        for family in families
     }
 
-    for i, count in enumerate(pdf_counts.values()):
+    for i, count in enumerate(family_counts.values()):
         assert col_limits[0][i] <= count <= col_limits[1][i]
