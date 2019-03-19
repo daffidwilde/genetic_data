@@ -12,9 +12,9 @@ def build_class(cls):
         pass
 
     setattr(Class, "__repr__", cls.__repr__)
-    setattr(Class, "parent", cls)
+    setattr(Class, "family", cls)
     for key, value in vars(cls).items():
-        if "key" != "subtypes":
+        if key != "subtypes":
             setattr(Class, key, copy.deepcopy(value))
 
     cls.subtypes.append(Class)

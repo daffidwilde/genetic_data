@@ -40,7 +40,7 @@ def _remove_col(dataframe, metadata, col_limits, families):
             col = np.random.choice(dataframe.columns)
             idx = dataframe.columns.get_loc(col)
             pdf = metadata[idx]
-            family = pdf.parent
+            family = pdf.family
             family_idx = families.index(family)
             if family_counts[family] > col_limits[0][family_idx]:
                 dataframe = _rename(dataframe.drop(col, axis=1))
