@@ -1,5 +1,7 @@
 """ .. The main script containing a generic genetic algorithm. """
 
+from collections import defaultdict
+
 import numpy as np
 
 from .fitness import get_fitness
@@ -93,8 +95,8 @@ def run_algorithm(
         The seed for a particular run of the genetic algorithm. If :code:`None`,
         no seed is set.
     fitness_kwargs : dict
-        Any additional parameters that need to be passed to :code:`fitness` should
-        be placed here as a dictionary or suitable mapping.
+        Any additional parameters that need to be passed to :code:`fitness`
+        should be placed here as a dictionary or suitable mapping.
 
     Returns
     -------
@@ -110,6 +112,9 @@ def run_algorithm(
 
     if seed is not None:
         np.random.seed(seed)
+
+    for pdf in pdfs:
+        pdf.reset()
 
     population = create_initial_population(
         size, row_limits, col_limits, pdfs, weights
@@ -129,6 +134,7 @@ def run_algorithm(
         parents = selection(
             population, pop_fitness, best_prop, lucky_prop, maximise
         )
+        pdfs = _update_subtypes(parents, pdfs)
 
         population = create_new_population(
             parents,
@@ -154,3 +160,18 @@ def run_algorithm(
             pdfs = shrink(parents, pdfs, itr, shrinkage)
 
     return population, pop_fitness, all_populations, all_fitnesses
+
+
+def _update_subtypes(parents, pdfs):
+    """ Update the recorded subtypes for each pdf to be only those present in
+    the parents. """
+
+    subtypes = defaultdict(set)
+    for parent in parents:
+        for column in parent.metadata:
+            subtypes[column.parent].add(column.__class__)
+
+    for pdf in pdfs:
+        pdf.subtypes = list(subtypes[pdf])
+
+    return pdfs
