@@ -1,5 +1,9 @@
 """ .. Base inheritance class for all distributions. """
 
+import copy
+
+import numpy as np
+
 
 class Distribution:
     """ A base class for all currently implemented distributions and those
@@ -36,6 +40,34 @@ class Distribution:
         return f"{self.name}({params})"
 
     @classmethod
+    def build_subtype(cls):
+        """ Build a copy of the distribution class with identical properties
+        that is independent of the original. """
+
+        class Subtype:
+
+            family = cls
+
+        setattr(Subtype, "__repr__", cls.__repr__)
+        for key, value in vars(cls).items():
+            if key != "subtypes":
+                setattr(Subtype, key, copy.deepcopy(value))
+
+        cls.subtypes.append(Subtype)
+        return Subtype
+
+    @classmethod
+    def make_instance(cls):
+        """ Choose an existing subtype or build a new one. Return an instance of
+        that subtype. """
+
+        subtype = np.random.choice(cls.subtypes + [cls.build_subtype])
+        if subtype == cls.build_subtype:
+            subtype = cls.build_subtype()
+
+        return subtype()
+
+    @classmethod
     def reset(cls):
         """ Reset the class to have its original parameter limits, i.e. those
         given in the class attribute :code:`param_limits` when the first
@@ -54,7 +86,7 @@ class Distribution:
         else. """
 
         out = [self.name]
-        for key, val in self.__dict__.items():
+        for key, val in vars(self).items():
             out.append(key)
             out.append(val)
 

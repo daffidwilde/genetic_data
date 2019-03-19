@@ -56,7 +56,7 @@ def _cross_remaining_columns(
 
         try:
             pdf = parent_meta[idx]
-            family = pdf.parent
+            family = pdf.family
             family_idx = families.index(family)
             if family_counts[family] < col_limits[1][family_idx]:
                 columns.append(parent_cols.pop(idx))

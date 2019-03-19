@@ -1,11 +1,8 @@
 """ Test base distribution class and the methods shared by all pdf classes. """
 
-# pylint: disable=protected-access
-
-import numpy as np
 import pytest
 from hypothesis import given
-from hypothesis.strategies import integers
+from hypothesis.strategies import integers, sampled_from
 
 from edo.pdfs import Distribution, all_pdfs
 
@@ -22,84 +19,114 @@ def test_distribution_init():
         dist.sample()
 
 
-@given(seed=integers(min_value=0, max_value=2 ** 32 - 1))
-def test_init(seed):
+@given(family=sampled_from(all_pdfs))
+def test_init(family):
     """ Check defaults of distribution objects. """
 
-    np.random.seed(seed)
-    for pdf_class in all_pdfs:
-        pdf = pdf_class()
-        assert pdf.name == pdf_class.name
-        assert pdf.param_limits == pdf_class.param_limits
+    pdf = family()
+    assert pdf.name == family.name
+    assert pdf.param_limits == family.param_limits
 
-        for name, value in vars(pdf).items():
-            limits = pdf.param_limits[name]
-            try:
-                for val in value:
-                    assert min(limits) <= val <= max(limits)
-            except TypeError:
-                assert min(limits) <= value <= max(limits)
+    for name, value in vars(pdf).items():
+        limits = pdf.param_limits[name]
+        try:
+            for val in value:
+                assert min(limits) <= val <= max(limits)
+        except TypeError:
+            assert min(limits) <= value <= max(limits)
 
 
-@given(seed=integers(min_value=0, max_value=2 ** 32 - 1))
-def test_repr(seed):
+@given(family=sampled_from(all_pdfs))
+def test_repr(family):
     """ Assert that distribution objects have the correct string. """
 
-    np.random.seed(seed)
-    for pdf_class in all_pdfs:
-        pdf = pdf_class()
-        assert str(pdf).startswith(pdf.name)
+    pdf = family()
+    assert str(pdf).startswith(pdf.name)
+
+
+@given(family=sampled_from(all_pdfs))
+def test_build_subtype(family):
+    """ Test that a distribution family can make a subtype (copy) of itself. """
+
+    family.reset()
+    subtype = family.build_subtype()
+    for key, value in vars(subtype).items():
+        if key in vars(family) and key != "subtypes":
+            assert getattr(family, key) == value
+
+    assert subtype.__repr__ is family.__repr__
+    assert subtype.sample is family.sample
+
+    sub = subtype()
+    assert sub.family == family
+    assert isinstance(sub, subtype)
+    assert not isinstance(sub, family)
+
+
+@given(family=sampled_from(all_pdfs))
+def test_make_instance(family):
+    """ Test that distribution objects can make instances in its family
+    correctly. """
+
+    family.reset()
+    pdf = family.make_instance()
+
+    assert family.subtypes == [pdf.__class__]
+    assert isinstance(pdf, family.subtypes[0])
+
+    pdf = family.make_instance()
+    if len(family.subtypes) == 1:
+        assert isinstance(pdf, family.subtypes[0])
+    else:
+        assert len(family.subtypes) == 2
+        assert isinstance(pdf, family.subtypes[1])
+
+
+@given(family=sampled_from(all_pdfs))
+def test_reset(family):
+    """ Test that distribution classes can be reset. """
+
+    family.subtypes = ["foo"]
+    family.reset()
+    assert family.subtypes == []
 
 
 @given(
-    nrows=integers(min_value=1, max_value=1000),
-    seed=integers(min_value=0, max_value=2 ** 32 - 1),
+    family=sampled_from(all_pdfs), nrows=integers(min_value=0, max_value=1000)
 )
-def test_sample(nrows, seed):
+def test_sample(family, nrows):
     """ Verify that distribution objects can sample correctly. """
 
-    np.random.seed(seed)
-    for pdf_class in all_pdfs:
-        pdf = pdf_class()
-        sample = pdf.sample(nrows)
-        assert sample.shape == (nrows,)
-        assert sample.dtype == pdf.dtype
+    pdf = family()
+    sample = pdf.sample(nrows)
+    assert sample.shape == (nrows,)
+    assert sample.dtype == pdf.dtype
 
 
-@given(seed=integers(min_value=0, max_value=2 ** 32 - 1))
-def test_to_tuple(seed):
+@given(family=sampled_from(all_pdfs))
+def test_to_tuple(family):
     """ Verify that objects can pass their information to a tuple of the correct
     length and form. """
 
-    np.random.seed(seed)
-    for pdf_class in all_pdfs:
-        pdf = pdf_class()
-        out = pdf.to_tuple()
-        assert len(out) - 2 * len(pdf.__dict__) == 1
-        assert out[0] == pdf.name
-        for i, item in enumerate(out[1:]):
-            if i % 2 == 0:
-                assert isinstance(item, str)
-            else:
-                assert item == list(pdf.__dict__.values())[int((i - 1) / 2)]
+    pdf = family()
+    out = pdf.to_tuple()
+    assert len(out) - 1 == 2 * len(vars(pdf))
+    assert out[0] == pdf.name
+    for i, item in enumerate(out[1:]):
+        if i % 2 == 0:
+            assert isinstance(item, str)
+        else:
+            assert item == list(vars(pdf).values())[int((i - 1) / 2)]
 
 
-def test_set_param_limits():
+@given(family=sampled_from(all_pdfs))
+def test_set_param_limits(family):
     """ Check distribution classes can have their default parameter limits
     changed. """
 
-    for pdf_class in all_pdfs:
-        param_limits = dict(pdf_class.param_limits)
-        for param_name in pdf_class.param_limits:
-            pdf_class.param_limits[param_name] = None
+    param_limits = dict(family.param_limits)
+    for param_name in family.param_limits:
+        family.param_limits[param_name] = None
 
-        assert pdf_class.param_limits != param_limits
-
-
-def test_reset():
-    """ Test that distribution classes can be reset. """
-
-    for pdf_class in all_pdfs:
-        pdf_class.subtypes = ["foo"]
-        pdf_class.reset()
-        assert pdf_class.subtypes == []
+    assert family.param_limits != param_limits
+    family.param_limits = param_limits

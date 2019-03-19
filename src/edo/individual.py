@@ -9,21 +9,8 @@ from collections import namedtuple
 import numpy as np
 import pandas as pd
 
-from edo.pdfs.subtypes import build_class
-
 
 Individual = namedtuple("Individual", ["dataframe", "metadata"])
-
-
-def _make_pdf_instance(family):
-    """ Choose one of the existing pdf family subtypes, or choose to create a
-    new one. Create an instance and return it. """
-
-    pdf = np.random.choice(family.subtypes + [build_class])
-    if pdf is build_class:
-        pdf = build_class(family)
-
-    return pdf()
 
 
 def _sample_ncols(col_limits):
@@ -48,7 +35,7 @@ def _get_minimum_cols(nrows, col_limits, families, family_counts):
     cols, metadata = [], []
     for family, min_limit in zip(families, col_limits[0]):
         for _ in range(min_limit):
-            meta = _make_pdf_instance(family)
+            meta = family.make_instance()
             cols.append(meta.sample(nrows))
             metadata.append(meta)
             family_counts[family.name] += 1
@@ -68,13 +55,13 @@ def _get_remaining_cols(
         idx = families.index(family)
         try:
             if family_counts[family.name] < col_limits[1][idx]:
-                meta = _make_pdf_instance(family)
+                meta = family.make_instance()
                 cols.append(meta.sample(nrows))
                 metadata.append(meta)
                 family_counts[family.name] += 1
 
         except TypeError:
-            meta = _make_pdf_instance(family)
+            meta = family.make_instance()
             cols.append(meta.sample(nrows))
             metadata.append(meta)
 

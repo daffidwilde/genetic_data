@@ -169,7 +169,7 @@ def _update_subtypes(parents, pdfs):
     subtypes = defaultdict(set)
     for parent in parents:
         for column in parent.metadata:
-            subtypes[column.parent].add(column.__class__)
+            subtypes[column.family].add(column.__class__)
 
     for pdf in pdfs:
         pdf.subtypes = list(subtypes[pdf])
