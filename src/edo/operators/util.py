@@ -2,7 +2,6 @@
 
 import numpy as np
 
-from edo.individual import _make_pdf_instance
 
 def _get_pdf_counts(metadata, families):
     """ Get the count of each pdf class present in metadata. """
@@ -80,7 +79,7 @@ def _add_col(dataframe, metadata, col_limits, families, weights):
             family = np.random.choice(families, p=weights)
             idx = families.index(family)
             if family_counts[family] < col_limits[1][idx]:
-                pdf = _make_pdf_instance(family)
+                pdf = family.make_instance()
                 dataframe[ncols] = pdf.sample(nrows)
                 metadata.append(pdf)
 
@@ -88,7 +87,7 @@ def _add_col(dataframe, metadata, col_limits, families, weights):
         return dataframe, metadata
 
     family = np.random.choice(families, p=weights)
-    pdf = _make_pdf_instance(family)
+    pdf = family.make_instance()
     dataframe[ncols] = pdf.sample(nrows)
     metadata.append(pdf)
 

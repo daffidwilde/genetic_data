@@ -1,7 +1,5 @@
 """ .. Functions related to the mutation operator. """
 
-from copy import deepcopy
-
 import numpy as np
 
 from edo.individual import Individual
@@ -107,7 +105,7 @@ def mutation(individual, prob, row_limits, col_limits, pdfs, weights=None):
         A (potentially) mutated individual.
     """
 
-    dataframe, metadata = deepcopy(individual)
+    dataframe, metadata = individual
     dataframe, metadata = _mutate_nrows(dataframe, metadata, row_limits, prob)
     dataframe, metadata = _mutate_ncols(
         dataframe, metadata, col_limits, pdfs, weights, prob
