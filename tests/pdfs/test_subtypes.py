@@ -15,8 +15,10 @@ def test_make_subtype(cls):
     for key, value in vars(subtype).items():
         if key in vars(cls) and key != "subtypes":
             assert getattr(cls, key) == value
+
     assert subtype.__repr__ is cls.__repr__
 
     sub = subtype()
+    assert sub.family == cls
     assert isinstance(sub, subtype)
     assert not isinstance(sub, cls)
