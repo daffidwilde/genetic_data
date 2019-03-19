@@ -5,7 +5,7 @@ import pandas as pd
 
 from edo.individual import Individual
 
-from .util import _get_pdf_counts
+from .util import get_family_counts
 
 
 def _collate_parents(parent1, parent2):
@@ -50,7 +50,7 @@ def _cross_remaining_columns(
     inherit all remaining columns from the two parents so as not to exceed these
     bounds. Return the components of a full individual. """
 
-    family_counts = _get_pdf_counts(metadata, families)
+    family_counts = get_family_counts(metadata, families)
     while len(columns) < ncols:
         idx = np.random.choice(len(parent_cols))
 
