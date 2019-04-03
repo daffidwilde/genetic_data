@@ -21,6 +21,7 @@ class Distribution:
 
     name = "Distribution"
     subtypes = []
+    max_subtypes = None
     param_limits = None
 
     def __repr__(self):
@@ -58,10 +59,14 @@ class Distribution:
 
     @classmethod
     def make_instance(cls):
-        """ Choose an existing subtype or build a new one. Return an instance of
-        that subtype. """
+        """ Choose an existing subtype or build a new one if there is space
+        available in their subtype list. Return an instance of that subtype. """
 
-        subtype = np.random.choice(cls.subtypes + [cls.build_subtype])
+        choices = list(cls.subtypes)
+        if cls.max_subtypes is None or len(choices) < cls.max_subtypes:
+            choices.append(cls.build_subtype)
+
+        subtype = np.random.choice(choices)
         if subtype == cls.build_subtype:
             subtype = cls.build_subtype()
 
@@ -69,9 +74,7 @@ class Distribution:
 
     @classmethod
     def reset(cls):
-        """ Reset the class to have its original parameter limits, i.e. those
-        given in the class attribute :code:`param_limits` when the first
-        instance is made. """
+        """ Reset the class to have no subtypes. """
 
         cls.subtypes = []
 

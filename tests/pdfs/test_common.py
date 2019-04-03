@@ -83,6 +83,24 @@ def test_make_instance(family):
 
 
 @given(family=sampled_from(all_pdfs))
+def test_max_subtypes(family):
+    """ Test that distribution objects cannot make more subtypes than their
+    prescribed maximum. """
+
+    family.reset()
+
+    family.max_subtypes = 0
+    with pytest.raises(ValueError):
+        family.make_instance()
+
+    family.max_subtypes = 1
+    family.make_instance()
+    subtype = family.subtypes[0]
+    pdf = family.make_instance()
+    assert isinstance(pdf, subtype)
+
+
+@given(family=sampled_from(all_pdfs))
 def test_reset(family):
     """ Test that distribution classes can be reset. """
 
@@ -91,9 +109,7 @@ def test_reset(family):
     assert family.subtypes == []
 
 
-@given(
-    family=sampled_from(all_pdfs), nrows=integers(min_value=0, max_value=1000)
-)
+@given(family=sampled_from(all_pdfs), nrows=integers(min_value=0, max_value=99))
 def test_sample(family, nrows):
     """ Verify that distribution objects can sample correctly. """
 
