@@ -18,7 +18,6 @@ def test_get_fitness(row_limits, col_limits, weights):
     is of the correct data type and has been added to the cache. """
 
     cache = edo.cache
-    cache.clear()
 
     families = [Normal, Poisson, Uniform]
     individual = create_individual(row_limits, col_limits, families, weights)
@@ -28,6 +27,8 @@ def test_get_fitness(row_limits, col_limits, weights):
     assert repr(dataframe) in cache
     assert isinstance(fit, float)
 
+    cache.clear()
+
 
 @INTEGER_INDIVIDUAL
 def test_get_fitness_kwargs(row_limits, col_limits, weights):
@@ -36,7 +37,6 @@ def test_get_fitness_kwargs(row_limits, col_limits, weights):
     the cache. """
 
     cache = edo.cache
-    cache.clear()
 
     fitness_kwargs = {"arg": None}
     families = [Normal, Poisson, Uniform]
@@ -47,6 +47,8 @@ def test_get_fitness_kwargs(row_limits, col_limits, weights):
     assert repr(dataframe) in cache
     assert isinstance(fit, float)
 
+    cache.clear()
+
 
 @POPULATION
 @settings(max_examples=30)
@@ -56,7 +58,6 @@ def test_get_population_fitness_serial(size, row_limits, col_limits, weights):
     been added to the cache. """
 
     cache = edo.cache
-    cache.clear()
 
     families = [Normal, Poisson, Uniform]
     population = create_initial_population(size, row_limits, col_limits,
@@ -67,6 +68,8 @@ def test_get_population_fitness_serial(size, row_limits, col_limits, weights):
     for ind, fit in zip(population, pop_fit):
         assert repr(ind.dataframe) in cache
         assert isinstance(fit, float)
+
+    cache.clear()
 
 
 @POP_FITNESS
@@ -79,7 +82,6 @@ def test_get_population_fitness_parallel(
     been added to the cache. """
 
     cache = edo.cache
-    cache.clear()
 
     families = [Normal, Poisson, Uniform]
     population = create_initial_population(size, row_limits, col_limits,
@@ -90,3 +92,5 @@ def test_get_population_fitness_parallel(
     for ind, fit in zip(population, pop_fit):
         assert repr(ind.dataframe) in cache
         assert isinstance(fit, float)
+
+    cache.clear()

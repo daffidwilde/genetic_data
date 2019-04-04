@@ -15,7 +15,7 @@ HALF_PROB = PROB.filter(lambda x: x > 0.5)
 OPEN_UNIT = PROB.filter(lambda x: x not in [0, 1])
 
 
-@settings(deadline=None)
+@settings(deadline=None, max_examples=30)
 @given(
     size=SIZE,
     row_limits=SHAPES,

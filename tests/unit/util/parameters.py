@@ -41,7 +41,7 @@ TUPLES = tuples(TUPS, TUPS).filter(
     and x[0][2] <= x[1][2]
 )
 
-UNIT = np.linspace(0, 1, 101)
+UNIT = np.linspace(0.01, 1, 100)
 
 PROPS = tuples(PROB, PROB).filter(lambda x: x[0] > 0.5 or x[1] > 0.5)
 
