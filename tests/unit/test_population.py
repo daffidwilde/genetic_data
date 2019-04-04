@@ -71,17 +71,12 @@ def test_create_new_population(
     of offspring. Verify that each offspring is a valid individual and there are
     the correct number of them. """
 
-    best_prop, lucky_prop = props
     families = [Gamma, Normal, Poisson]
     for family in families:
         family.reset()
 
-    population = create_initial_population(
-        size, row_limits, col_limits, families, weights
-    )
-    pop_fitness = get_fitness(trivial_fitness, population)
-    parents = selection(
-        population, pop_fitness, best_prop, lucky_prop, maximise
+    parents = create_initial_population(
+        max(int(size / 2), 2), row_limits, col_limits, families, weights
     )
 
     population = create_new_population(

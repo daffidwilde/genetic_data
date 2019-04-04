@@ -17,9 +17,9 @@ INTS = integers(min_value=1, max_value=5)
 PROB = floats(min_value=0, max_value=1)
 SMALL_PROB = floats(min_value=0, max_value=1e-3)
 TUPS = tuples(
-    integers(min_value=0, max_value=3),
-    integers(min_value=0, max_value=3),
-    integers(min_value=0, max_value=3),
+    integers(min_value=0, max_value=2),
+    integers(min_value=0, max_value=2),
+    integers(min_value=0, max_value=2),
 )
 
 SHAPES = tuples(INTS, INTS).map(sorted).filter(lambda x: x[0] <= x[1])
