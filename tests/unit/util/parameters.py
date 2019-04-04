@@ -68,6 +68,11 @@ POPULATION = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
 )
 
+POP_FITNESS = given(
+    size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS,
+    processes=INTS
+)
+
 INTEGER_CROSSOVER = given(
     row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, prob=PROB
 )
