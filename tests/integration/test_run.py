@@ -87,9 +87,9 @@ def test_run_algorithm(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert sum(
-                    [pdf.name == family.name for family in families]
-                ) == 1
+                assert (
+                    sum([pdf.name == family.name for family in families]) == 1
+                )
 
             for i, limits in enumerate([row_limits, col_limits]):
                 assert limits[0] <= dataframe.shape[i] <= limits[1]

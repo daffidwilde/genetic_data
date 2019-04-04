@@ -4,11 +4,11 @@ from hypothesis import settings
 
 import edo
 from edo.fitness import get_fitness, get_population_fitness
-from edo.pdfs import Normal, Poisson, Uniform
 from edo.individual import create_individual
+from edo.pdfs import Normal, Poisson, Uniform
 from edo.population import create_initial_population
 
-from .util.parameters import INTEGER_INDIVIDUAL, POPULATION, POP_FITNESS
+from .util.parameters import INTEGER_INDIVIDUAL, POP_FITNESS, POPULATION
 from .util.trivials import trivial_fitness
 
 
@@ -60,8 +60,9 @@ def test_get_population_fitness_serial(size, row_limits, col_limits, weights):
     cache = edo.cache
 
     families = [Normal, Poisson, Uniform]
-    population = create_initial_population(size, row_limits, col_limits,
-            families, weights)
+    population = create_initial_population(
+        size, row_limits, col_limits, families, weights
+    )
 
     pop_fit = get_population_fitness(population, trivial_fitness)
     assert len(pop_fit) == size
@@ -84,8 +85,9 @@ def test_get_population_fitness_parallel(
     cache = edo.cache
 
     families = [Normal, Poisson, Uniform]
-    population = create_initial_population(size, row_limits, col_limits,
-            families, weights)
+    population = create_initial_population(
+        size, row_limits, col_limits, families, weights
+    )
 
     pop_fit = get_population_fitness(population, trivial_fitness, processes)
     assert len(pop_fit) == size

@@ -25,7 +25,9 @@ def test_integer_limits(row_limits, col_limits, weights, prob):
 
     individual = create_individual(row_limits, col_limits, families, weights)
 
-    mutant = mutation(individual, prob, row_limits, col_limits, families, weights)
+    mutant = mutation(
+        individual, prob, row_limits, col_limits, families, weights
+    )
     dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)
@@ -51,7 +53,9 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
 
     individual = create_individual(row_limits, col_limits, families, weights)
 
-    mutant = mutation(individual, prob, row_limits, col_limits, families, weights)
+    mutant = mutation(
+        individual, prob, row_limits, col_limits, families, weights
+    )
     dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)
@@ -85,7 +89,9 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
 
     individual = create_individual(row_limits, col_limits, families, weights)
 
-    mutant = mutation(individual, prob, row_limits, col_limits, families, weights)
+    mutant = mutation(
+        individual, prob, row_limits, col_limits, families, weights
+    )
     dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)
@@ -119,7 +125,9 @@ def test_tuple_limits(row_limits, col_limits, weights, prob):
 
     individual = create_individual(row_limits, col_limits, families, weights)
 
-    mutant = mutation(individual, prob, row_limits, col_limits, families, weights)
+    mutant = mutation(
+        individual, prob, row_limits, col_limits, families, weights
+    )
     dataframe, metadata = mutant
 
     assert isinstance(mutant, Individual)

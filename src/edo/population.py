@@ -66,9 +66,7 @@ def create_new_population(
     while len(population) < size:
         parent1_idx, parent2_idx = np.random.choice(len(parents), size=2)
         parents_ = parents[parent1_idx], parents[parent2_idx]
-        offspring = crossover(
-            *parents_, col_limits, pdfs, crossover_prob
-        )
+        offspring = crossover(*parents_, col_limits, pdfs, crossover_prob)
         mutant = mutation(
             offspring, mutation_prob, row_limits, col_limits, pdfs, weights
         )

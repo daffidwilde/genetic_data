@@ -6,6 +6,7 @@ from edo.individual import Individual
 
 from .util import get_family_counts
 
+
 def mutation(individual, prob, row_limits, col_limits, pdfs, weights=None):
     """ Mutate an individual. Here, the characteristics of an individual can be
     split into two parts: their dimensions, and their values. Each of these

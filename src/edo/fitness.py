@@ -4,6 +4,7 @@ import dask
 
 import edo
 
+
 @dask.delayed
 def get_fitness(dataframe, fitness, fitness_kwargs=None):
     """ Return the fitness score of the individual. """

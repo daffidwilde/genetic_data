@@ -127,7 +127,9 @@ def run_algorithm(
         size, row_limits, col_limits, pdfs, weights
     )
 
-    pop_fitness = get_population_fitness(population, fitness, processes, fitness_kwargs)
+    pop_fitness = get_population_fitness(
+        population, fitness, processes, fitness_kwargs
+    )
 
     converged = False
     if stop:
@@ -154,7 +156,9 @@ def run_algorithm(
             weights,
         )
 
-        pop_fitness = get_population_fitness(population, fitness, processes, fitness_kwargs)
+        pop_fitness = get_population_fitness(
+            population, fitness, processes, fitness_kwargs
+        )
 
         all_populations.append(population)
         all_fitnesses.append(pop_fitness)
