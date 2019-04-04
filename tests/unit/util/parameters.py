@@ -41,7 +41,7 @@ TUPLES = tuples(TUPS, TUPS).filter(
     and x[0][2] <= x[1][2]
 )
 
-UNIT = np.linspace(0.01, 1, 100)
+UNIT = np.linspace(0, 1, 101)
 
 PROPS = tuples(PROB, PROB).filter(lambda x: x[0] > 0.5 or x[1] > 0.5)
 
@@ -82,10 +82,6 @@ TUPLE_INTEGER_CROSSOVER = given(
 
 TUPLE_CROSSOVER = given(
     row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS, prob=PROB
-)
-
-FITNESS = given(
-    size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
 )
 
 INTEGER_MUTATION = given(

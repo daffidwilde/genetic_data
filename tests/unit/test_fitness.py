@@ -1,43 +1,59 @@
 """ Test(s) for the calculating of population fitness. """
 
-import numpy as np
-
-from edo.fitness import get_fitness
-from edo.pdfs import Gamma, Normal, Poisson
+from edo.fitness import get_fitness, get_population_fitness
+from edo.pdfs import Normal, Poisson, Uniform
+from edo.individual import create_individual
 from edo.population import create_initial_population
 
-from .util.parameters import FITNESS
+from .util.parameters import INTEGER_INDIVIDUAL, POPULATION
 from .util.trivials import trivial_fitness
 
 
-@FITNESS
-def test_get_fitness(size, row_limits, col_limits, weights):
-    """ Create a population and get its fitness. Then verify that the
-    fitness is of the correct size and data type. """
+@INTEGER_INDIVIDUAL
+def test_get_fitness(row_limits, col_limits, weights):
+    """ Create an individual and get its fitness. Then verify that the fitness
+    is of the correct data type and has been added to the cache. """
 
-    pdfs = [Gamma, Normal, Poisson]
-    population = create_initial_population(
-        size, row_limits, col_limits, pdfs, weights
-    )
+    cache = {}
+    families = [Normal, Poisson, Uniform]
+    individual = create_individual(row_limits, col_limits, families, weights)
+    dataframe = individual.dataframe
 
-    pop_fitness = get_fitness(trivial_fitness, population)
+    fit = get_fitness(dataframe, trivial_fitness, cache)
+    assert repr(dataframe) in cache
+    assert isinstance(fit, float)
 
-    assert len(pop_fitness) == size
-    assert np.array(pop_fitness).dtype == "float"
 
+@INTEGER_INDIVIDUAL
+def test_get_fitness_kwargs(row_limits, col_limits, weights):
+    """ Create an individual and get its fitness with keyword arguments. Then
+    verify that the fitness is of the correct data type and has been added to
+    the cache. """
 
-@FITNESS
-def test_get_fitness_kwargs(size, row_limits, col_limits, weights):
-    """ Create a population and get its fitness with keyword arguments. Then
-    verify that the fitness is of the correct size and data type. """
-
+    cache = {}
     fitness_kwargs = {"arg": None}
-    pdfs = [Gamma, Normal, Poisson]
-    population = create_initial_population(
-        size, row_limits, col_limits, pdfs, weights
-    )
+    families = [Normal, Poisson, Uniform]
+    individual = create_individual(row_limits, col_limits, families, weights)
+    dataframe = individual.dataframe
 
-    pop_fitness = get_fitness(trivial_fitness, population, fitness_kwargs)
+    fit = get_fitness(dataframe, trivial_fitness, cache, fitness_kwargs)
+    assert repr(dataframe) in cache
+    assert isinstance(fit, float)
 
-    assert len(pop_fitness) == size
-    assert np.array(pop_fitness).dtype == "float"
+
+@POPULATION
+def test_get_population_fitness(size, row_limits, col_limits, weights):
+    """ Create a population and find its fitness. Verify that the fitness array
+    is of the correct data type and size, and that they have each been added to
+    the cache. """
+
+    cache = {}
+    families = [Normal, Poisson, Uniform]
+    population = create_initial_population(size, row_limits, col_limits,
+            families, weights)
+
+    pop_fit = get_population_fitness(population, trivial_fitness, cache)
+    assert len(pop_fit) == size
+    for ind, fit in zip(population, pop_fit):
+        assert repr(ind.dataframe) in cache
+        assert isinstance(fit, float)
