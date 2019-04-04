@@ -12,6 +12,7 @@ cache:
 install:
     - pip install -r requirements.txt
     - python setup.py develop
+    - pip install "dask[complete]"
     - pip install pytest
     - pip install coveralls
     - pip install hypothesis
