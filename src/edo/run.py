@@ -4,9 +4,10 @@ from collections import defaultdict
 
 import numpy as np
 
-from .fitness import get_fitness
-from .operators import selection, shrink
-from .population import create_initial_population, create_new_population
+import edo
+from edo.fitness import get_population_fitness
+from edo.operators import selection, shrink
+from edo.population import create_initial_population, create_new_population
 
 
 def run_algorithm(
@@ -26,6 +27,7 @@ def run_algorithm(
     shrinkage=None,
     maximise=False,
     seed=None,
+    processes=None,
     fitness_kwargs=None,
 ):
     """ Run a genetic algorithm under the presented constraints, giving a
@@ -94,6 +96,9 @@ def run_algorithm(
     seed : int
         The seed for a particular run of the genetic algorithm. If :code:`None`,
         no seed is set.
+    processes : int
+        The number of processes to use in order to parallelise several
+        processes. Defaults to `None` where the algorithm is executed serially.
     fitness_kwargs : dict
         Any additional parameters that need to be passed to :code:`fitness`
         should be placed here as a dictionary or suitable mapping.
@@ -113,6 +118,8 @@ def run_algorithm(
     if seed is not None:
         np.random.seed(seed)
 
+    edo.cache.clear()
+
     for pdf in pdfs:
         pdf.reset()
 
@@ -120,7 +127,7 @@ def run_algorithm(
         size, row_limits, col_limits, pdfs, weights
     )
 
-    pop_fitness = get_fitness(fitness, population, fitness_kwargs)
+    pop_fitness = get_population_fitness(population, fitness, processes, fitness_kwargs)
 
     converged = False
     if stop:
@@ -147,7 +154,7 @@ def run_algorithm(
             weights,
         )
 
-        pop_fitness = get_fitness(fitness, population, fitness_kwargs)
+        pop_fitness = get_population_fitness(population, fitness, processes, fitness_kwargs)
 
         all_populations.append(population)
         all_fitnesses.append(pop_fitness)

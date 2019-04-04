@@ -37,4 +37,4 @@ def get_population_fitness(
     else:
         out = dask.compute(*tasks, num_workers=processes)
 
-    return out
+    return list(out)
