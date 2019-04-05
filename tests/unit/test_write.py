@@ -9,7 +9,7 @@ from hypothesis.strategies import integers
 import numpy as np
 import pandas as pd
 
-from edo.run import write_fitness, write_individual
+from edo.write import write_fitness, write_individual
 from edo.individual import create_individual
 from edo.pdfs import Normal, Poisson, Uniform
 
