@@ -3,6 +3,7 @@
 from collections import defaultdict
 from pathlib import Path
 
+import dask
 import numpy as np
 import pandas as pd
 
@@ -216,3 +217,32 @@ def write_individual(individual, gen, idx, root):
 
     dataframe.to_csv(path / "main.csv", index=False)
     meta_df.to_csv(path / "meta.csv", index=False)
+
+
+def write_fitness(fitness, gen, root):
+    """ Write the generation fitness to file in the generation's directory in
+    `root`. """
+
+    path = Path(f"{root}/{gen}")
+    path.mkdir(parents=True, exist_ok=True)
+
+    pd.DataFrame(fitness, columns=[gen]).to_csv(
+        path / "fitness.csv", index=False
+    )
+
+
+def write_generation(population, pop_fitness, gen, root, processes=None):
+    """ Write all individuals in a generation and their collective fitnesses to
+    file at the generation's directory in `root`. """
+
+    tasks = (
+        *[
+            write_individual(individual, gen, i, root)
+            for i, individual in enumerate(population)
+        ], write_fitness(pop_fitness, gen, root)
+    )
+
+    if processes is None:
+        dask.compute(*tasks, scheduler="single-threaded")
+    else:
+        dask.compute(*tasks, num_workers=processes)
