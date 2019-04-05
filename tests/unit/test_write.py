@@ -1,17 +1,19 @@
 """ Tests for the writing of individuals to file. """
 
 import os
-
 from pathlib import Path
+
+from hypothesis import given
+from hypothesis.strategies import integers
 
 import numpy as np
 import pandas as pd
 
-from edo.run import write_individual
+from edo.run import write_fitness, write_individual
 from edo.individual import create_individual
 from edo.pdfs import Normal, Poisson, Uniform
 
-from .util.parameters import INTEGER_INDIVIDUAL, POPULATION
+from .util.parameters import INTEGER_INDIVIDUAL
 from .util.trivials import trivial_fitness
 
 
@@ -29,5 +31,19 @@ def test_write_individual(row_limits, col_limits, weights):
 
     df = pd.read_csv(path / "main.csv")
     assert np.allclose(df.values, individual.dataframe.values)
+
+
+@given(size=integers(min_value=1, max_value=100))
+def test_write_fitness(size):
+    """ Test that a generation's fitness can be written to file correctly. """
+
+    fitness = [trivial_fitness(pd.DataFrame()) for _ in range(size)]
+
+    write_fitness(fitness, gen=0, root="out")
+    path = Path(f"out/0")
+    assert (path / "fitness.csv").exists()
+
+    fit = pd.read_csv(path / "fitness.csv")
+    assert np.allclose(fit.values.reshape(size,), fitness)
 
     os.system("rm -r out")

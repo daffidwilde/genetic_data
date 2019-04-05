@@ -8,7 +8,7 @@ def trivial_fitness(individual, arg=None):
     """ A fitness function. """
     assert isinstance(individual, pd.DataFrame)
     assert arg is None
-    return np.nan
+    return 0.
 
 
 def trivial_stop(pop_fitness):
