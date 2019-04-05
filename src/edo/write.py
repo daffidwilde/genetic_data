@@ -19,6 +19,7 @@ def _get_meta_df(metadata):
     return meta_df
 
 
+@dask.delayed
 def write_individual(individual, gen, idx, root):
     """ Write an individual to file. Each individual has their own directory at
     `root/gen/idx/` which contains their dataframe and metadata saved as in CSV
@@ -34,6 +35,7 @@ def write_individual(individual, gen, idx, root):
     meta_df.to_csv(path / "meta.csv", index=False)
 
 
+@dask.delayed
 def write_fitness(fitness, gen, root):
     """ Write the generation fitness to file in the generation's directory in
     `root`. """

@@ -25,7 +25,7 @@ def test_write_individual(row_limits, col_limits, weights):
     families = [Normal, Poisson, Uniform]
     individual = create_individual(row_limits, col_limits, families, weights)
 
-    write_individual(individual, gen=0, idx=0, root="out")
+    write_individual(individual, gen=0, idx=0, root="out").compute()
     path = Path("out/0/0")
     assert (path / "main.csv").exists()
     assert (path / "meta.csv").exists()
@@ -40,7 +40,7 @@ def test_write_fitness(size):
 
     fitness = [trivial_fitness(pd.DataFrame()) for _ in range(size)]
 
-    write_fitness(fitness, gen=0, root="out")
+    write_fitness(fitness, gen=0, root="out").compute()
     path = Path(f"out/0")
     assert (path / "fitness.csv").exists()
 
@@ -50,9 +50,9 @@ def test_write_fitness(size):
 
 @POPULATION
 @settings(max_examples=30)
-def test_write_generation(size, row_limits, col_limits, weights):
+def test_write_generation_serial(size, row_limits, col_limits, weights):
     """ Test that an entire generation and its fitness can be written to file
-    correctly. """
+    correctly using a single core. """
 
     families = [Normal, Poisson, Uniform]
     population = create_initial_population(size, row_limits, col_limits,
@@ -61,7 +61,11 @@ def test_write_generation(size, row_limits, col_limits, weights):
 
     write_generation(population, fitness, gen=0, root="out")
     path = Path("out/0")
+
     assert (path / "fitness.csv").exists()
+    fit = pd.read_csv(path / "fitness.csv")
+    assert np.allclose(fit.values.reshape(size,), fitness)
+
     for i, ind in enumerate(population):
         ind_path = path / str(i)
         assert (ind_path / "main.csv").exists()
@@ -71,3 +75,33 @@ def test_write_generation(size, row_limits, col_limits, weights):
         assert np.allclose(df.values, ind.dataframe.values)
 
     os.system("rm -r out")
+
+
+@POPULATION
+@settings(max_examples=30)
+def test_write_generation_parallel(size, row_limits, col_limits, weights):
+    """ Test that an entire generation and its fitness can be written to file
+    correctly using multiple cores in parallel. """
+
+    families = [Normal, Poisson, Uniform]
+    population = create_initial_population(size, row_limits, col_limits,
+            families, weights)
+    fitness = [trivial_fitness(ind.dataframe) for ind in population]
+
+    write_generation(population, fitness, gen=0, root="out", processes=4)
+    path = Path("out/0")
+
+    assert (path / "fitness.csv").exists()
+    fit = pd.read_csv(path / "fitness.csv")
+    assert np.allclose(fit.values.reshape(size,), fitness)
+
+    for i, ind in enumerate(population):
+        ind_path = path / str(i)
+        assert (ind_path / "main.csv").exists()
+        assert (ind_path / "meta.csv").exists()
+
+        df = pd.read_csv(ind_path / "main.csv")
+        assert np.allclose(df.values, ind.dataframe.values)
+
+    os.system("rm -r out")
+
