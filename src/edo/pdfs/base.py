@@ -50,6 +50,8 @@ class Distribution:
             family = cls
 
         setattr(Subtype, "__repr__", cls.__repr__)
+        setattr(Subtype, "sample", cls.sample)
+        setattr(Subtype, "to_tuple", cls.to_tuple)
         for key, value in vars(cls).items():
             if key != "subtypes":
                 setattr(Subtype, key, copy.deepcopy(value))
