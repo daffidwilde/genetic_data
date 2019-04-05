@@ -56,6 +56,7 @@ def test_build_subtype(family):
 
     assert subtype.__repr__ is family.__repr__
     assert subtype.sample is family.sample
+    assert subtype.to_tuple is family.to_tuple
 
     sub = subtype()
     assert sub.family == family
