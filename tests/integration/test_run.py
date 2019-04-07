@@ -30,7 +30,7 @@ OPEN_UNIT = PROB.filter(lambda x: x not in [0, 1])
     maximise=booleans(),
     seed=SIZE,
 )
-def test_run_algorithm(
+def test_run_algorithm_serial(
     size,
     row_limits,
     col_limits,
@@ -51,12 +51,12 @@ def test_run_algorithm(
     for family in families:
         family.reset()
 
-    pop, fit, all_pops, all_fits = edo.run_algorithm(
+    _, _, pop_history, fit_history = edo.run_algorithm(
         fitness=trivial_fitness,
         size=size,
         row_limits=row_limits,
         col_limits=col_limits,
-        pdfs=families,
+        families=families,
         weights=weights,
         stop=trivial_stop,
         dwindle=trivial_dwindle,
@@ -71,14 +71,14 @@ def test_run_algorithm(
         fitness_kwargs={"arg": None},
     )
 
-    assert len(pop) == size
-    assert len(fit) == size
-
-    for population, scores in zip(all_pops, all_fits):
+    for population, pop_fitness in zip(pop_history, fit_history):
         assert len(population) == size
-        assert len(scores) == size
+        assert len(pop_fitness) == size
 
-        for individual in population:
+        for individual, fit in zip(population, pop_fitness):
+
+            assert isinstance(fit, float)
+
             dataframe, metadata = individual
 
             assert isinstance(individual, Individual)
@@ -94,5 +94,37 @@ def test_run_algorithm(
             for i, limits in enumerate([row_limits, col_limits]):
                 assert limits[0] <= dataframe.shape[i] <= limits[1]
 
-            for score in scores:
-                assert isinstance(score, float)
+
+@settings(deadline=None, max_examples=30)
+@given(
+    size=SIZE,
+    row_limits=SHAPES,
+    col_limits=SHAPES,
+    weights=WEIGHTS,
+    max_iter=SIZE,
+    best_prop=HALF_PROB,
+    lucky_prop=HALF_PROB,
+    crossover_prob=PROB,
+    mutation_prob=PROB,
+    shrinkage=OPEN_UNIT,
+    maximise=booleans(),
+    seed=SIZE,
+)
+def test_run_algorithm_parallel(
+    size,
+    row_limits,
+    col_limits,
+    weights,
+    max_iter,
+    best_prop,
+    lucky_prop,
+    crossover_prob,
+    mutation_prob,
+    shrinkage,
+    maximise,
+    seed,
+):
+    """ Verify that the algorithm produces a valid population, and keeps track
+    of them/their fitnesses correctly. """
+
+    pass
