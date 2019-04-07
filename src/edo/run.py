@@ -158,6 +158,10 @@ def run_algorithm(
             weights,
         )
 
+        pop_fitness = get_population_fitness(
+            population, fitness, processes, fitness_kwargs
+        )
+
         if root is None:
             pop_history.append(population)
             fit_history.append(pop_fitness)
