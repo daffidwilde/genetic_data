@@ -51,7 +51,7 @@ def test_run_algorithm_serial(
     for family in families:
         family.reset()
 
-    _, _, pop_history, fit_history = edo.run_algorithm(
+    pop_history, fit_history = edo.run_algorithm(
         fitness=trivial_fitness,
         size=size,
         row_limits=row_limits,
@@ -71,14 +71,17 @@ def test_run_algorithm_serial(
         fitness_kwargs={"arg": None},
     )
 
-    for population, pop_fitness in zip(pop_history, fit_history):
+    assert isinstance(fit_history, pd.DataFrame)
+    assert all(fit_history.columns == ["fitness", "generation", "individual"])
+    assert all(fit_history.dtypes == [float, int, int])
+    assert all(fit_history["generation"].unique() == range(max_iter))
+    assert all(fit_history["individual"].unique() == range(size))
+    assert len(fit_history) % size == 0
+
+    for population in pop_history:
         assert len(population) == size
-        assert len(pop_fitness) == size
 
-        for individual, fit in zip(population, pop_fitness):
-
-            assert isinstance(fit, float)
-
+        for individual in population:
             dataframe, metadata = individual
 
             assert isinstance(individual, Individual)
@@ -127,4 +130,52 @@ def test_run_algorithm_parallel(
     """ Verify that the algorithm produces a valid population, and keeps track
     of them/their fitnesses correctly. """
 
-    pass
+    families = [Normal, Poisson, Uniform]
+    for family in families:
+        family.reset()
+
+    pop_history, fit_history = edo.run_algorithm(
+        fitness=trivial_fitness,
+        size=size,
+        row_limits=row_limits,
+        col_limits=col_limits,
+        families=families,
+        weights=weights,
+        stop=trivial_stop,
+        dwindle=trivial_dwindle,
+        max_iter=max_iter,
+        best_prop=best_prop,
+        lucky_prop=lucky_prop,
+        crossover_prob=crossover_prob,
+        mutation_prob=mutation_prob,
+        shrinkage=shrinkage,
+        maximise=maximise,
+        seed=seed,
+        fitness_kwargs={"arg": None},
+    )
+
+    assert isinstance(fit_history, pd.DataFrame)
+    assert all(fit_history.columns == ["fitness", "generation", "individual"])
+    assert all(fit_history.dtypes == [float, int, int])
+    assert all(fit_history["generation"].unique() == range(max_iter))
+    assert all(fit_history["individual"].unique() == range(size))
+    assert len(fit_history) % size == 0
+
+    for population in pop_history:
+        assert len(population) == size
+
+        for individual in population:
+            dataframe, metadata = individual
+
+            assert isinstance(individual, Individual)
+            assert isinstance(metadata, list)
+            assert isinstance(dataframe, pd.DataFrame)
+            assert len(metadata) == len(dataframe.columns)
+
+            for pdf in metadata:
+                assert (
+                    sum([pdf.name == family.name for family in families]) == 1
+                )
+
+            for i, limits in enumerate([row_limits, col_limits]):
+                assert limits[0] <= dataframe.shape[i] <= limits[1]
