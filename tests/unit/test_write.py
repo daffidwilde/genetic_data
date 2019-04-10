@@ -1,7 +1,9 @@
 """ Tests for the writing of individuals to file. """
 
-import os
 from pathlib import Path
+
+import os
+import yaml
 
 from hypothesis import given, settings
 from hypothesis.strategies import integers
@@ -28,10 +30,16 @@ def test_write_individual(row_limits, col_limits, weights):
     write_individual(individual, gen=0, idx=0, root="out").compute()
     path = Path("out/0/0")
     assert (path / "main.csv").exists()
-    assert (path / "meta.csv").exists()
+    assert (path / "main.meta").exists()
 
     df = pd.read_csv(path / "main.csv")
+    with open(path / "main.meta", "r") as meta_file:
+        meta = yaml.load(meta_file)
+
     assert np.allclose(df.values, individual.dataframe.values)
+    assert meta == [m.to_dict() for m in individual.metadata]
+
+    os.system("rm -r out")
 
 
 @given(size=integers(min_value=1, max_value=100))
@@ -41,11 +49,15 @@ def test_write_fitness(size):
     fitness = [trivial_fitness(pd.DataFrame()) for _ in range(size)]
 
     write_fitness(fitness, gen=0, root="out").compute()
-    path = Path(f"out/0")
+    path = Path("out")
     assert (path / "fitness.csv").exists()
 
     fit = pd.read_csv(path / "fitness.csv")
-    assert np.allclose(fit.values.reshape(size,), fitness)
+    assert list(fit.columns) == ["fitness", "generation", "individual"]
+    assert list(fit.dtypes) == [float, int, int]
+    assert list(fit["generation"].unique()) == [0]
+    assert list(fit["individual"]) == list(range(size))
+    assert np.allclose(fit["fitness"].values, fitness)
 
 
 @POPULATION
@@ -60,21 +72,28 @@ def test_write_generation_serial(size, row_limits, col_limits, weights):
     fitness = [trivial_fitness(ind.dataframe) for ind in population]
 
     write_generation(population, fitness, gen=0, root="out")
-    path = Path("out/0")
+    path = Path("out")
 
     assert (path / "fitness.csv").exists()
     fit = pd.read_csv(path / "fitness.csv")
-    assert np.allclose(fit.values.reshape(size,), fitness)
+    assert list(fit.columns) == ["fitness", "generation", "individual"]
+    assert list(fit.dtypes) == [float, int, int]
+    assert list(fit["generation"].unique()) == [0]
+    assert list(fit["individual"]) == list(range(size))
+    assert np.allclose(fit["fitness"].values, fitness)
 
+    path /= "0"
     for i, ind in enumerate(population):
         ind_path = path / str(i)
         assert (ind_path / "main.csv").exists()
-        assert (ind_path / "meta.csv").exists()
+        assert (ind_path / "main.meta").exists()
 
         df = pd.read_csv(ind_path / "main.csv")
-        assert np.allclose(df.values, ind.dataframe.values)
+        with open(ind_path / "main.meta", "r") as meta_file:
+            meta = yaml.load(meta_file)
 
-    os.system("rm -r out")
+        assert np.allclose(df.values, ind.dataframe.values)
+        assert meta == [m.to_dict() for m in ind.metadata]
 
 
 @POPULATION
@@ -89,19 +108,26 @@ def test_write_generation_parallel(size, row_limits, col_limits, weights):
     fitness = [trivial_fitness(ind.dataframe) for ind in population]
 
     write_generation(population, fitness, gen=0, root="out", processes=4)
-    path = Path("out/0")
+    path = Path("out")
 
     assert (path / "fitness.csv").exists()
     fit = pd.read_csv(path / "fitness.csv")
-    assert np.allclose(fit.values.reshape(size,), fitness)
+    assert list(fit.columns) == ["fitness", "generation", "individual"]
+    assert list(fit.dtypes) == [float, int, int]
+    assert list(fit["generation"].unique()) == [0]
+    assert list(fit["individual"]) == list(range(size))
+    assert np.allclose(fit["fitness"].values, fitness)
 
+    path /= "0"
     for i, ind in enumerate(population):
         ind_path = path / str(i)
         assert (ind_path / "main.csv").exists()
-        assert (ind_path / "meta.csv").exists()
+        assert (ind_path / "main.meta").exists()
 
         df = pd.read_csv(ind_path / "main.csv")
-        assert np.allclose(df.values, ind.dataframe.values)
+        with open(ind_path / "main.meta", "r") as meta_file:
+            meta = yaml.load(meta_file)
 
-    os.system("rm -r out")
+        assert np.allclose(df.values, ind.dataframe.values)
+        assert meta == [m.to_dict() for m in ind.metadata]
 

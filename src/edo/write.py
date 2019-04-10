@@ -2,21 +2,10 @@
 
 from pathlib import Path
 
+import yaml
+
 import dask
 import pandas as pd
-
-
-def _get_meta_df(metadata):
-    """ Create a dataframe containing an individual's metadata. """
-
-    max_params = max([len(vars(meta)) for meta in metadata])
-
-    cols = ["family"]
-    for i in range(max_params):
-        cols.extend([f"param_{i}_name", f"param_{i}_value"])
-
-    meta_df = pd.DataFrame([meta.to_tuple() for meta in metadata], columns=cols)
-    return meta_df
 
 
 @dask.delayed
@@ -27,25 +16,30 @@ def write_individual(individual, gen, idx, root):
 
     path = Path(f"{root}/{gen}/{idx}")
     path.mkdir(parents=True, exist_ok=True)
-
     dataframe, metadata = individual
-    meta_df = _get_meta_df(metadata)
 
     dataframe.to_csv(path / "main.csv", index=False)
-    meta_df.to_csv(path / "meta.csv", index=False)
+    with open(path / "main.meta", "w") as meta_file:
+        yaml.dump([m.to_dict() for m in metadata], meta_file)
 
 
 @dask.delayed
 def write_fitness(fitness, gen, root):
-    """ Write the generation fitness to file in the generation's directory in
-    `root`. """
+    """ Write the generation fitness to file in the root directory. """
 
-    path = Path(f"{root}/{gen}")
+    path = Path(root)
     path.mkdir(parents=True, exist_ok=True)
+    size = len(fitness)
 
-    pd.DataFrame(fitness, columns=[gen]).to_csv(
-        path / "fitness.csv", index=False
-    )
+    if gen == 0:
+        pd.DataFrame(
+            {"fitness": fitness, "generation": gen, "individual": range(size)}
+        ).to_csv(path / "fitness.csv", index=False)
+
+    else:
+        with open(path / "fitness.csv", "a") as fit_file:
+            for fit, gen, ind in zip(fitness, [gen] * size, range(size)):
+                fit_file.write(f"{fit},{gen},{ind}\n")
 
 
 def write_generation(population, pop_fitness, gen, root, processes=None):
