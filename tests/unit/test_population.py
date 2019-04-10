@@ -6,14 +6,11 @@ import pytest
 from hypothesis import given, settings
 from hypothesis.strategies import integers
 
-from edo.fitness import get_fitness
 from edo.individual import Individual
-from edo.operators import selection
 from edo.pdfs import Gamma, Normal, Poisson
 from edo.population import create_initial_population, create_new_population
 
 from .util.parameters import OFFSPRING, POPULATION
-from .util.trivials import trivial_fitness
 
 
 @POPULATION

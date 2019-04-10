@@ -1,12 +1,18 @@
 """ .. The main script containing the evolutionary dataset algorithm. """
 
 from collections import defaultdict
+from glob import iglob
+from pathlib import Path
 
+import yaml
+
+import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 
 import edo
 from edo.fitness import get_population_fitness
+from edo.individual import Individual
 from edo.operators import selection, shrink
 from edo.population import create_initial_population, create_new_population
 from edo.write import write_generation
@@ -57,7 +63,7 @@ def run_algorithm(
 
         .. note::
             For reproducibility, a user-defined class' :code:`sample` method
-            should use NumPy for any random elements as the seed for the GA is
+            should use NumPy for)any random elements as the seed for the GA is
             set using :func:`np.random.seed`.
     weights : list
         A probability distribution on how to select columns from
@@ -71,7 +77,7 @@ def run_algorithm(
         A function which acts as a means of dwindling the mutation probability.
         Such functions should take the current mutation probability and the
         current iteration as argument, and should return a new mutation
-        probability. If :)ode:`None`, the GA will run with a constant mutation
+        probability. If :code:`None`, the GA will run with a constant mutation
         probability.
     max_iter : int
         The maximum number of iterations to be carried out before terminating.
@@ -130,20 +136,13 @@ def run_algorithm(
         fitness_kwargs
     )
 
-    itr = 0
-    converged = False
+    itr, converged = 0, False
     if stop:
         converged = stop(pop_fitness)
 
     if root is None:
-        pop_history = [population]
-        fit_history = pd.DataFrame(
-            {
-                "fitness": pop_fitness,
-                "generation": itr,
-                "individual": range(size),
-            }
-        )
+        pop_history = _update_pop_history(population)
+        fit_history = _update_fit_history(pop_fitness, itr)
     else:
         write_generation(population, pop_fitness, itr, root, processes)
 
@@ -170,17 +169,9 @@ def run_algorithm(
             population, fitness, processes, fitness_kwargs
         )
 
-        if root is None:
-            pop_history.append(population)
-            fit_history = fit_history.append(
-                pd.DataFrame(
-                    {
-                        "fitness": pop_fitness,
-                        "generation": itr,
-                        "individual": range(size),
-                    }
-                )
-            )
+        if root is not None:
+            pop_history = _update_pop_history(population, pop_history)
+            fit_history = _update_fit_history(pop_fitness, itr, fit_history)
         else:
             write_generation(population, pop_fitness, itr, root, processes)
 
@@ -190,6 +181,10 @@ def run_algorithm(
             mutation_prob = dwindle(mutation_prob, itr)
         if shrinkage is not None:
             families = shrink(parents, families, itr, shrinkage)
+
+    if root is not None:
+        pop_history = _get_pop_history(root, itr)
+        fit_history = _get_fit_history(root)
 
     return pop_history, fit_history
 
@@ -209,10 +204,50 @@ def _initialise_algorithm(
     population = create_initial_population(
         size, row_limits, col_limits, families, weights
     )
-    pop_fitness = get_population_fitness(population, fitness, processes,
-            fitness_kwargs)
+    pop_fitness = get_population_fitness(
+        population, fitness, processes, fitness_kwargs
+    )
 
     return population, pop_fitness
+
+
+def _get_metadata_dicts(individual):
+    """ Extract the dictionary form of  """
+
+    meta_dicts = [pdf.to_dict() for pdf in individual.metadata]
+    return meta_dicts
+
+
+def _update_pop_history(population, pop_history=None):
+    """ Add the current generation to the history. """
+
+    population_dict = []
+    for individual in population:
+        meta_dicts = _get_metadata_dicts(individual)
+        population_dict.append(Individual(individual.dataframe, meta_dicts))
+
+    if pop_history is None:
+        pop_history = [population_dict]
+    else:
+        pop_history.append(population)
+
+    return pop_history
+
+
+def _update_fit_history(pop_fitness, itr, fit_history=None):
+    """ Add the current generation's population fitness to the history. """
+
+    size = len(pop_fitness)
+    fitness_df = pd.DataFrame(
+        {"fitness": pop_fitness, "generation": itr, "individual": range(size)}
+    )
+
+    if fit_history is None:
+        fit_history = fitness_df
+    else:
+        fit_history = fit_history.append(fitness_df, ignore_index=True)
+
+    return fit_history
 
 
 def _update_subtypes(parents, families):
@@ -228,3 +263,32 @@ def _update_subtypes(parents, families):
         pdf.subtypes = list(subtypes[pdf])
 
     return families
+
+
+def _get_pop_history(root, itr):
+    """ Read in the individuals from each generation. The dataset is given as a
+    `dask.dataframe.core.DataFrame` and the metadata as a `dask.bag.core.Bag` of
+    dictionaries. However, the individual is still an `Individual`. """
+
+    pop_history = []
+    for gen in range(itr):
+
+        generation = []
+        gen_path = Path(f"{root}/{gen}")
+        for ind_dir in sorted(
+            iglob(gen_path / "*"), key=lambda path: int(path.split("/")[-1])
+        ):
+            dataframe = dd.read_csv(ind_dir / "main.csv")
+            metadata = yaml.load(ind_dir / "main.meta")
+            generation.append(Individual(dataframe, metadata))
+
+        pop_history.append(generation)
+
+    return pop_history
+
+
+def _get_fit_history(root):
+    """ Read in the fitness history from each generation in a run  as a
+    `dask.dataframe.core.DataFrame`. """
+
+    return dd.read_csv(f"{root}/fitness.csv")
