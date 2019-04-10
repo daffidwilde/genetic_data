@@ -2,8 +2,8 @@
 
 from collections import defaultdict
 
-import dask
 import numpy as np
+import pandas as pd
 
 import edo
 from edo.fitness import get_population_fitness
@@ -134,8 +134,16 @@ def run_algorithm(
     converged = False
     if stop:
         converged = stop(pop_fitness)
+
     if root is None:
-        pop_history, fit_history = [population], [pop_fitness]
+        pop_history = [population]
+        fit_history = pd.DataFrame(
+            {
+                "fitness": pop_fitness,
+                "generation": itr,
+                "individual": range(size),
+            }
+        )
     else:
         write_generation(population, pop_fitness, itr, root, processes)
 
@@ -164,7 +172,15 @@ def run_algorithm(
 
         if root is None:
             pop_history.append(population)
-            fit_history.append(pop_fitness)
+            fit_history = fit_history.append(
+                pd.DataFrame(
+                    {
+                        "fitness": pop_fitness,
+                        "generation": itr,
+                        "individual": range(size),
+                    }
+                )
+            )
         else:
             write_generation(population, pop_fitness, itr, root, processes)
 
@@ -175,8 +191,7 @@ def run_algorithm(
         if shrinkage is not None:
             families = shrink(parents, families, itr, shrinkage)
 
-    if root is None:
-        return population, pop_fitness, pop_history, fit_history
+    return pop_history, fit_history
 
 
 def _initialise_algorithm(

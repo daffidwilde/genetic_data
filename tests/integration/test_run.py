@@ -74,8 +74,8 @@ def test_run_algorithm_serial(
     assert isinstance(fit_history, pd.DataFrame)
     assert all(fit_history.columns == ["fitness", "generation", "individual"])
     assert all(fit_history.dtypes == [float, int, int])
-    assert all(fit_history["generation"].unique() == range(max_iter))
-    assert all(fit_history["individual"].unique() == range(size))
+    assert list(fit_history["generation"].unique()) == list(range(max_iter + 1))
+    assert list(fit_history["individual"].unique()) == list(range(size))
     assert len(fit_history) % size == 0
 
     for population in pop_history:
@@ -157,8 +157,8 @@ def test_run_algorithm_parallel(
     assert isinstance(fit_history, pd.DataFrame)
     assert all(fit_history.columns == ["fitness", "generation", "individual"])
     assert all(fit_history.dtypes == [float, int, int])
-    assert all(fit_history["generation"].unique() == range(max_iter))
-    assert all(fit_history["individual"].unique() == range(size))
+    assert list(fit_history["generation"].unique()) == list(range(max_iter + 1))
+    assert list(fit_history["individual"].unique()) == list(range(size))
     assert len(fit_history) % size == 0
 
     for population in pop_history:
