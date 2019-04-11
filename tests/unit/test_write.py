@@ -49,15 +49,16 @@ def test_write_fitness(size):
     fitness = [trivial_fitness(pd.DataFrame()) for _ in range(size)]
 
     write_fitness(fitness, gen=0, root="out").compute()
+    write_fitness(fitness, gen=1, root="out").compute()
     path = Path("out")
     assert (path / "fitness.csv").exists()
 
     fit = pd.read_csv(path / "fitness.csv")
     assert list(fit.columns) == ["fitness", "generation", "individual"]
     assert list(fit.dtypes) == [float, int, int]
-    assert list(fit["generation"].unique()) == [0]
-    assert list(fit["individual"]) == list(range(size))
-    assert np.allclose(fit["fitness"].values, fitness)
+    assert list(fit["generation"].unique()) == [0, 1]
+    assert list(fit["individual"]) == list(range(size)) * 2
+    assert np.allclose(fit["fitness"].values, fitness * 2)
 
 
 @POPULATION
@@ -95,6 +96,8 @@ def test_write_generation_serial(size, row_limits, col_limits, weights):
         assert np.allclose(df.values, ind.dataframe.values)
         assert meta == [m.to_dict() for m in ind.metadata]
 
+    os.system("rm -r out")
+
 
 @POPULATION
 @settings(max_examples=30)
@@ -130,4 +133,6 @@ def test_write_generation_parallel(size, row_limits, col_limits, weights):
 
         assert np.allclose(df.values, ind.dataframe.values)
         assert meta == [m.to_dict() for m in ind.metadata]
+
+    os.system("rm -r out")
 
