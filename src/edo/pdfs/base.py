@@ -51,7 +51,7 @@ class Distribution:
 
         setattr(Subtype, "__repr__", cls.__repr__)
         setattr(Subtype, "sample", cls.sample)
-        setattr(Subtype, "to_tuple", cls.to_tuple)
+        setattr(Subtype, "to_dict", cls.to_dict)
         for key, value in vars(cls).items():
             if key != "subtypes":
                 setattr(Subtype, key, copy.deepcopy(value))
@@ -85,14 +85,11 @@ class Distribution:
 
         raise NotImplementedError("You must define a sample method.")
 
-    def to_tuple(self):
-        """ Returns the name of distribution, and the names and values of all
-        parameters as a tuple. This is used for the saving of data and little
-        else. """
+    def to_dict(self):
+        """ Returns a dictionary containing the name of distribution, and the
+        values of all its parameters. """
 
-        out = [self.name]
-        for key, val in vars(self).items():
-            out.append(key)
-            out.append(val)
+        out = dict(vars(self))
+        out["name"] = self.name
 
-        return tuple(out)
+        return out

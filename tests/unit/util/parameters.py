@@ -12,7 +12,7 @@ from hypothesis.strategies import (
     tuples,
 )
 
-SIZE = integers(min_value=2, max_value=10)
+SIZE = integers(min_value=2, max_value=5)
 INTS = integers(min_value=1, max_value=5)
 PROB = floats(min_value=0, max_value=1)
 SMALL_PROB = floats(min_value=0, max_value=1e-3)
