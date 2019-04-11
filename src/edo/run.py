@@ -169,7 +169,7 @@ def run_algorithm(
             population, fitness, processes, fitness_kwargs
         )
 
-        if root is not None:
+        if root is None:
             pop_history = _update_pop_history(population, pop_history)
             fit_history = _update_fit_history(pop_fitness, itr, fit_history)
         else:
@@ -229,7 +229,7 @@ def _update_pop_history(population, pop_history=None):
     if pop_history is None:
         pop_history = [population_dict]
     else:
-        pop_history.append(population)
+        pop_history.append(population_dict)
 
     return pop_history
 
@@ -276,10 +276,13 @@ def _get_pop_history(root, itr):
         generation = []
         gen_path = Path(f"{root}/{gen}")
         for ind_dir in sorted(
-            iglob(gen_path / "*"), key=lambda path: int(path.split("/")[-1])
+            iglob(f"{gen_path}/*"), key=lambda path: int(path.split("/")[-1])
         ):
+            ind_dir = Path(ind_dir)
             dataframe = dd.read_csv(ind_dir / "main.csv")
-            metadata = yaml.load(ind_dir / "main.meta")
+            with open(ind_dir / "main.meta", "r") as meta_file:
+                metadata = yaml.load(meta_file)
+
             generation.append(Individual(dataframe, metadata))
 
         pop_history.append(generation)
