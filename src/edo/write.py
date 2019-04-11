@@ -2,10 +2,9 @@
 
 from pathlib import Path
 
-import yaml
-
 import dask
 import pandas as pd
+import yaml
 
 
 @dask.delayed
@@ -50,7 +49,8 @@ def write_generation(population, pop_fitness, gen, root, processes=None):
         *[
             write_individual(individual, gen, i, root)
             for i, individual in enumerate(population)
-        ], write_fitness(pop_fitness, gen, root)
+        ],
+        write_fitness(pop_fitness, gen, root),
     )
 
     if processes is None:

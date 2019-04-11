@@ -236,8 +236,12 @@ def test_run_algorithm_on_disk(
     assert isinstance(fit_history, dd.DataFrame)
     assert list(fit_history.columns) == ["fitness", "generation", "individual"]
     assert list(fit_history.dtypes) == [float, int, int]
-    assert list(fit_history["generation"].unique().compute()) == list(range(max_iter + 1))
-    assert list(fit_history["individual"].unique().compute()) == list(range(size))
+    assert list(fit_history["generation"].unique().compute()) == list(
+        range(max_iter + 1)
+    )
+    assert list(fit_history["individual"].unique().compute()) == list(
+        range(size)
+    )
 
     for generation in pop_history:
         assert len(generation) == size

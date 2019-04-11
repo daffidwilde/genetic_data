@@ -5,7 +5,7 @@ import numpy as np
 
 def trivial_fitness(individual, arg=None):
     """ A fitness function. """
-    return 0.
+    return 0.0
 
 
 def trivial_stop(pop_fitness):

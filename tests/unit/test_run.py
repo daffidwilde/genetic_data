@@ -2,12 +2,11 @@
 
 import os
 
-from hypothesis import given, settings
-from hypothesis.strategies import integers
-
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
+from hypothesis import given, settings
+from hypothesis.strategies import integers
 
 from edo.individual import Individual, create_individual
 from edo.pdfs import Normal, Poisson, Uniform
@@ -35,8 +34,14 @@ def test_initialise_algorithm(size, row_limits, col_limits, weights):
     families = [Normal, Poisson, Uniform]
     fitness_kwargs = {"arg": None}
     population, pop_fitness = _initialise_algorithm(
-        trivial_fitness, size, row_limits, col_limits, families, weights, None,
-        fitness_kwargs
+        trivial_fitness,
+        size,
+        row_limits,
+        col_limits,
+        families,
+        weights,
+        None,
+        fitness_kwargs,
     )
 
     assert isinstance(population, list)
@@ -120,7 +125,7 @@ def test_update_subtypes(size, row_limits, col_limits, weights):
         size, row_limits, col_limits, families, weights
     )
 
-    parents = population[:max(int(size / 5), 1)]
+    parents = population[: max(int(size / 5), 1)]
     parent_subtypes = {
         pdf.__class__ for parent in parents for pdf in parent.metadata
     }
@@ -158,8 +163,7 @@ def test_get_history(size, row_limits, col_limits, weights):
             pop_ind = population[i]
             assert isinstance(individual.dataframe, dd.DataFrame)
             assert np.allclose(
-                pop_ind.dataframe.values,
-                individual.dataframe.values.compute()
+                pop_ind.dataframe.values, individual.dataframe.values.compute()
             )
             assert isinstance(individual.metadata, list)
             assert individual.metadata == [

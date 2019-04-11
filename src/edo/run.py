@@ -4,11 +4,10 @@ from collections import defaultdict
 from glob import iglob
 from pathlib import Path
 
-import yaml
-
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
+import yaml
 
 import edo
 from edo.fitness import get_population_fitness
@@ -16,6 +15,7 @@ from edo.individual import Individual
 from edo.operators import selection, shrink
 from edo.population import create_initial_population, create_new_population
 from edo.write import write_generation
+
 
 def run_algorithm(
     fitness,
@@ -132,8 +132,14 @@ def run_algorithm(
         np.random.seed(seed)
 
     population, pop_fitness = _initialise_algorithm(
-        fitness, size, row_limits, col_limits, families, weights, processes,
-        fitness_kwargs
+        fitness,
+        size,
+        row_limits,
+        col_limits,
+        families,
+        weights,
+        processes,
+        fitness_kwargs,
     )
 
     itr, converged = 0, False
@@ -190,8 +196,14 @@ def run_algorithm(
 
 
 def _initialise_algorithm(
-    fitness, size, row_limits, col_limits, families, weights, processes,
-    fitness_kwargs=None
+    fitness,
+    size,
+    row_limits,
+    col_limits,
+    families,
+    weights,
+    processes,
+    fitness_kwargs=None,
 ):
     """ Initialise the algorithm: reset families and the fitness cache, generate
     an initial population and evaluate its fitness. """

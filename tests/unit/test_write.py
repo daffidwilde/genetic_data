@@ -1,20 +1,18 @@
 """ Tests for the writing of individuals to file. """
 
-from pathlib import Path
-
 import os
-import yaml
-
-from hypothesis import given, settings
-from hypothesis.strategies import integers
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import yaml
+from hypothesis import given, settings
+from hypothesis.strategies import integers
 
-from edo.write import write_fitness, write_generation, write_individual
 from edo.individual import create_individual
 from edo.pdfs import Normal, Poisson, Uniform
 from edo.population import create_initial_population
+from edo.write import write_fitness, write_generation, write_individual
 
 from .util.parameters import INTEGER_INDIVIDUAL, POPULATION
 from .util.trivials import trivial_fitness
@@ -68,8 +66,9 @@ def test_write_generation_serial(size, row_limits, col_limits, weights):
     correctly using a single core. """
 
     families = [Normal, Poisson, Uniform]
-    population = create_initial_population(size, row_limits, col_limits,
-            families, weights)
+    population = create_initial_population(
+        size, row_limits, col_limits, families, weights
+    )
     fitness = [trivial_fitness(ind.dataframe) for ind in population]
 
     write_generation(population, fitness, gen=0, root="out")
@@ -106,8 +105,9 @@ def test_write_generation_parallel(size, row_limits, col_limits, weights):
     correctly using multiple cores in parallel. """
 
     families = [Normal, Poisson, Uniform]
-    population = create_initial_population(size, row_limits, col_limits,
-            families, weights)
+    population = create_initial_population(
+        size, row_limits, col_limits, families, weights
+    )
     fitness = [trivial_fitness(ind.dataframe) for ind in population]
 
     write_generation(population, fitness, gen=0, root="out", processes=4)
@@ -135,4 +135,3 @@ def test_write_generation_parallel(size, row_limits, col_limits, weights):
         assert meta == [m.to_dict() for m in ind.metadata]
 
     os.system("rm -r out")
-
