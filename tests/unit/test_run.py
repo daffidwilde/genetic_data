@@ -136,7 +136,7 @@ def test_update_subtypes(size, row_limits, col_limits, weights):
     assert parent_subtypes == updated_subtypes
 
 
-@settings(max_examples=10)
+@settings(deadline=None, max_examples=10)
 @POPULATION
 def test_get_history(size, row_limits, col_limits, weights):
     """ Test that a population and fitness history can be read in correctly. """
