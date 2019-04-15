@@ -20,6 +20,7 @@ class Distribution:
     """
 
     name = "Distribution"
+    subtype_id = 0
     subtypes = []
     max_subtypes = None
     param_limits = None
@@ -52,10 +53,12 @@ class Distribution:
         setattr(Subtype, "__repr__", cls.__repr__)
         setattr(Subtype, "sample", cls.sample)
         setattr(Subtype, "to_dict", cls.to_dict)
+        setattr(Subtype, "subtype_id", cls.subtype_id)
         for key, value in vars(cls).items():
-            if key != "subtypes":
+            if "subtype" not in key:
                 setattr(Subtype, key, copy.deepcopy(value))
 
+        cls.subtype_id += 1
         cls.subtypes.append(Subtype)
         return Subtype
 
@@ -78,6 +81,7 @@ class Distribution:
     def reset(cls):
         """ Reset the class to have no subtypes. """
 
+        cls.subtype_id = 0
         cls.subtypes = []
 
     def sample(self, nrows=None):
@@ -91,5 +95,6 @@ class Distribution:
 
         out = dict(vars(self))
         out["name"] = self.name
+        out["subtype_id"] = self.subtype_id
 
         return out
