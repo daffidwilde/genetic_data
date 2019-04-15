@@ -13,10 +13,19 @@ class Distribution:
     ----------
     name : str
         The name of the distribution, :code:`"Distribution"`.
+    subtype_id : int
+        A placeholder for a subtype's identifier. Defaults to 0 and increments
+        with each new subtype. Reset with :code:`reset` class method.
+    subtypes : list
+        A list of all currently available subtypes. Can be reset with
+        :code:`reset` class method.
+    max_subtypes : int
+        The maximum number of subtypes the distribution may have at any given
+        time. If :code:`None`, then no limit is set.
     param_limits : None
         A placeholder for a distribution parameter limit dictionary. These are
-        considered the original limits and the class can be reset to them using
-        the :code:`reset` class method.
+        considered the original limits to be used by all subtypes of the
+        distribution.
     """
 
     name = "Distribution"
@@ -49,11 +58,11 @@ class Distribution:
         class Subtype:
 
             family = cls
+            subtype_id = cls.subtype_id
 
         setattr(Subtype, "__repr__", cls.__repr__)
         setattr(Subtype, "sample", cls.sample)
         setattr(Subtype, "to_dict", cls.to_dict)
-        setattr(Subtype, "subtype_id", cls.subtype_id)
         for key, value in vars(cls).items():
             if "subtype" not in key:
                 setattr(Subtype, key, copy.deepcopy(value))
