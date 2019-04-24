@@ -4,6 +4,7 @@
 *_build*
 .cache/
 *coverage*
+dask-worker-space
 dist
 *egg-info*
 htmlcov/
