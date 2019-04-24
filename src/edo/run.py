@@ -293,7 +293,7 @@ def _get_pop_history(root, itr):
             ind_dir = Path(ind_dir)
             dataframe = dd.read_csv(ind_dir / "main.csv")
             with open(ind_dir / "main.meta", "r") as meta_file:
-                metadata = yaml.load(meta_file)
+                metadata = yaml.load(meta_file, Loader=yaml.Loader)
 
             generation.append(Individual(dataframe, metadata))
 
