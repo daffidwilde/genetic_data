@@ -32,7 +32,7 @@ def test_write_individual(row_limits, col_limits, weights):
 
     df = pd.read_csv(path / "main.csv")
     with open(path / "main.meta", "r") as meta_file:
-        meta = yaml.load(meta_file, Loader=yaml.Loader)
+        meta = yaml.load(meta_file, Loader=yaml.FullLoader)
 
     assert np.allclose(df.values, individual.dataframe.values)
     assert meta == [m.to_dict() for m in individual.metadata]
@@ -90,7 +90,7 @@ def test_write_generation_serial(size, row_limits, col_limits, weights):
 
         df = pd.read_csv(ind_path / "main.csv")
         with open(ind_path / "main.meta", "r") as meta_file:
-            meta = yaml.load(meta_file, Loader=yaml.Loader)
+            meta = yaml.load(meta_file, Loader=yaml.FullLoader)
 
         assert np.allclose(df.values, ind.dataframe.values)
         assert meta == [m.to_dict() for m in ind.metadata]
@@ -129,7 +129,7 @@ def test_write_generation_parallel(size, row_limits, col_limits, weights):
 
         df = pd.read_csv(ind_path / "main.csv")
         with open(ind_path / "main.meta", "r") as meta_file:
-            meta = yaml.load(meta_file, Loader=yaml.Loader)
+            meta = yaml.load(meta_file, Loader=yaml.FullLoader)
 
         assert np.allclose(df.values, ind.dataframe.values)
         assert meta == [m.to_dict() for m in ind.metadata]
