@@ -135,3 +135,19 @@ def test_tuple_limits(row_limits, col_limits, weights):
     for i, family in enumerate(families):
         count = sum([pdf.name == family.name for pdf in metadata])
         assert col_limits[0][i] <= count <= col_limits[1][i]
+
+
+@INTEGER_INDIVIDUAL
+def test_to_history(row_limits, col_limits, weights):
+    """ Test that an individual can export themselves to a version fit for a
+    population history. """
+
+    families = [Gamma, Normal, Poisson]
+    individual = create_individual(row_limits, col_limits, families, weights)
+    history_individual = individual.to_history()
+
+    assert isinstance(history_individual, Individual)
+    assert history_individual.dataframe.equals(individual.dataframe)
+
+    for i, pdf in enumerate(history_individual.metadata):
+        assert pdf == individual.metadata[i].to_dict()

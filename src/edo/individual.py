@@ -36,6 +36,13 @@ class Individual:
         for _, val in vars(self).items():
             yield val
 
+    def to_history(self):
+        """ Export a copy of itself fit for a population history, i.e. with
+        dictionary metadata as sampling is no longer required. """
+
+        meta_dicts = [pdf.to_dict() for pdf in self.metadata]
+        return Individual(self.dataframe, meta_dicts)
+
 def _sample_ncols(col_limits):
     """ Sample a valid number of columns from the column limits, even if those
     limits contain tuples. """
