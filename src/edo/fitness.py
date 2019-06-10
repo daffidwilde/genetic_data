@@ -1,6 +1,9 @@
 """ Fitness-related functions. """
 
+from pathlib import Path
+
 import dask
+import pandas as pd
 
 import edo
 
@@ -39,3 +42,22 @@ def get_population_fitness(
         out = dask.compute(*tasks, num_workers=processes)
 
     return list(out)
+
+
+@dask.delayed
+def write_fitness(fitness, generation, root):
+    """ Write the generation fitness to file in the root directory. """
+
+    path = Path(root)
+    path.mkdir(parents=True, exist_ok=True)
+    size = len(fitness)
+
+    if generation == 0:
+        pd.DataFrame(
+            {"fitness": fitness, "generation": generation, "individual": range(size)}
+        ).to_csv(path / "fitness.csv", index=False)
+
+    else:
+        with open(path / "fitness.csv", "a") as fit_file:
+            for fit, gen, ind in zip(fitness, [generation] * size, range(size)):
+                fit_file.write(f"{fit},{gen},{ind}\n")

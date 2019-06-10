@@ -1,5 +1,10 @@
 """ Tests for the creation of an individual. """
 
+import os
+import yaml
+from pathlib import Path
+
+import numpy as np
 import pandas as pd
 from hypothesis import given
 from hypothesis.strategies import text
@@ -151,3 +156,45 @@ def test_to_history(row_limits, col_limits, weights):
 
     for i, pdf in enumerate(history_individual.metadata):
         assert pdf == individual.metadata[i].to_dict()
+
+
+@INTEGER_INDIVIDUAL
+def test_from_file(row_limits, col_limits, weights):
+    """ Test that an individual can be created from file. """
+
+    path = Path("out/0/0")
+    path.mkdir(exist_ok=True, parents=True)
+    families = [Gamma, Normal, Poisson]
+    dataframe, metadata = create_individual(row_limits, col_limits, families,
+            weights)
+
+    dataframe.to_csv(path / "main.csv", index=False)
+    with open(path / "main.meta", "w") as meta_file:
+        yaml.dump([m.to_dict() for m in metadata], meta_file)
+
+    individual = Individual.from_file(path)
+    assert np.allclose(individual.dataframe.values, dataframe.values)
+    assert individual.metadata == [m.to_dict() for m in metadata]
+
+    os.system("rm -r out")
+
+
+@INTEGER_INDIVIDUAL
+def test_to_file(row_limits, col_limits, weights):
+    """ Test that an individual can write themselves to file. """
+
+    families = [Gamma, Normal, Poisson]
+    individual = create_individual(row_limits, col_limits, families, weights)
+    path = individual.to_file(0, 0, "out")
+
+    assert (path / "main.csv").exists()
+    assert (path / "main.meta").exists()
+
+    dataframe = pd.read_csv(path / "main.csv")
+    with open(path / "main.meta", "r") as meta_file:
+        metadata = yaml.load(meta_file, Loader=yaml.FullLoader)
+
+    assert np.allclose(dataframe.values, individual.dataframe.values)
+    assert metadata == [m.to_dict() for m in individual.metadata]
+
+    os.system("rm -r out")

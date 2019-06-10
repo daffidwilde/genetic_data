@@ -11,11 +11,10 @@ import pandas as pd
 import yaml
 
 import edo
-from edo.fitness import get_population_fitness
+from edo.fitness import get_population_fitness, write_fitness
 from edo.individual import Individual
 from edo.operators import selection, shrink
 from edo.population import create_initial_population, create_new_population
-from edo.write import write_fitness, write_individual
 
 
 class DataOptimiser:
@@ -226,10 +225,7 @@ class DataOptimiser:
 
         population_with_dicts = []
         for individual in self.population:
-            meta_dicts = _get_metadata_dicts(individual)
-            population_with_dicts.append(
-                Individual(individual.dataframe, meta_dicts)
-            )
+            population_with_dicts.append(individual.to_history())
 
         if self.pop_history is None:
             self.pop_history = [population_with_dicts]
@@ -260,8 +256,8 @@ class DataOptimiser:
 
         tasks = (
             *[
-                write_individual(individual, self.generation, i, root)
-                for i, individual in enumerate(self.population)
+                individual.to_file(self.generation, idx, root)
+                for idx, individual in enumerate(self.population)
             ],
             write_fitness(self.pop_fitness, self.generation, root),
         )
@@ -323,10 +319,3 @@ def _get_fit_history(root):
     `dask.dataframe.core.DataFrame`. """
 
     return dd.read_csv(f"{root}/fitness.csv")
-
-
-def _get_metadata_dicts(individual):
-    """ Extract the dictionary form of  """
-
-    meta_dicts = [pdf.to_dict() for pdf in individual.metadata]
-    return meta_dicts
