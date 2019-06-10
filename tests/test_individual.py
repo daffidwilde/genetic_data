@@ -3,7 +3,7 @@
 import pandas as pd
 
 from edo.individual import Individual, create_individual
-from edo.pdfs import Gamma, Normal, Poisson
+from edo.families import Gamma, Normal, Poisson
 
 from .util.parameters import (
     INTEGER_INDIVIDUAL,

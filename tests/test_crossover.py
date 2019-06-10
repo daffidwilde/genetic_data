@@ -5,7 +5,7 @@ from hypothesis import settings
 
 from edo.individual import Individual, create_individual
 from edo.operators import crossover
-from edo.pdfs import Gamma, Normal, Poisson
+from edo.families import Gamma, Normal, Poisson
 
 from .util.parameters import (
     INTEGER_CROSSOVER,

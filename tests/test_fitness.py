@@ -5,7 +5,7 @@ from hypothesis import settings
 import edo
 from edo.fitness import get_fitness, get_population_fitness
 from edo.individual import create_individual
-from edo.pdfs import Normal, Poisson, Uniform
+from edo.families import Normal, Poisson, Uniform
 from edo.population import create_initial_population
 
 from .util.parameters import INTEGER_INDIVIDUAL, POP_FITNESS, POPULATION

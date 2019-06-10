@@ -6,7 +6,7 @@ import pytest
 from edo.fitness import get_population_fitness
 from edo.individual import Individual
 from edo.operators import selection
-from edo.pdfs import Gamma, Normal, Poisson
+from edo.families import Gamma, Normal, Poisson
 from edo.population import create_initial_population
 
 from .util.parameters import SELECTION, SMALL_PROPS
