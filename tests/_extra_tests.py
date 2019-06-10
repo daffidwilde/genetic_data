@@ -177,3 +177,82 @@ def test_get_history(size, row_limits, col_limits, weights):
     assert list(fit_history["individual"].compute()) == list(range(size))
 
     os.system("rm -r out")
+
+
+
+@POPULATION
+@settings(max_examples=30)
+def test_write_generation_serial(size, row_limits, col_limits, weights):
+    """ Test that an entire generation and its fitness can be written to file
+    correctly using a single core. """
+
+    families = [Normal, Poisson, Uniform]
+    population = create_initial_population(
+        size, row_limits, col_limits, families, weights
+    )
+    fitness = [trivial_fitness(ind.dataframe) for ind in population]
+
+    write_generation(population, fitness, gen=0, root="out")
+    path = Path("out")
+
+    assert (path / "fitness.csv").exists()
+    fit = pd.read_csv(path / "fitness.csv")
+    assert list(fit.columns) == ["fitness", "generation", "individual"]
+    assert list(fit.dtypes) == [float, int, int]
+    assert list(fit["generation"].unique()) == [0]
+    assert list(fit["individual"]) == list(range(size))
+    assert np.allclose(fit["fitness"].values, fitness)
+
+    path /= "0"
+    for i, ind in enumerate(population):
+        ind_path = path / str(i)
+        assert (ind_path / "main.csv").exists()
+        assert (ind_path / "main.meta").exists()
+
+        df = pd.read_csv(ind_path / "main.csv")
+        with open(ind_path / "main.meta", "r") as meta_file:
+            meta = yaml.load(meta_file, Loader=yaml.FullLoader)
+
+        assert np.allclose(df.values, ind.dataframe.values)
+        assert meta == [m.to_dict() for m in ind.metadata]
+
+    os.system("rm -r out")
+
+
+@POPULATION
+@settings(max_examples=30)
+def test_write_generation_parallel(size, row_limits, col_limits, weights):
+    """ Test that an entire generation and its fitness can be written to file
+    correctly using multiple cores in parallel. """
+
+    families = [Normal, Poisson, Uniform]
+    population = create_initial_population(
+        size, row_limits, col_limits, families, weights
+    )
+    fitness = [trivial_fitness(ind.dataframe) for ind in population]
+
+    write_generation(population, fitness, gen=0, root="out", processes=4)
+    path = Path("out")
+
+    assert (path / "fitness.csv").exists()
+    fit = pd.read_csv(path / "fitness.csv")
+    assert list(fit.columns) == ["fitness", "generation", "individual"]
+    assert list(fit.dtypes) == [float, int, int]
+    assert list(fit["generation"].unique()) == [0]
+    assert list(fit["individual"]) == list(range(size))
+    assert np.allclose(fit["fitness"].values, fitness)
+
+    path /= "0"
+    for i, ind in enumerate(population):
+        ind_path = path / str(i)
+        assert (ind_path / "main.csv").exists()
+        assert (ind_path / "main.meta").exists()
+
+        df = pd.read_csv(ind_path / "main.csv")
+        with open(ind_path / "main.meta", "r") as meta_file:
+            meta = yaml.load(meta_file, Loader=yaml.FullLoader)
+
+        assert np.allclose(df.values, ind.dataframe.values)
+        assert meta == [m.to_dict() for m in ind.metadata]
+
+    os.system("rm -r out")

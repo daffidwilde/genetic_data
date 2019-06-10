@@ -39,21 +39,3 @@ def write_fitness(fitness, gen, root):
         with open(path / "fitness.csv", "a") as fit_file:
             for fit, gen, ind in zip(fitness, [gen] * size, range(size)):
                 fit_file.write(f"{fit},{gen},{ind}\n")
-
-
-def write_generation(population, pop_fitness, gen, root, processes=None):
-    """ Write all individuals in a generation and their collective fitnesses to
-    file at the generation's directory in `root`. """
-
-    tasks = (
-        *[
-            write_individual(individual, gen, i, root)
-            for i, individual in enumerate(population)
-        ],
-        write_fitness(pop_fitness, gen, root),
-    )
-
-    if processes is None:
-        dask.compute(*tasks, scheduler="single-threaded")
-    else:
-        dask.compute(*tasks, num_workers=processes)
