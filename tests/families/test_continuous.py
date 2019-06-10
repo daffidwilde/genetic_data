@@ -4,7 +4,7 @@ import numpy as np
 from hypothesis import given
 from hypothesis.strategies import floats, integers, tuples
 
-from edo.pdfs.continuous import Gamma, Normal, Uniform
+from edo.families import Gamma, Normal, Uniform
 
 LIMITS = (
     tuples(floats(min_value=0, max_value=10), floats(min_value=0, max_value=10))
