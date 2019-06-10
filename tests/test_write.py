@@ -58,3 +58,5 @@ def test_write_fitness(size):
     assert list(fit["individual"]) == list(range(size)) * 2
     assert np.allclose(fit["fitness"].values, fitness * 2)
 
+    os.system("rm -r out")
+

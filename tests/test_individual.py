@@ -1,6 +1,8 @@
 """ Tests for the creation of an individual. """
 
 import pandas as pd
+from hypothesis import given
+from hypothesis.strategies import text
 
 from edo.individual import Individual, create_individual
 from edo.families import Gamma, Normal, Poisson
@@ -11,6 +13,17 @@ from .util.parameters import (
     TUPLE_INDIVIDUAL,
     TUPLE_INTEGER_INDIVIDUAL,
 )
+
+
+@given(dataframe=text(), metadata=text())
+def test_repr(dataframe, metadata):
+    """ Test an individual has the correct representation. """
+
+    individual = Individual(dataframe, metadata)
+    assert (
+        repr(individual)
+        == f"Individual(dataframe={dataframe}, metadata={metadata})"
+    )
 
 
 @INTEGER_INDIVIDUAL

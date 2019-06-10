@@ -1,16 +1,40 @@
 """ A collection of objects related to the definition and creation of an
-individual in this GA. An individual is defined by a dataframe and its
+individual in this EA. An individual is defined by a dataframe and its
 associated metadata. This metadata is simply a list of the distributions from
 which each column of the dataframe was generated. These are reused during
 mutation and for filling in missing values during crossover. """
 
-from collections import namedtuple
-
 import numpy as np
 import pandas as pd
 
-Individual = namedtuple("Individual", ["dataframe", "metadata"])
 
+class Individual:
+    """ A class to represent an individual in the EA.
+
+    Parameters
+    ----------
+    dataframe : pd.DataFrame
+        The dataframe of the individual.
+    metadata : list
+        A list of distributions that are associated with the respective column
+        of `dataframe`.
+    """
+
+    def __init__(self, dataframe, metadata):
+
+        self.dataframe = dataframe
+        self.metadata = metadata
+
+    def __repr__(self):
+
+        return (
+            f"Individual(dataframe={self.dataframe}, metadata={self.metadata})"
+        )
+
+    def __iter__(self):
+
+        for _, val in vars(self).items():
+            yield val
 
 def _sample_ncols(col_limits):
     """ Sample a valid number of columns from the column limits, even if those
