@@ -126,19 +126,19 @@ class DataOptimiser:
 
         Parameters
         ----------
-        seed : int
-            The random seed for a particular run of the algorithm. If
-            :code:`None`, no seed is set.
-        processes : int
-            The number of processes to use in order to parallelise several
-            stages of the EA. Defaults to `None` where the algorithm is executed
-            serially.
         root : str
             The directory in which to write all generations to file. Defaults to
             `None` where nothing is written to file. Instead, everything is kept
             in memory and returned at the end. If writing to file, one
             generation is held in memory at a time and everything is returned in
             `dask` objects.
+        processes : int
+            The number of processes to use in order to parallelise several
+            stages of the EA. Defaults to `None` where the algorithm is executed
+            serially.
+        seed : int
+            The random seed for a particular run of the algorithm. If
+            :code:`None`, no seed is set.
         kwargs : dict
             Any additional parameters that need to be passed to the functions
             for fitness, stopping or dwindling should be placed here as a
@@ -188,8 +188,8 @@ class DataOptimiser:
         )
 
     def _get_next_generation(self, processes, kwargs):
-        """ Create the next population, update the family subtypes and get the
-        new population's fitness. """
+        """ Create the next population via selection, crossover and mutation,
+        update the family subtypes and get the new population's fitness. """
 
         parents = selection(
             self.population,
@@ -216,9 +216,10 @@ class DataOptimiser:
             self.population, self.fitness, processes, kwargs
         )
 
-        self.families = shrink(
-            parents, self.families, self.generation, self.shrinkage
-        )
+        if self.shrinkage is not None:
+            self.families = shrink(
+                parents, self.families, self.generation, self.shrinkage
+            )
 
     def _update_pop_history(self):
         """ Add the current generation to the history. """
