@@ -235,6 +235,50 @@ def test_initialise_run(
 
 
 @OPTIMISER
+def test_get_next_generation(
+    size,
+    row_limits,
+    col_limits,
+    families,
+    weights,
+    max_iter,
+    best_prop,
+    lucky_prop,
+    crossover_prob,
+    mutation_prob,
+    shrinkage,
+    maximise,
+):
+    """ Test that the EA can find the next generation. """
+
+    do = DataOptimiser(
+        trivial_fitness,
+        size,
+        row_limits,
+        col_limits,
+        families,
+        weights,
+        max_iter,
+        best_prop,
+        lucky_prop,
+        crossover_prob,
+        mutation_prob,
+        shrinkage,
+        maximise,
+    )
+
+    do._initialise_run(4, None)
+    do._get_next_generation(4, {})
+    assert isinstance(do.population, list)
+    assert len(do.population) == len(do.pop_fitness) == size
+
+    for individual, fitness in zip(do.population,
+        do.pop_fitness):
+        assert isinstance(individual, Individual)
+        assert isinstance(fitness, float)
+
+
+@OPTIMISER
 @settings(deadline=None, max_examples=10)
 def test_run_serial(
     size,
@@ -480,3 +524,4 @@ def test_run_on_disk_parallel(
                 assert pdf["name"] in [family.name for family in families]
 
     os.system("rm -r out")
+
