@@ -5,10 +5,10 @@ which each column of the dataframe was generated. These are reused during
 mutation and for filling in missing values during crossover. """
 
 from pathlib import Path
-import yaml
 
 import numpy as np
 import pandas as pd
+import yaml
 
 
 class Individual:
@@ -68,6 +68,7 @@ class Individual:
             yaml.dump(metadata, meta_file)
 
         return path
+
 
 def _sample_ncols(col_limits):
     """ Sample a valid number of columns from the column limits, even if those

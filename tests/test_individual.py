@@ -1,16 +1,16 @@
 """ Tests for the creation of an individual. """
 
 import os
-import yaml
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import yaml
 from hypothesis import given
 from hypothesis.strategies import text
 
-from edo.individual import Individual, create_individual
 from edo.families import Gamma, Normal, Poisson
+from edo.individual import Individual, create_individual
 
 from .util.parameters import (
     INTEGER_INDIVIDUAL,
@@ -165,8 +165,9 @@ def test_from_file(row_limits, col_limits, weights):
     path = Path("out/0/0")
     path.mkdir(exist_ok=True, parents=True)
     families = [Gamma, Normal, Poisson]
-    dataframe, metadata = create_individual(row_limits, col_limits, families,
-            weights)
+    dataframe, metadata = create_individual(
+        row_limits, col_limits, families, weights
+    )
 
     dataframe.to_csv(path / "main.csv", index=False)
     with open(path / "main.meta", "w") as meta_file:

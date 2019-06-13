@@ -179,7 +179,6 @@ def test_get_history(size, row_limits, col_limits, weights):
     os.system("rm -r out")
 
 
-
 @POPULATION
 @settings(max_examples=30)
 def test_write_generation_serial(size, row_limits, col_limits, weights):

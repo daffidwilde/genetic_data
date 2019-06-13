@@ -54,7 +54,11 @@ def write_fitness(fitness, generation, root):
 
     if generation == 0:
         pd.DataFrame(
-            {"fitness": fitness, "generation": generation, "individual": range(size)}
+            {
+                "fitness": fitness,
+                "generation": generation,
+                "individual": range(size),
+            }
         ).to_csv(path / "fitness.csv", index=False)
 
     else:

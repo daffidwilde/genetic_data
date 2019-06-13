@@ -1,8 +1,8 @@
 """ Tests for the shrinking of the search space. """
 
+from edo.families import Gamma, Normal, Poisson
 from edo.fitness import get_population_fitness
 from edo.operators import selection, shrink
-from edo.families import Gamma, Normal, Poisson
 from edo.population import create_initial_population
 
 from .util.parameters import SHRINK

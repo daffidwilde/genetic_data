@@ -18,11 +18,10 @@ from hypothesis.strategies import (
 
 import edo
 from edo import DataOptimiser
-from edo.individual import Individual
 from edo.families import all_families
+from edo.individual import Individual
 
 from .util.trivials import trivial_fitness
-
 
 LIMITS = (
     tuples(integers(1, 3), integers(1, 3))
@@ -34,7 +33,9 @@ OPTIMISER = given(
     size=integers(min_value=2, max_value=5),
     row_limits=LIMITS,
     col_limits=LIMITS,
-    families=lists(sampled_from(all_families), min_size=2, max_size=2, unique=True),
+    families=lists(
+        sampled_from(all_families), min_size=2, max_size=2, unique=True
+    ),
     weights=sampled_from(
         [
             dist
@@ -192,9 +193,20 @@ def test_dwindle(
 
 
 @OPTIMISER
-def test_initialise_run(size, row_limits, col_limits, families, weights,
-        max_iter, best_prop, lucky_prop, crossover_prob, mutation_prob,
-        shrinkage, maximise):
+def test_initialise_run(
+    size,
+    row_limits,
+    col_limits,
+    families,
+    weights,
+    max_iter,
+    best_prop,
+    lucky_prop,
+    crossover_prob,
+    mutation_prob,
+    shrinkage,
+    maximise,
+):
     """ Test that the EA can be initialised. """
 
     do = DataOptimiser(
@@ -468,4 +480,3 @@ def test_run_on_disk_parallel(
                 assert pdf["name"] in [family.name for family in families]
 
     os.system("rm -r out")
-

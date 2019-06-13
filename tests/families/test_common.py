@@ -117,7 +117,9 @@ def test_reset(family):
     assert family.subtypes == []
 
 
-@given(family=sampled_from(all_families), nrows=integers(min_value=0, max_value=99))
+@given(
+    family=sampled_from(all_families), nrows=integers(min_value=0, max_value=99)
+)
 def test_sample(family, nrows):
     """ Verify that distribution objects can sample correctly. """
 

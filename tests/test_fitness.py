@@ -1,7 +1,7 @@
 """ Tests for the calculating and writing of population fitness. """
 
-from pathlib import Path
 import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -9,9 +9,9 @@ from hypothesis import given, settings
 from hypothesis.strategies import integers
 
 import edo
+from edo.families import Normal, Poisson, Uniform
 from edo.fitness import get_fitness, get_population_fitness, write_fitness
 from edo.individual import create_individual
-from edo.families import Normal, Poisson, Uniform
 from edo.population import create_initial_population
 
 from .util.parameters import INTEGER_INDIVIDUAL, POP_FITNESS, POPULATION
