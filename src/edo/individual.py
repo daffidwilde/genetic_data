@@ -1,15 +1,73 @@
 """ A collection of objects related to the definition and creation of an
-individual in this GA. An individual is defined by a dataframe and its
+individual in this EA. An individual is defined by a dataframe and its
 associated metadata. This metadata is simply a list of the distributions from
 which each column of the dataframe was generated. These are reused during
 mutation and for filling in missing values during crossover. """
 
-from collections import namedtuple
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import yaml
 
-Individual = namedtuple("Individual", ["dataframe", "metadata"])
+
+class Individual:
+    """ A class to represent an individual in the EA.
+
+    Parameters
+    ----------
+    dataframe : pd.DataFrame
+        The dataframe of the individual.
+    metadata : list
+        A list of distributions that are associated with the respective column
+        of `dataframe`.
+    """
+
+    def __init__(self, dataframe, metadata):
+
+        self.dataframe = dataframe
+        self.metadata = metadata
+
+    def __repr__(self):
+
+        return (
+            f"Individual(dataframe={self.dataframe}, metadata={self.metadata})"
+        )
+
+    def __iter__(self):
+
+        for _, val in vars(self).items():
+            yield val
+
+    @classmethod
+    def from_file(cls, path):
+        """ Create an instance of `Individual` from files at `path`. """
+
+        dataframe = pd.read_csv(path / "main.csv")
+        with open(path / "main.meta", "r") as meta_file:
+            metadata = yaml.load(meta_file, Loader=yaml.FullLoader)
+
+        return Individual(dataframe, metadata)
+
+    def to_history(self):
+        """ Export a copy of itself fit for a population history, i.e. with
+        dictionary metadata as sampling is no longer required. """
+
+        meta_dicts = [pdf.to_dict() for pdf in self.metadata]
+        return Individual(self.dataframe, meta_dicts)
+
+    def to_file(self, generation, index, root):
+        """ Write self to file. """
+
+        path = Path(root) / str(generation) / str(index)
+        path.mkdir(exist_ok=True, parents=True)
+
+        dataframe, metadata = self.to_history()
+        dataframe.to_csv(path / "main.csv", index=False)
+        with open(path / "main.meta", "w") as meta_file:
+            yaml.dump(metadata, meta_file)
+
+        return path
 
 
 def _sample_ncols(col_limits):

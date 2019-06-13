@@ -11,11 +11,10 @@ import pandas as pd
 import yaml
 
 import edo
-from edo.fitness import get_population_fitness
+from edo.fitness import get_population_fitness, write_fitness
 from edo.individual import Individual
 from edo.operators import selection, shrink
 from edo.population import create_initial_population, create_new_population
-from edo.write import write_fitness, write_individual
 
 
 class DataOptimiser:
@@ -127,19 +126,19 @@ class DataOptimiser:
 
         Parameters
         ----------
-        seed : int
-            The random seed for a particular run of the algorithm. If
-            :code:`None`, no seed is set.
-        processes : int
-            The number of processes to use in order to parallelise several
-            stages of the EA. Defaults to `None` where the algorithm is executed
-            serially.
         root : str
             The directory in which to write all generations to file. Defaults to
             `None` where nothing is written to file. Instead, everything is kept
             in memory and returned at the end. If writing to file, one
             generation is held in memory at a time and everything is returned in
             `dask` objects.
+        processes : int
+            The number of processes to use in order to parallelise several
+            stages of the EA. Defaults to `None` where the algorithm is executed
+            serially.
+        seed : int
+            The random seed for a particular run of the algorithm. If
+            :code:`None`, no seed is set.
         kwargs : dict
             Any additional parameters that need to be passed to the functions
             for fitness, stopping or dwindling should be placed here as a
@@ -189,8 +188,8 @@ class DataOptimiser:
         )
 
     def _get_next_generation(self, processes, kwargs):
-        """ Create the next population, update the family subtypes and get the
-        new population's fitness. """
+        """ Create the next population via selection, crossover and mutation,
+        update the family subtypes and get the new population's fitness. """
 
         parents = selection(
             self.population,
@@ -217,19 +216,17 @@ class DataOptimiser:
             self.population, self.fitness, processes, kwargs
         )
 
-        self.families = shrink(
-            parents, self.families, self.generation, self.shrinkage
-        )
+        if self.shrinkage is not None:
+            self.families = shrink(
+                parents, self.families, self.generation, self.shrinkage
+            )
 
     def _update_pop_history(self):
         """ Add the current generation to the history. """
 
         population_with_dicts = []
         for individual in self.population:
-            meta_dicts = _get_metadata_dicts(individual)
-            population_with_dicts.append(
-                Individual(individual.dataframe, meta_dicts)
-            )
+            population_with_dicts.append(individual.to_history())
 
         if self.pop_history is None:
             self.pop_history = [population_with_dicts]
@@ -260,8 +257,8 @@ class DataOptimiser:
 
         tasks = (
             *[
-                write_individual(individual, self.generation, i, root)
-                for i, individual in enumerate(self.population)
+                individual.to_file(self.generation, idx, root)
+                for idx, individual in enumerate(self.population)
             ],
             write_fitness(self.pop_fitness, self.generation, root),
         )
@@ -323,10 +320,3 @@ def _get_fit_history(root):
     `dask.dataframe.core.DataFrame`. """
 
     return dd.read_csv(f"{root}/fitness.csv")
-
-
-def _get_metadata_dicts(individual):
-    """ Extract the dictionary form of  """
-
-    meta_dicts = [pdf.to_dict() for pdf in individual.metadata]
-    return meta_dicts
