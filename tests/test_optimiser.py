@@ -1,8 +1,8 @@
 """ Tests for the `DataOptimiser` class. """
 
-from pathlib import Path
 import itertools as it
 import os
+from pathlib import Path
 
 import dask.dataframe as dd
 import numpy as np
@@ -275,8 +275,7 @@ def test_get_next_generation(
     assert isinstance(do.population, list)
     assert len(do.population) == len(do.pop_fitness) == size
 
-    for individual, fitness in zip(do.population,
-        do.pop_fitness):
+    for individual, fitness in zip(do.population, do.pop_fitness):
         assert isinstance(individual, Individual)
         assert isinstance(fitness, float)
 
@@ -419,7 +418,9 @@ def test_update_subtypes(
     }
 
     do._update_subtypes(parents)
-    updated_subtypes = {sub for family in do.families for sub in family.subtypes}
+    updated_subtypes = {
+        sub for family in do.families for sub in family.subtypes
+    }
 
     assert parent_subtypes == updated_subtypes
 
@@ -439,7 +440,6 @@ def test_write_generation_serial(
     mutation_prob,
     shrinkage,
     maximise,
-
 ):
     """ Test that the DataOptimiser can write a generation and its fitness to
     file with a single core. """
@@ -901,4 +901,3 @@ def test_run_on_disk_parallel(
                 assert pdf["name"] in [family.name for family in families]
 
     os.system("rm -r out")
-
