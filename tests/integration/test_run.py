@@ -5,7 +5,7 @@ import os
 import dask.dataframe as dd
 import pandas as pd
 from hypothesis import given, settings
-from hypothesis.strategies import booleans
+from hypothesis.strategies import booleans, integers
 
 import edo
 from edo.individual import Individual
@@ -258,3 +258,30 @@ def test_run_algorithm_on_disk(
                 assert pdf["name"] in [family.name for family in families]
 
     os.system("rm -r out")
+
+
+@given(seed=integers(min_value=0, max_value=10000))
+@settings(deadline=None, max_examples=15)
+def test_run_algorithm_is_reproducible(seed):
+    """ Test that two runs of the algorithm with the same parameters produce the
+    same population and fitness histories. """
+
+    families = [Normal, Poisson, Uniform]
+
+    parameters = {
+        "fitness": lambda df: df.mean().mean(),
+        "size": 30,
+        "row_limits": [10, 30],
+        "col_limits": [2, 4],
+        "families": families,
+        "max_iter": 5,
+        "seed": seed,
+    }
+
+    first_pops, first_fits = edo.run_algorithm(**parameters)
+    second_pops, second_fits = edo.run_algorithm(**parameters)
+
+    assert first_fits.equals(second_fits)
+    for first_gen, second_gen in zip(first_pops, second_pops):
+        for first_ind, second_ind in zip(first_gen, second_gen):
+            assert first_ind.dataframe.equals(second_ind.dataframe)
