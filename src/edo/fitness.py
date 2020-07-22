@@ -21,9 +21,7 @@ def get_fitness(dataframe, fitness, **kwargs):
     return cache[key]
 
 
-def get_population_fitness(
-    population, fitness, processes=None, **kwargs
-):
+def get_population_fitness(population, fitness, processes=None, **kwargs):
     """ Return the fitness of each individual in the population. This can be
     done in parallel by specifying a number of cores to use for independent
     processes. """

@@ -271,7 +271,7 @@ def test_get_next_generation(
     )
 
     do._initialise_run(4)
-    do._get_next_generation(4) 
+    do._get_next_generation(4)
     assert isinstance(do.population, list)
     assert len(do.population) == len(do.pop_fitness) == size
 
@@ -805,8 +805,7 @@ def test_run_on_disk_serial(
         maximise,
     )
 
-    pop_history, fit_history = do.run(
-        root="out", seed=size)
+    pop_history, fit_history = do.run(root="out", seed=size)
 
     assert isinstance(fit_history, dd.DataFrame)
     assert list(fit_history.columns) == ["fitness", "generation", "individual"]
@@ -869,9 +868,7 @@ def test_run_on_disk_parallel(
         maximise,
     )
 
-    pop_history, fit_history = do.run(
-        root="out", processes=4, seed=size
-    )
+    pop_history, fit_history = do.run(root="out", processes=4, seed=size)
 
     assert isinstance(fit_history, dd.DataFrame)
     assert list(fit_history.columns) == ["fitness", "generation", "individual"]
@@ -936,7 +933,7 @@ def test_run_is_reproducible(
     )
 
     pop_history_one, fit_history_one = do_one.run(
-            processes=4, seed=size, arg=None
+        processes=4, seed=size, arg=None
     )
 
     do_two = DataOptimiser(
@@ -955,9 +952,7 @@ def test_run_is_reproducible(
         maximise,
     )
 
-    pop_history_two, fit_history_two = do_two.run(
-        processes=4, seed=size
-    )
+    pop_history_two, fit_history_two = do_two.run(processes=4, seed=size)
 
     assert fit_history_one.equals(fit_history_two)
 

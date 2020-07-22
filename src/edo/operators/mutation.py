@@ -147,8 +147,8 @@ def _remove_row(dataframe):
 
 def _add_col(dataframe, metadata, col_limits, families, weights):
     """ Add a new column to the end of the dataframe by sampling a distribution
-    from :code:`families` according to the column limits and distribution weights.
-    """
+    from :code:`families` according to the column limits and distribution
+    weights. """
 
     nrows, ncols = dataframe.shape
     if isinstance(col_limits[1], tuple):
