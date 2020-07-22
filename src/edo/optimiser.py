@@ -284,10 +284,12 @@ class DataOptimiser:
         """ Update the recorded subtypes for each pdf to be only those present
         in the parents. """
 
-        subtypes = defaultdict(set)
+        subtypes = defaultdict(list)
         for parent in parents:
             for column in parent.metadata:
-                subtypes[column.family].add(column.__class__)
+                column_subtype = column.__class__
+                if column_subtype not in subtypes[column.family]:
+                    subtypes[column.family].append(column_subtype)
 
         for pdf in self.families:
             pdf.subtypes = list(subtypes[pdf])
