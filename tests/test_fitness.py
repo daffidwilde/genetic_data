@@ -1,11 +1,17 @@
-""" Test(s) for the calculating of population fitness. """
+""" Tests for the calculating and writing of population fitness. """
 
-from hypothesis import settings
+import os
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from hypothesis import given, settings
+from hypothesis.strategies import integers
 
 import edo
-from edo.fitness import get_fitness, get_population_fitness
+from edo.families import Normal, Poisson, Uniform
+from edo.fitness import get_fitness, get_population_fitness, write_fitness
 from edo.individual import create_individual
-from edo.pdfs import Normal, Poisson, Uniform
 from edo.population import create_initial_population
 
 from .util.parameters import INTEGER_INDIVIDUAL, POP_FITNESS, POPULATION
@@ -96,3 +102,24 @@ def test_get_population_fitness_parallel(
         assert isinstance(fit, float)
 
     cache.clear()
+
+
+@given(size=integers(min_value=1, max_value=100))
+def test_write_fitness(size):
+    """ Test that a generation's fitness can be written to file correctly. """
+
+    fitness = [trivial_fitness(pd.DataFrame()) for _ in range(size)]
+
+    write_fitness(fitness, generation=0, root="out").compute()
+    write_fitness(fitness, generation=1, root="out").compute()
+    path = Path("out")
+    assert (path / "fitness.csv").exists()
+
+    fit = pd.read_csv(path / "fitness.csv")
+    assert list(fit.columns) == ["fitness", "generation", "individual"]
+    assert list(fit.dtypes) == [float, int, int]
+    assert list(fit["generation"].unique()) == [0, 1]
+    assert list(fit["individual"]) == list(range(size)) * 2
+    assert np.allclose(fit["fitness"].values, fitness * 2)
+
+    os.system("rm -r out")

@@ -1,4 +1,4 @@
-from .run import run_algorithm
+from .optimiser import DataOptimiser
 from .version import __version__
 
 cache = {}

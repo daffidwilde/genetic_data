@@ -6,8 +6,8 @@ import pytest
 from hypothesis import given, settings
 from hypothesis.strategies import integers
 
+from edo.families import Gamma, Normal, Poisson
 from edo.individual import Individual
-from edo.pdfs import Gamma, Normal, Poisson
 from edo.population import create_initial_population, create_new_population
 
 from .util.parameters import OFFSPRING, POPULATION

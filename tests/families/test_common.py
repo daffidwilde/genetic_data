@@ -4,12 +4,13 @@ import pytest
 from hypothesis import given
 from hypothesis.strategies import integers, sampled_from
 
-from edo.pdfs import Distribution, all_pdfs
+from edo.families import Distribution, all_families
 
 
 def test_distribution_init():
     """ Verify defaults of Distribution instance. """
 
+    Distribution.reset()
     dist = Distribution()
     assert dist.name == "Distribution"
     assert dist.subtype_id == 0
@@ -21,7 +22,7 @@ def test_distribution_init():
         dist.sample()
 
 
-@given(family=sampled_from(all_pdfs))
+@given(family=sampled_from(all_families))
 def test_init(family):
     """ Check defaults of distribution objects. """
 
@@ -38,7 +39,7 @@ def test_init(family):
             assert min(limits) <= value <= max(limits)
 
 
-@given(family=sampled_from(all_pdfs))
+@given(family=sampled_from(all_families))
 def test_repr(family):
     """ Assert that distribution objects have the correct string. """
 
@@ -46,7 +47,7 @@ def test_repr(family):
     assert str(pdf).startswith(pdf.name)
 
 
-@given(family=sampled_from(all_pdfs))
+@given(family=sampled_from(all_families))
 def test_build_subtype(family):
     """ Test that a distribution family can make a subtype (copy) of itself. """
 
@@ -68,7 +69,7 @@ def test_build_subtype(family):
     assert not isinstance(sub, family)
 
 
-@given(family=sampled_from(all_pdfs))
+@given(family=sampled_from(all_families))
 def test_make_instance(family):
     """ Test that distribution objects can make instances in its family
     correctly. """
@@ -87,7 +88,7 @@ def test_make_instance(family):
         assert isinstance(pdf, family.subtypes[1])
 
 
-@given(family=sampled_from(all_pdfs))
+@given(family=sampled_from(all_families))
 def test_max_subtypes(family):
     """ Test that distribution objects cannot make more subtypes than their
     prescribed maximum. """
@@ -105,7 +106,7 @@ def test_max_subtypes(family):
     assert isinstance(pdf, subtype)
 
 
-@given(family=sampled_from(all_pdfs))
+@given(family=sampled_from(all_families))
 def test_reset(family):
     """ Test that distribution classes can be reset. """
 
@@ -116,7 +117,9 @@ def test_reset(family):
     assert family.subtypes == []
 
 
-@given(family=sampled_from(all_pdfs), nrows=integers(min_value=0, max_value=99))
+@given(
+    family=sampled_from(all_families), nrows=integers(min_value=0, max_value=99)
+)
 def test_sample(family, nrows):
     """ Verify that distribution objects can sample correctly. """
 
@@ -126,7 +129,7 @@ def test_sample(family, nrows):
     assert sample.dtype == pdf.dtype
 
 
-@given(family=sampled_from(all_pdfs))
+@given(family=sampled_from(all_families))
 def test_to_dict(family):
     """ Verify that objects can pass their information to a dictionary of the
     correct form. """
@@ -140,7 +143,7 @@ def test_to_dict(family):
         assert pdf_dict[param] == vars(pdf)[param]
 
 
-@given(family=sampled_from(all_pdfs))
+@given(family=sampled_from(all_families))
 def test_set_param_limits(family):
     """ Check distribution classes can have their default parameter limits
     changed. """
