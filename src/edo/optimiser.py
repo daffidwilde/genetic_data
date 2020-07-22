@@ -69,6 +69,9 @@ class DataOptimiser:
     maximise : bool
         Determines whether :code:`fitness` is a function to be maximised or not.
         Fitness scores are minimised by default.
+    kwargs : dict
+        A dictionary of any keyword arguments to be shared amongst the `stop`
+        and `dwindle` methods as well as any for the fitness function.
     """
 
     def __init__(
@@ -121,7 +124,7 @@ class DataOptimiser:
         """ A placeholder for a function which can adjust (typically, reduce)
         the mutation probability over the run of the EA. """
 
-    def run(self, root=None, processes=None, seed=None, kwargs=None):
+    def run(self, root=None, processes=None, seed=None, **kwargs):
         """ Run the evolutionary algorithm under the given constraints.
 
         Parameters
@@ -156,13 +159,13 @@ class DataOptimiser:
         if seed is not None:
             np.random.seed(seed)
 
-        self._initialise_run(processes, kwargs)
+        self._initialise_run(processes, **kwargs)
         self._update_histories(root, processes)
         self.stop(**kwargs)
         while self.generation < self.max_iter and not self.converged:
 
             self.generation += 1
-            self._get_next_generation(processes, kwargs)
+            self._get_next_generation(processes, **kwargs)
             self._update_histories(root, processes)
             self.stop(**kwargs)
             self.dwindle(**kwargs)
@@ -173,7 +176,7 @@ class DataOptimiser:
 
         return self.pop_history, self.fit_history
 
-    def _initialise_run(self, processes, kwargs):
+    def _initialise_run(self, processes, **kwargs):
         """ Create the initial population and get its fitness. """
 
         self.population = create_initial_population(
@@ -184,10 +187,10 @@ class DataOptimiser:
             self.weights,
         )
         self.pop_fitness = get_population_fitness(
-            self.population, self.fitness, processes, kwargs
+            self.population, self.fitness, processes, **kwargs
         )
 
-    def _get_next_generation(self, processes, kwargs):
+    def _get_next_generation(self, processes, **kwargs):
         """ Create the next population via selection, crossover and mutation,
         update the family subtypes and get the new population's fitness. """
 
@@ -213,7 +216,7 @@ class DataOptimiser:
         )
 
         self.pop_fitness = get_population_fitness(
-            self.population, self.fitness, processes, kwargs
+            self.population, self.fitness, processes, **kwargs
         )
 
         if self.shrinkage is not None:

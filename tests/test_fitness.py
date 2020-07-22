@@ -49,7 +49,7 @@ def test_get_fitness_kwargs(row_limits, col_limits, weights):
     individual = create_individual(row_limits, col_limits, families, weights)
     dataframe = individual.dataframe
 
-    fit = get_fitness(dataframe, trivial_fitness, fitness_kwargs).compute()
+    fit = get_fitness(dataframe, trivial_fitness, **fitness_kwargs).compute()
     assert repr(dataframe) in cache
     assert isinstance(fit, float)
 

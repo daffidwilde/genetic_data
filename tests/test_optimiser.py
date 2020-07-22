@@ -228,7 +228,7 @@ def test_initialise_run(
         maximise,
     )
 
-    do._initialise_run(4, None)
+    do._initialise_run(4)
     assert isinstance(do.population, list)
     assert len(do.population) == len(do.pop_fitness) == size
 
@@ -270,8 +270,8 @@ def test_get_next_generation(
         maximise,
     )
 
-    do._initialise_run(4, None)
-    do._get_next_generation(4, {})
+    do._initialise_run(4)
+    do._get_next_generation(4) 
     assert isinstance(do.population, list)
     assert len(do.population) == len(do.pop_fitness) == size
 
@@ -313,7 +313,7 @@ def test_update_pop_history(
         maximise,
     )
 
-    do._initialise_run(4, None)
+    do._initialise_run(4)
     assert do.pop_history is None
 
     do._update_pop_history()
@@ -358,7 +358,7 @@ def test_update_fit_history(
         maximise,
     )
 
-    do._initialise_run(4, None)
+    do._initialise_run(4)
     assert do.fit_history is None
 
     do._update_fit_history()
@@ -411,7 +411,7 @@ def test_update_subtypes(
         maximise,
     )
 
-    do._initialise_run(4, None)
+    do._initialise_run(4)
     parents = do.population[: max(int(size / 5), 1)]
     parent_subtypes = {
         type(pdf) for parent in parents for pdf in parent.metadata
@@ -460,7 +460,7 @@ def test_write_generation_serial(
         maximise,
     )
 
-    do._initialise_run(4, None)
+    do._initialise_run(4)
     do._write_generation(root="out", processes=None)
     path = Path("out")
 
@@ -523,7 +523,7 @@ def test_write_generation_parallel(
         maximise,
     )
 
-    do._initialise_run(4, None)
+    do._initialise_run(4)
     do._write_generation(root="out", processes=None)
     path = Path("out")
 
@@ -585,7 +585,7 @@ def test_get_pop_history(
         maximise,
     )
 
-    do._initialise_run(4, None)
+    do._initialise_run(4)
     do._write_generation(root="out", processes=4)
 
     pop_history = _get_pop_history("out", 1)
@@ -642,7 +642,7 @@ def test_get_fit_history(
         maximise,
     )
 
-    do._initialise_run(4, None)
+    do._initialise_run(4)
     do._write_generation(root="out", processes=4)
 
     fit_history = _get_fit_history("out")
@@ -689,7 +689,7 @@ def test_run_serial(
         maximise,
     )
 
-    pop_history, fit_history = do.run(seed=size, kwargs={"arg": None})
+    pop_history, fit_history = do.run(seed=size)
 
     assert isinstance(fit_history, pd.DataFrame)
     assert all(fit_history.columns == ["fitness", "generation", "individual"])
@@ -747,9 +747,7 @@ def test_run_parallel(
         maximise,
     )
 
-    pop_history, fit_history = do.run(
-        processes=4, seed=size, kwargs={"arg": None}
-    )
+    pop_history, fit_history = do.run(processes=4, seed=size)
 
     assert isinstance(fit_history, pd.DataFrame)
     assert all(fit_history.columns == ["fitness", "generation", "individual"])
@@ -808,8 +806,7 @@ def test_run_on_disk_serial(
     )
 
     pop_history, fit_history = do.run(
-        root="out", seed=size, kwargs={"arg": None}
-    )
+        root="out", seed=size)
 
     assert isinstance(fit_history, dd.DataFrame)
     assert list(fit_history.columns) == ["fitness", "generation", "individual"]
@@ -873,7 +870,7 @@ def test_run_on_disk_parallel(
     )
 
     pop_history, fit_history = do.run(
-        root="out", processes=4, seed=size, kwargs={"arg": None}
+        root="out", processes=4, seed=size
     )
 
     assert isinstance(fit_history, dd.DataFrame)
@@ -939,7 +936,7 @@ def test_run_is_reproducible(
     )
 
     pop_history_one, fit_history_one = do_one.run(
-        processes=4, seed=size, kwargs={"arg": None}
+            processes=4, seed=size, arg=None
     )
 
     do_two = DataOptimiser(
@@ -959,7 +956,7 @@ def test_run_is_reproducible(
     )
 
     pop_history_two, fit_history_two = do_two.run(
-        processes=4, seed=size, kwargs={"arg": None}
+        processes=4, seed=size
     )
 
     assert fit_history_one.equals(fit_history_two)
