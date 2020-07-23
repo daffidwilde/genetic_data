@@ -1,4 +1,4 @@
-""" All currently implemented, discrete distribution classes. """
+""" All currently implemented discrete distribution classes. """
 
 import numpy as np
 
@@ -32,6 +32,10 @@ class Bernoulli(Distribution):
 
         self.prob = np.random.uniform(*self.param_limits["prob"])
 
+    def __repr__(self):
+
+        return f"Bernoulli(prob={round(self.prob, 2)})"
+
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the Bernoulli distribution
         with success probability :code:`prob`. """
@@ -64,6 +68,10 @@ class Poisson(Distribution):
     def __init__(self):
 
         self.lam = np.random.uniform(*self.param_limits["lam"])
+
+    def __repr__(self):
+
+        return f"Poisson(lam={round(self.lam, 2)})"
 
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the Poisson distribution

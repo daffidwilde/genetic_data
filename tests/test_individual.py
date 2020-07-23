@@ -9,7 +9,7 @@ import yaml
 from hypothesis import given
 from hypothesis.strategies import text
 
-from edo.families import Gamma, Normal, Poisson
+from edo.distributions import Gamma, Normal, Poisson
 from edo.individual import Individual, create_individual
 
 from .util.parameters import (
@@ -35,13 +35,15 @@ def test_repr(dataframe, metadata):
 def test_integer_limits(row_limits, col_limits, weights):
     """ Create an individual with all-integer column limits and verify that it
     is a namedtuple with a `pandas.DataFrame` field of a valid shape, and
-    metadata made up of instances from the classes in families. """
+    metadata made up of instances from the classes in distributions. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    for distribution in distributions:
+        distribution.reset()
 
-    individual = create_individual(row_limits, col_limits, families, weights)
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -50,9 +52,9 @@ def test_integer_limits(row_limits, col_limits, weights):
     assert len(metadata) == len(dataframe.columns)
 
     for pdf in metadata:
-        for family in families:
-            if pdf.name == family.name:
-                assert pdf.__class__ in family.subtypes
+        for distribution in distributions:
+            if pdf.name == distribution.name:
+                assert pdf.__class__ in distribution.subtypes
 
     for i, limits in enumerate([row_limits, col_limits]):
         assert limits[0] <= dataframe.shape[i] <= limits[1]
@@ -64,8 +66,10 @@ def test_integer_tuple_limits(row_limits, col_limits, weights):
     the columns. Verify the individual is valid and of a reasonable shape and
     does not exceed the upper bounds. """
 
-    families = [Gamma, Normal, Poisson]
-    individual = create_individual(row_limits, col_limits, families, weights)
+    distributions = [Gamma, Normal, Poisson]
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -74,15 +78,15 @@ def test_integer_tuple_limits(row_limits, col_limits, weights):
     assert len(metadata) == len(dataframe.columns)
 
     for pdf in metadata:
-        for family in families:
-            if pdf.name == family.name:
-                assert pdf.__class__ in family.subtypes
+        for distribution in distributions:
+            if pdf.name == distribution.name:
+                assert pdf.__class__ in distribution.subtypes
 
     assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
     assert col_limits[0] <= dataframe.shape[1] <= sum(col_limits[1])
 
-    for family, upper_limit in zip(families, col_limits[1]):
-        count = sum([pdf.name == family.name for pdf in metadata])
+    for distribution, upper_limit in zip(distributions, col_limits[1]):
+        count = sum([pdf.name == distribution.name for pdf in metadata])
         assert count <= upper_limit
 
 
@@ -92,8 +96,10 @@ def test_tuple_integer_limits(row_limits, col_limits, weights):
     the columns. Verify the individual is valid and of a reasonable shape and
     does not exceed the lower bounds. """
 
-    families = [Gamma, Normal, Poisson]
-    individual = create_individual(row_limits, col_limits, families, weights)
+    distributions = [Gamma, Normal, Poisson]
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -102,15 +108,15 @@ def test_tuple_integer_limits(row_limits, col_limits, weights):
     assert len(metadata) == len(dataframe.columns)
 
     for pdf in metadata:
-        for family in families:
-            if pdf.name == family.name:
-                assert pdf.__class__ in family.subtypes
+        for distribution in distributions:
+            if pdf.name == distribution.name:
+                assert pdf.__class__ in distribution.subtypes
 
     assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
     assert sum(col_limits[0]) <= dataframe.shape[1] <= col_limits[1]
 
-    for family, lower_limit in zip(families, col_limits[0]):
-        count = sum([pdf.name == family.name for pdf in metadata])
+    for distribution, lower_limit in zip(distributions, col_limits[0]):
+        count = sum([pdf.name == distribution.name for pdf in metadata])
         assert count >= lower_limit
 
 
@@ -120,8 +126,10 @@ def test_tuple_limits(row_limits, col_limits, weights):
     valid and of a reasonable shape and does not exceed either of the column
     bounds. """
 
-    families = [Gamma, Normal, Poisson]
-    individual = create_individual(row_limits, col_limits, families, weights)
+    distributions = [Gamma, Normal, Poisson]
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -130,15 +138,15 @@ def test_tuple_limits(row_limits, col_limits, weights):
     assert len(metadata) == len(dataframe.columns)
 
     for pdf in metadata:
-        for family in families:
-            if pdf.name == family.name:
-                assert pdf.__class__ in family.subtypes
+        for distribution in distributions:
+            if pdf.name == distribution.name:
+                assert pdf.__class__ in distribution.subtypes
 
     assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
     assert sum(col_limits[0]) <= dataframe.shape[1] <= sum(col_limits[1])
 
-    for i, family in enumerate(families):
-        count = sum([pdf.name == family.name for pdf in metadata])
+    for i, distribution in enumerate(distributions):
+        count = sum([pdf.name == distribution.name for pdf in metadata])
         assert col_limits[0][i] <= count <= col_limits[1][i]
 
 
@@ -147,8 +155,10 @@ def test_to_history(row_limits, col_limits, weights):
     """ Test that an individual can export themselves to a version fit for a
     population history. """
 
-    families = [Gamma, Normal, Poisson]
-    individual = create_individual(row_limits, col_limits, families, weights)
+    distributions = [Gamma, Normal, Poisson]
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
     history_individual = individual.to_history()
 
     assert isinstance(history_individual, Individual)
@@ -164,9 +174,9 @@ def test_from_file(row_limits, col_limits, weights):
 
     path = Path("out/0/0")
     path.mkdir(exist_ok=True, parents=True)
-    families = [Gamma, Normal, Poisson]
+    distributions = [Gamma, Normal, Poisson]
     dataframe, metadata = create_individual(
-        row_limits, col_limits, families, weights
+        row_limits, col_limits, distributions, weights
     )
 
     dataframe.to_csv(path / "main.csv", index=False)
@@ -184,8 +194,10 @@ def test_from_file(row_limits, col_limits, weights):
 def test_to_file(row_limits, col_limits, weights):
     """ Test that an individual can write themselves to file. """
 
-    families = [Gamma, Normal, Poisson]
-    individual = create_individual(row_limits, col_limits, families, weights)
+    distributions = [Gamma, Normal, Poisson]
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
     path = individual.to_file(0, 0, "out")
 
     assert (path / "main.csv").exists()

@@ -6,12 +6,12 @@ from hypothesis import assume, given, settings
 from hypothesis.strategies import integers
 
 import edo
-from edo.families import Uniform
-
+from edo.distributions import Uniform
 
 ##########
 # CIRCLE #
 ##########
+
 
 class RadiusUniform(Uniform):
     """ A Uniform child for capturing the radius of a point in the unit
@@ -48,16 +48,16 @@ def circle_fitness(df):
 
     return max(
         df[0].var() - (df[1] - 1).abs().max(),
-        df[1].var() - (df[0] - 1).abs().max()
+        df[1].var() - (df[0] - 1).abs().max(),
     )
 
 
 def split_dataframe(individual):
 
     df, metadata = individual
-    families = [m["name"] for m in metadata]
-    radii = df[families.index("RadiusUniform")]
-    angles = df[families.index("AngleUniform")]
+    distributions = [m["name"] for m in metadata]
+    radii = df[distributions.index("RadiusUniform")]
+    angles = df[distributions.index("AngleUniform")]
 
     return radii, angles
 
@@ -76,7 +76,7 @@ def run_circle_example():
             size=10,
             row_limits=[5, 10],
             col_limits=[(1, 1), (1, 1)],
-            families=[RadiusUniform, AngleUniform],
+            distributions=[RadiusUniform, AngleUniform],
             max_iter=3,
             best_prop=0.1,
             mutation_prob=0.01,

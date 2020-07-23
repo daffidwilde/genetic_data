@@ -20,7 +20,7 @@ from hypothesis.strategies import (
 
 import edo
 from edo import DataOptimiser
-from edo.families import all_families
+from edo.distributions import all_distributions
 from edo.individual import Individual
 from edo.optimiser import _get_fit_history, _get_pop_history
 
@@ -36,8 +36,8 @@ OPTIMISER = given(
     size=integers(min_value=2, max_value=5),
     row_limits=LIMITS,
     col_limits=LIMITS,
-    families=lists(
-        sampled_from(all_families), min_size=2, max_size=2, unique=True
+    distributions=lists(
+        sampled_from(all_distributions), min_size=2, max_size=2, unique=True
     ),
     weights=sampled_from(
         [
@@ -61,7 +61,7 @@ def test_init(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -78,7 +78,7 @@ def test_init(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -93,7 +93,7 @@ def test_init(
     assert do.size == size
     assert do.row_limits == row_limits
     assert do.col_limits == col_limits
-    assert do.families == families
+    assert do.distributions == distributions
     assert do.weights == weights
     assert do.max_iter == max_iter
     assert do.best_prop == best_prop
@@ -118,7 +118,7 @@ def test_stop(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -135,7 +135,7 @@ def test_stop(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -159,7 +159,7 @@ def test_dwindle(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -176,7 +176,7 @@ def test_dwindle(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -200,7 +200,7 @@ def test_initialise_run(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -217,7 +217,7 @@ def test_initialise_run(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -242,7 +242,7 @@ def test_get_next_generation(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -259,7 +259,7 @@ def test_get_next_generation(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -285,7 +285,7 @@ def test_update_pop_history(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -302,7 +302,7 @@ def test_update_pop_history(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -330,7 +330,7 @@ def test_update_fit_history(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -347,7 +347,7 @@ def test_update_fit_history(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -383,7 +383,7 @@ def test_update_subtypes(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -400,7 +400,7 @@ def test_update_subtypes(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -419,7 +419,9 @@ def test_update_subtypes(
 
     do._update_subtypes(parents)
     updated_subtypes = {
-        sub for family in do.families for sub in family.subtypes
+        sub
+        for distribution in do.distributions
+        for sub in distribution.subtypes
     }
 
     assert parent_subtypes == updated_subtypes
@@ -431,7 +433,7 @@ def test_write_generation_serial(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -449,7 +451,7 @@ def test_write_generation_serial(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -494,7 +496,7 @@ def test_write_generation_parallel(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -512,7 +514,7 @@ def test_write_generation_parallel(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -557,7 +559,7 @@ def test_get_pop_history(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -574,7 +576,7 @@ def test_get_pop_history(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -614,7 +616,7 @@ def test_get_fit_history(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -631,7 +633,7 @@ def test_get_fit_history(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -661,7 +663,7 @@ def test_run_serial(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -678,7 +680,7 @@ def test_run_serial(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -710,7 +712,9 @@ def test_run_serial(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert pdf["name"] in [family.name for family in families]
+                assert pdf["name"] in [
+                    distribution.name for distribution in distributions
+                ]
 
 
 @OPTIMISER
@@ -719,7 +723,7 @@ def test_run_parallel(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -736,7 +740,7 @@ def test_run_parallel(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -768,7 +772,9 @@ def test_run_parallel(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert pdf["name"] in [family.name for family in families]
+                assert pdf["name"] in [
+                    distribution.name for distribution in distributions
+                ]
 
 
 @OPTIMISER
@@ -777,7 +783,7 @@ def test_run_on_disk_serial(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -794,7 +800,7 @@ def test_run_on_disk_serial(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -829,7 +835,9 @@ def test_run_on_disk_serial(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert pdf["name"] in [family.name for family in families]
+                assert pdf["name"] in [
+                    distribution.name for distribution in distributions
+                ]
 
     os.system("rm -r out")
 
@@ -840,7 +848,7 @@ def test_run_on_disk_parallel(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -857,7 +865,7 @@ def test_run_on_disk_parallel(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -892,7 +900,9 @@ def test_run_on_disk_parallel(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert pdf["name"] in [family.name for family in families]
+                assert pdf["name"] in [
+                    distribution.name for distribution in distributions
+                ]
 
     os.system("rm -r out")
 
@@ -903,7 +913,7 @@ def test_run_is_reproducible(
     size,
     row_limits,
     col_limits,
-    families,
+    distributions,
     weights,
     max_iter,
     best_prop,
@@ -921,7 +931,7 @@ def test_run_is_reproducible(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,
@@ -941,7 +951,7 @@ def test_run_is_reproducible(
         size,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
         max_iter,
         best_prop,

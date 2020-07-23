@@ -3,7 +3,7 @@
 import pandas as pd
 from hypothesis import settings
 
-from edo.families import Gamma, Normal, Poisson
+from edo.distributions import Gamma, Normal, Poisson
 from edo.individual import Individual, create_individual
 from edo.operators import crossover
 
@@ -21,16 +21,16 @@ def test_integer_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual with all integer
     column limits. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    for distribution in distributions:
+        distribution.reset()
 
     parent1, parent2 = [
-        create_individual(row_limits, col_limits, families, weights)
+        create_individual(row_limits, col_limits, distributions, weights)
         for _ in [0, 1]
     ]
 
-    individual = crossover(parent1, parent2, col_limits, families, prob)
+    individual = crossover(parent1, parent2, col_limits, distributions, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -56,16 +56,16 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual where the lower and
     upper column limits are integer and tuple respectively. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    for distribution in distributions:
+        distribution.reset()
 
     parent1, parent2 = [
-        create_individual(row_limits, col_limits, families, weights)
+        create_individual(row_limits, col_limits, distributions, weights)
         for _ in [0, 1]
     ]
 
-    individual = crossover(parent1, parent2, col_limits, families, prob)
+    individual = crossover(parent1, parent2, col_limits, distributions, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -85,8 +85,8 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
             parent2.dataframe.shape[i],
         ]
 
-    for family, upper_limit in zip(families, col_limits[1]):
-        count = sum([pdf.name == family.name for pdf in metadata])
+    for distribution, upper_limit in zip(distributions, col_limits[1]):
+        count = sum([pdf.name == distribution.name for pdf in metadata])
         assert count <= upper_limit
 
 
@@ -95,16 +95,16 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual where the lower and
     upper column limits are tuple and integer respectively. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    for distribution in distributions:
+        distribution.reset()
 
     parent1, parent2 = [
-        create_individual(row_limits, col_limits, families, weights)
+        create_individual(row_limits, col_limits, distributions, weights)
         for _ in [0, 1]
     ]
 
-    individual = crossover(parent1, parent2, col_limits, families, prob)
+    individual = crossover(parent1, parent2, col_limits, distributions, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -124,8 +124,8 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
             parent2.dataframe.shape[i],
         ]
 
-    for family, lower_limit in zip(families, col_limits[0]):
-        count = sum([pdf.name == family.name for pdf in metadata])
+    for distribution, lower_limit in zip(distributions, col_limits[0]):
+        count = sum([pdf.name == distribution.name for pdf in metadata])
         assert count >= lower_limit
 
 
@@ -134,16 +134,16 @@ def test_tuple_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual with all tuple
     column limits. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    for distribution in distributions:
+        distribution.reset()
 
     parent1, parent2 = [
-        create_individual(row_limits, col_limits, families, weights)
+        create_individual(row_limits, col_limits, distributions, weights)
         for _ in [0, 1]
     ]
 
-    individual = crossover(parent1, parent2, col_limits, families, prob)
+    individual = crossover(parent1, parent2, col_limits, distributions, prob)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -163,6 +163,6 @@ def test_tuple_limits(row_limits, col_limits, weights, prob):
             parent2.dataframe.shape[i],
         ]
 
-    for i, family in enumerate(families):
-        count = sum([pdf.name == family.name for pdf in metadata])
+    for i, distribution in enumerate(distributions):
+        count = sum([pdf.name == distribution.name for pdf in metadata])
         assert col_limits[0][i] <= count <= col_limits[1][i]

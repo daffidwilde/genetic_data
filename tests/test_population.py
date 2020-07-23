@@ -6,7 +6,7 @@ import pytest
 from hypothesis import given, settings
 from hypothesis.strategies import integers
 
-from edo.families import Gamma, Normal, Poisson
+from edo.distributions import Gamma, Normal, Poisson
 from edo.individual import Individual
 from edo.population import create_initial_population, create_new_population
 
@@ -18,12 +18,12 @@ def test_create_initial_population(size, row_limits, col_limits, weights):
     """ Create an initial population of individuals and verify it is a list
     of the correct length with valid individuals. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    for distribution in distributions:
+        distribution.reset()
 
     population = create_initial_population(
-        size, row_limits, col_limits, families, weights
+        size, row_limits, col_limits, distributions, weights
     )
 
     assert isinstance(population, list)
@@ -38,7 +38,15 @@ def test_create_initial_population(size, row_limits, col_limits, weights):
         assert len(metadata) == len(dataframe.columns)
 
         for pdf in metadata:
-            assert sum([pdf.name == family.name for family in families]) == 1
+            assert (
+                sum(
+                    [
+                        pdf.name == distribution.name
+                        for distribution in distributions
+                    ]
+                )
+                == 1
+            )
 
         for i, limits in enumerate([row_limits, col_limits]):
             assert limits[0] <= dataframe.shape[i] <= limits[1]
@@ -68,12 +76,12 @@ def test_create_new_population(
     of offspring. Verify that each offspring is a valid individual and there are
     the correct number of them. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    for distribution in distributions:
+        distribution.reset()
 
     parents = create_initial_population(
-        max(int(size / 2), 2), row_limits, col_limits, families, weights
+        max(int(size / 2), 2), row_limits, col_limits, distributions, weights
     )
 
     population = create_new_population(
@@ -83,7 +91,7 @@ def test_create_new_population(
         mutation_prob,
         row_limits,
         col_limits,
-        families,
+        distributions,
         weights,
     )
 
@@ -109,7 +117,12 @@ def test_create_new_population(
         assert len(metadata) == len(dataframe.columns)
 
         for dtype, pdf in zip(dataframe.dtypes, metadata):
-            assert sum([pdf.name == family.name for family in families])
+            assert sum(
+                [
+                    pdf.name == distribution.name
+                    for distribution in distributions
+                ]
+            )
             assert dtype == pdf.dtype
 
         for i, limits in enumerate([row_limits, col_limits]):

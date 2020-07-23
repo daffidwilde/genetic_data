@@ -6,13 +6,12 @@ import pathlib
 from hypothesis import given
 from hypothesis.strategies import composite, sampled_from
 
-
 from edo import Family
-from edo.families import all_families
+from edo.distributions import all_distributions
 
 
 @composite
-def distributions(draw, pool=all_families):
+def distributions(draw, pool=all_distributions):
     """ Draw a distribution from the pool. """
 
     return draw(sampled_from(pool))

@@ -9,7 +9,7 @@ from hypothesis import given, settings
 from hypothesis.strategies import integers
 
 import edo
-from edo.families import Normal, Poisson, Uniform
+from edo.distributions import Normal, Poisson, Uniform
 from edo.fitness import get_fitness, get_population_fitness, write_fitness
 from edo.individual import create_individual
 from edo.population import create_initial_population
@@ -25,8 +25,10 @@ def test_get_fitness(row_limits, col_limits, weights):
 
     cache = edo.cache
 
-    families = [Normal, Poisson, Uniform]
-    individual = create_individual(row_limits, col_limits, families, weights)
+    distributions = [Normal, Poisson, Uniform]
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
     dataframe = individual.dataframe
 
     fit = get_fitness(dataframe, trivial_fitness).compute()
@@ -45,8 +47,10 @@ def test_get_fitness_kwargs(row_limits, col_limits, weights):
     cache = edo.cache
 
     fitness_kwargs = {"arg": None}
-    families = [Normal, Poisson, Uniform]
-    individual = create_individual(row_limits, col_limits, families, weights)
+    distributions = [Normal, Poisson, Uniform]
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
     dataframe = individual.dataframe
 
     fit = get_fitness(dataframe, trivial_fitness, **fitness_kwargs).compute()
@@ -65,9 +69,9 @@ def test_get_population_fitness_serial(size, row_limits, col_limits, weights):
 
     cache = edo.cache
 
-    families = [Normal, Poisson, Uniform]
+    distributions = [Normal, Poisson, Uniform]
     population = create_initial_population(
-        size, row_limits, col_limits, families, weights
+        size, row_limits, col_limits, distributions, weights
     )
 
     pop_fit = get_population_fitness(population, trivial_fitness)
@@ -90,9 +94,9 @@ def test_get_population_fitness_parallel(
 
     cache = edo.cache
 
-    families = [Normal, Poisson, Uniform]
+    distributions = [Normal, Poisson, Uniform]
     population = create_initial_population(
-        size, row_limits, col_limits, families, weights
+        size, row_limits, col_limits, distributions, weights
     )
 
     pop_fit = get_population_fitness(population, trivial_fitness, processes)

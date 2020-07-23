@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from edo.families import Gamma, Normal, Poisson
+from edo.distributions import Gamma, Normal, Poisson
 from edo.individual import Individual, create_individual
 from edo.operators import mutation
 
@@ -19,14 +19,16 @@ def test_integer_limits(row_limits, col_limits, weights, prob):
     """ Verify that `mutation` creates a valid individual with all integer
     column limits. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    for distribution in distributions:
+        distribution.reset()
 
-    individual = create_individual(row_limits, col_limits, families, weights)
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
 
     mutant = mutation(
-        individual, prob, row_limits, col_limits, families, weights
+        individual, prob, row_limits, col_limits, distributions, weights
     )
     dataframe, metadata = mutant
 
@@ -36,7 +38,15 @@ def test_integer_limits(row_limits, col_limits, weights, prob):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert sum([pdf.name == family.name for family in families]) == 1
+        assert (
+            sum(
+                [
+                    pdf.name == distribution.name
+                    for distribution in distributions
+                ]
+            )
+            == 1
+        )
 
     for i, limits in enumerate([row_limits, col_limits]):
         assert limits[0] <= dataframe.shape[i] <= limits[1]
@@ -47,14 +57,16 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
     """ Verify that `mutation` creates a valid individual where the lower and
     upper column limits are integer and tuple respectively. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    for distribution in distributions:
+        distribution.reset()
 
-    individual = create_individual(row_limits, col_limits, families, weights)
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
 
     mutant = mutation(
-        individual, prob, row_limits, col_limits, families, weights
+        individual, prob, row_limits, col_limits, distributions, weights
     )
     dataframe, metadata = mutant
 
@@ -64,17 +76,25 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert sum([pdf.name == family.name for family in families]) == 1
+        assert (
+            sum(
+                [
+                    pdf.name == distribution.name
+                    for distribution in distributions
+                ]
+            )
+            == 1
+        )
 
     assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
     assert col_limits[0] <= dataframe.shape[1] <= sum(col_limits[1])
 
-    family_counts = {
-        family: sum([pdf.name == family.name for pdf in metadata])
-        for family in families
+    distribution_counts = {
+        distribution: sum([pdf.name == distribution.name for pdf in metadata])
+        for distribution in distributions
     }
 
-    for i, count in enumerate(family_counts.values()):
+    for i, count in enumerate(distribution_counts.values()):
         assert count <= col_limits[1][i]
 
 
@@ -83,14 +103,16 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
     """ Verify that `mutation` creates a valid individual where the lower and
     upper column limits and tuple and integer respectively. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    for distribution in distributions:
+        distribution.reset()
 
-    individual = create_individual(row_limits, col_limits, families, weights)
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
 
     mutant = mutation(
-        individual, prob, row_limits, col_limits, families, weights
+        individual, prob, row_limits, col_limits, distributions, weights
     )
     dataframe, metadata = mutant
 
@@ -100,17 +122,25 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert sum([pdf.name == family.name for family in families]) == 1
+        assert (
+            sum(
+                [
+                    pdf.name == distribution.name
+                    for distribution in distributions
+                ]
+            )
+            == 1
+        )
 
     assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
     assert sum(col_limits[0]) <= dataframe.shape[1] <= col_limits[1]
 
-    family_counts = {
-        family: sum([pdf.name == family.name for pdf in metadata])
-        for family in families
+    distribution_counts = {
+        distribution: sum([pdf.name == distribution.name for pdf in metadata])
+        for distribution in distributions
     }
 
-    for i, count in enumerate(family_counts.values()):
+    for i, count in enumerate(distribution_counts.values()):
         assert count >= col_limits[0][i]
 
 
@@ -119,14 +149,16 @@ def test_tuple_limits(row_limits, col_limits, weights, prob):
     """ Verify that `mutation` creates a valid individual with all tuple column
     limits. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    for distribution in distributions:
+        distribution.reset()
 
-    individual = create_individual(row_limits, col_limits, families, weights)
+    individual = create_individual(
+        row_limits, col_limits, distributions, weights
+    )
 
     mutant = mutation(
-        individual, prob, row_limits, col_limits, families, weights
+        individual, prob, row_limits, col_limits, distributions, weights
     )
     dataframe, metadata = mutant
 
@@ -136,15 +168,17 @@ def test_tuple_limits(row_limits, col_limits, weights, prob):
     assert isinstance(dataframe, pd.DataFrame)
 
     for pdf in metadata:
-        assert sum([pdf.name == family.name for family in families])
+        assert sum(
+            [pdf.name == distribution.name for distribution in distributions]
+        )
 
     assert row_limits[0] <= dataframe.shape[0] <= row_limits[1]
     assert sum(col_limits[0]) <= dataframe.shape[1] <= sum(col_limits[1])
 
-    family_counts = {
-        family: sum([pdf.name == family.name for pdf in metadata])
-        for family in families
+    distribution_counts = {
+        distribution: sum([pdf.name == distribution.name for pdf in metadata])
+        for distribution in distributions
     }
 
-    for i, count in enumerate(family_counts.values()):
+    for i, count in enumerate(distribution_counts.values()):
         assert col_limits[0][i] <= count <= col_limits[1][i]
