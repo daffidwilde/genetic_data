@@ -101,8 +101,6 @@ def test_circle_example(repetitions):
 
     history = run_circle_example()
 
-    print("\n", history)
-
     try:
         expected = pd.read_csv("tests/circle.csv")
         assert np.allclose(history.values, expected.values, 1e-5)
