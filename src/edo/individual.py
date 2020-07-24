@@ -85,44 +85,44 @@ def _sample_ncols(col_limits):
     return np.random.randint(integer_limits[0], integer_limits[1] + 1)
 
 
-def _get_minimum_cols(nrows, col_limits, families, family_counts):
+def _get_minimum_columns(nrows, col_limits, families, family_counts):
     """ If :code:`col_limits` has a tuple lower limit then sample columns of the
     correct class from :code:`families` as needed to satisfy this bound. """
 
-    cols, metadata = [], []
+    columns, metadata = [], []
     for family, min_limit in zip(families, col_limits[0]):
         for _ in range(min_limit):
             meta = family.make_instance()
-            cols.append(meta.sample(nrows))
+            columns.append(meta.sample(nrows))
             metadata.append(meta)
             family_counts[family.name] += 1
 
-    return cols, metadata, family_counts
+    return columns, metadata, family_counts
 
 
-def _get_remaining_cols(
-    cols, metadata, nrows, ncols, col_limits, families, weights, family_counts
+def _get_remaining_columns(
+    columns, metadata, nrows, ncols, col_limits, families, weights, family_counts
 ):
     """ Sample all remaining columns for the current individual. If
     :code:`col_limits` has a tuple upper limit then sample all remaining
     columns for the individual without exceeding the bounds. """
 
-    while len(cols) < ncols:
+    while len(columns) < ncols:
         family = np.random.choice(families, p=weights)
         idx = families.index(family)
         try:
             if family_counts[family.name] < col_limits[1][idx]:
                 meta = family.make_instance()
-                cols.append(meta.sample(nrows))
+                columns.append(meta.sample(nrows))
                 metadata.append(meta)
                 family_counts[family.name] += 1
 
         except TypeError:
             meta = family.make_instance()
-            cols.append(meta.sample(nrows))
+            columns.append(meta.sample(nrows))
             metadata.append(meta)
 
-    return cols, metadata
+    return columns, metadata
 
 
 def create_individual(row_limits, col_limits, families, weights=None):
@@ -137,8 +137,8 @@ def create_individual(row_limits, col_limits, families, weights=None):
         Lower and upper bounds on the number of columns a dataset can have.
         Tuples can be used to indicate limits on the number of columns needed to
     families : list
-        A list of potential column pdf family classes to select from such as
-        those found in :code:`edo.pdfs`.
+        A list of `edo.Family` instances handling the column distributions that
+        can be selected from.
     weights : list
         A sequence of relative weights the same length as :code:`families`. This
         acts as a probability distribution from which to sample column classes.
@@ -149,15 +149,15 @@ def create_individual(row_limits, col_limits, families, weights=None):
     ncols = _sample_ncols(col_limits)
 
     cols, metadata = [], []
-    pdf_counts = {pdf_family.name: 0 for pdf_family in families}
+    family_counts = {family.name: 0 for family in families}
 
     if isinstance(col_limits[0], tuple):
-        cols, metadata, pdf_counts = _get_minimum_cols(
-            nrows, col_limits, families, pdf_counts
+        cols, metadata, pdf_counts = _get_minimum_columns(
+            nrows, col_limits, families, family_counts
         )
 
-    cols, metadata = _get_remaining_cols(
-        cols, metadata, nrows, ncols, col_limits, families, weights, pdf_counts
+    cols, metadata = _get_remaining_columns(
+        cols, metadata, nrows, ncols, col_limits, families, weights, family_counts
     )
 
     dataframe = pd.DataFrame({i: col for i, col in enumerate(cols)})
