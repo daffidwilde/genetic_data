@@ -1,14 +1,13 @@
-""" A collection of objects related to the definition and creation of an
-individual in this EA. An individual is defined by a dataframe and its
-associated metadata. This metadata is simply a list of the distributions from
-which each column of the dataframe was generated. These are reused during
-mutation and for filling in missing values during crossover. """
+""" A collection of objects to facilitate an individual representation. """
 
+import json
+import pickle
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import yaml
+
+from .family import Family
 
 
 class Individual:
@@ -40,21 +39,34 @@ class Individual:
             yield val
 
     @classmethod
-    def from_file(cls, path):
+    def from_file(cls, distributions, generation, index, root):
         """ Create an instance of `Individual` from files at `path`. """
 
+        path = Path(root) / str(generation) / str(index)
+        distributions = {dist.name: dist for dist in distributions}
+
         dataframe = pd.read_csv(path / "main.csv")
-        with open(path / "main.meta", "r") as meta_file:
-            metadata = yaml.load(meta_file, Loader=yaml.FullLoader)
+
+        with open(path / "main.meta", "r") as meta:
+            meta_dicts = json.load(meta)
+
+        root = path.parts[-3]
+        metadata = []
+        for meta in meta_dicts:
+            distribution = meta["name"]
+            family = globals().get(f"{distribution}Family", None)
+            if family is None:
+                distribution = distributions[distribution]
+                family = Family.load(distribution, root)
+
+            subtype_id = meta["subtype_id"]
+            subtype = family.subtypes[subtype_id]
+
+            pdf = subtype.__new__(subtype)
+            pdf.__dict__.update(meta["params"])
+            metadata.append(pdf)
 
         return Individual(dataframe, metadata)
-
-    def to_history(self):
-        """ Export a copy of itself fit for a population history, i.e. with
-        dictionary metadata as sampling is no longer required. """
-
-        meta_dicts = [pdf.to_dict() for pdf in self.metadata]
-        return Individual(self.dataframe, meta_dicts)
 
     def to_file(self, generation, index, root):
         """ Write self to file. """
@@ -62,10 +74,15 @@ class Individual:
         path = Path(root) / str(generation) / str(index)
         path.mkdir(exist_ok=True, parents=True)
 
-        dataframe, metadata = self.to_history()
-        dataframe.to_csv(path / "main.csv", index=False)
-        with open(path / "main.meta", "w") as meta_file:
-            yaml.dump(metadata, meta_file)
+        self.dataframe.to_csv(path / "main.csv", index=False)
+
+        meta_dicts = []
+        for pdf in self.metadata:
+            pdf.family.save(root)
+            meta_dicts.append(pdf.to_dict())
+
+        with open(path / "main.meta", "w") as meta:
+            json.dump(meta_dicts, meta)
 
         return path
 
