@@ -28,6 +28,7 @@ def test_init(distribution):
     assert family.name == distribution.name + "Family"
     assert family.subtype_id == 0
     assert family.subtypes == {}
+    assert family.all_subtypes == {}
 
 
 @given(distribution=distributions())
@@ -54,6 +55,7 @@ def test_add_subtype(distribution):
     assert subtype.__name__ == f"{distribution.name}Subtype"
     assert subtype.subtype_id == 0
     assert subtype.family is family
+    assert subtype is family.all_subtypes.get(0)
 
 
 @given(distribution=distributions())
@@ -68,6 +70,22 @@ def test_make_instance(distribution):
     assert isinstance(pdf, distribution)
     assert isinstance(pdf, family.subtypes[0])
     assert pdf.family is family
+
+
+@given(distribution=distributions())
+def test_keep_track_all_subtypes(distribution):
+    """ Test that a family can keep track of all of its subtypes. """
+
+    family = Family(distribution)
+    family.add_subtype()
+    family.add_subtype()
+
+    subtype0, subtype1 = family.subtypes.values()
+
+    family.subtypes.pop(0)
+
+    assert family.subtypes == {1: subtype1}
+    assert family.all_subtypes == {0: subtype0, 1: subtype1}
 
 
 @given(distribution=distributions())

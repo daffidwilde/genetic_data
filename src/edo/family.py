@@ -38,6 +38,7 @@ class Family:
         self.name = distribution.name + "Family"
         self.subtype_id = 0
         self.subtypes = {}
+        self.all_subtypes = {}
 
     def __repr__(self):
 
@@ -58,6 +59,7 @@ class Family:
         subtype.family = self
 
         self.subtypes[self.subtype_id] = subtype
+        self.all_subtypes[self.subtype_id] = subtype
         self.subtype_id += 1
 
     def make_instance(self):
@@ -82,7 +84,7 @@ class Family:
         path = pathlib.Path(f"{cache_dir}/subtypes/{self.distribution.name}")
         path.mkdir(exist_ok=True, parents=True)
 
-        for subtype_id, subtype in self.subtypes.items():
+        for subtype_id, subtype in self.all_subtypes.items():
 
             attributes = _get_attrs_for_subtype(subtype)
             with open(path / f"{subtype_id}.pkl", "wb") as sub:
@@ -94,6 +96,7 @@ class Family:
 
         self.subtype_id = 0
         self.subtypes.clear()
+        self.all_subtypes.clear()
 
         if cache_dir is not None:
             os.system(f"rm -r {cache_dir}/subtypes/{self.distribution.name}")
