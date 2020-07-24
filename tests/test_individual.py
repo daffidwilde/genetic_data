@@ -157,9 +157,10 @@ def test_tuple_limits(row_limits, col_limits, weights):
 
 
 @INTEGER_INDIVIDUAL
-def test_to_history(row_limits, col_limits, weights):
-    """ Test that an individual can export themselves to a version fit for a
-    population history. """
+def test_to_and_from_file(row_limits, col_limits, weights):
+    """ Test that an individual can be saved to and created from file. """
+
+    root = Path(".testcache")
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -167,60 +168,21 @@ def test_to_history(row_limits, col_limits, weights):
     individual = create_individual(
         row_limits, col_limits, families, weights
     )
-    history_individual = individual.to_history()
 
-    assert isinstance(history_individual, Individual)
-    assert history_individual.dataframe.equals(individual.dataframe)
+    individual.to_file(0, 0, root)
+    assert (root / "0/0/main.csv").exists()
+    assert (root / "0/0/main.meta").exists()
 
-    for i, pdf in enumerate(history_individual.metadata):
-        assert pdf == individual.metadata[i].to_dict()
+    saved_individual = Individual.from_file(distributions, 0, 0, root)
 
-
-@INTEGER_INDIVIDUAL
-def test_from_file(row_limits, col_limits, weights):
-    """ Test that an individual can be created from file. """
-
-    path = Path("out/0/0")
-    path.mkdir(exist_ok=True, parents=True)
-
-    distributions = [Gamma, Normal, Poisson]
-    families = [Family(distribution) for distribution in distributions]
-
-    dataframe, metadata = create_individual(
-        row_limits, col_limits, families, weights
+    assert np.allclose(
+        saved_individual.dataframe.values, individual.dataframe.values
     )
 
-    dataframe.to_csv(path / "main.csv", index=False)
-    with open(path / "main.meta", "w") as meta_file:
-        yaml.dump([m.to_dict() for m in metadata], meta_file)
+    for saved_pdf, pdf in zip(saved_individual.metadata, individual.metadata):
 
-    individual = Individual.from_file(path)
-    assert np.allclose(individual.dataframe.values, dataframe.values)
-    assert individual.metadata == [m.to_dict() for m in metadata]
+        assert saved_pdf.family.name == pdf.family.name
+        assert saved_pdf.family.distribution is pdf.family.distribution
+        assert saved_pdf.to_dict() == pdf.to_dict()
 
-    os.system("rm -r out")
-
-
-@INTEGER_INDIVIDUAL
-def test_to_file(row_limits, col_limits, weights):
-    """ Test that an individual can write themselves to file. """
-
-    distributions = [Gamma, Normal, Poisson]
-    families = [Family(distribution) for distribution in distributions]
-
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
-    path = individual.to_file(0, 0, "out")
-
-    assert (path / "main.csv").exists()
-    assert (path / "main.meta").exists()
-
-    dataframe = pd.read_csv(path / "main.csv")
-    with open(path / "main.meta", "r") as meta_file:
-        metadata = yaml.load(meta_file, Loader=yaml.FullLoader)
-
-    assert np.allclose(dataframe.values, individual.dataframe.values)
-    assert metadata == [m.to_dict() for m in individual.metadata]
-
-    os.system("rm -r out")
+    os.system("rm -r .testcache")
