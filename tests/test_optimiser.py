@@ -2,7 +2,6 @@
 
 import itertools as it
 import os
-from collections import defaultdict
 from pathlib import Path
 
 import dask.dataframe as dd
@@ -110,8 +109,8 @@ def test_init(
     assert do.generation == 0
     assert do.population is None
     assert do.pop_fitness is None
-    assert do.pop_history is None
-    assert do.fit_history is None
+    assert do.pop_history == []
+    assert do.fit_history.equals(pd.DataFrame())
 
     assert edo.cache == {}
 
@@ -327,15 +326,13 @@ def test_update_pop_history(
     )
 
     do._initialise_run(4)
-    assert do.pop_history is None
-
     do._update_pop_history()
     assert len(do.pop_history) == 1
     assert len(do.pop_history[0]) == size
     for i, individual in enumerate(do.population):
         hist_ind = do.pop_history[0][i]
         assert hist_ind.dataframe.equals(individual.dataframe)
-        assert hist_ind.metadata == individual.to_history().metadata
+        assert hist_ind.metadata == individual.metadata
 
 
 @OPTIMISER
@@ -374,8 +371,6 @@ def test_update_fit_history(
     )
 
     do._initialise_run(4)
-    assert do.fit_history is None
-
     do._update_fit_history()
     fit_history = do.fit_history
     assert fit_history.shape == (size, 3)
@@ -478,72 +473,7 @@ def test_write_generation_serial(
     )
 
     do._initialise_run(4)
-    do._write_generation(root=".testcache", processes=None)
-    path = Path(".testcache")
-
-    assert (path / "fitness.csv").exists()
-    fit = pd.read_csv(path / "fitness.csv")
-    assert list(fit.columns) == ["fitness", "generation", "individual"]
-    assert list(fit.dtypes) == [float, int, int]
-    assert list(fit["generation"].unique()) == [0]
-    assert list(fit["individual"]) == list(range(size))
-    assert np.allclose(fit["fitness"].values, do.pop_fitness)
-
-    path /= "0"
-    for i, ind in enumerate(do.population):
-        ind_path = path / str(i)
-        assert (ind_path / "main.csv").exists()
-        assert (ind_path / "main.meta").exists()
-
-        df = pd.read_csv(ind_path / "main.csv")
-        with open(ind_path / "main.meta", "r") as meta_file:
-            meta = yaml.load(meta_file, Loader=yaml.FullLoader)
-
-        assert np.allclose(df.values, ind.dataframe.values)
-        assert meta == [m.to_dict() for m in ind.metadata]
-
-    os.system("rm -r .testcache")
-
-
-@OPTIMISER
-@settings(max_examples=30)
-def test_write_generation_parallel(
-    size,
-    row_limits,
-    col_limits,
-    distributions,
-    weights,
-    max_iter,
-    best_prop,
-    lucky_prop,
-    crossover_prob,
-    mutation_prob,
-    shrinkage,
-    maximise,
-):
-    """ Test that the DataOptimiser can write a generation and its fitness to
-    file using multiple cores in parallel. """
-
-    families = [edo.Family(dist) for dist in distributions]
-
-    do = DataOptimiser(
-        trivial_fitness,
-        size,
-        row_limits,
-        col_limits,
-        families,
-        weights,
-        max_iter,
-        best_prop,
-        lucky_prop,
-        crossover_prob,
-        mutation_prob,
-        shrinkage,
-        maximise,
-    )
-
-    do._initialise_run(4)
-    do._write_generation(root=".testcache", processes=None)
+    do._write_generation(root=".testcache")
     path = Path(".testcache")
 
     assert (path / "fitness.csv").exists()
@@ -607,9 +537,9 @@ def test_get_pop_history(
     )
 
     do._initialise_run(4)
-    do._write_generation(root=".testcache", processes=4)
+    do._write_generation(root=".testcache")
 
-    pop_history = _get_pop_history(".testcache", 1)
+    pop_history = _get_pop_history(".testcache", 1, distributions)
     assert isinstance(pop_history, list)
     for generation in pop_history:
 
@@ -617,14 +547,23 @@ def test_get_pop_history(
         for i, individual in enumerate(generation):
 
             pop_ind = do.population[i]
+            assert isinstance(individual, Individual)
             assert isinstance(individual.dataframe, dd.DataFrame)
+            assert isinstance(individual.metadata, list)
+
             assert np.allclose(
                 pop_ind.dataframe.values, individual.dataframe.values.compute()
             )
-            assert isinstance(individual.metadata, list)
-            assert individual.metadata == [
-                m.to_dict() for m in pop_ind.metadata
-            ]
+
+            for ind_meta, pop_ind_meta in zip(
+                individual.metadata, pop_ind.metadata
+            ):
+                assert ind_meta.family.name == pop_ind_meta.family.name
+                assert (
+                    ind_meta.family.distribution
+                    is pop_ind_meta.family.distribution
+                )
+                assert ind_meta.to_dict() == pop_ind_meta.to_dict()
 
     os.system("rm -r .testcache")
 
@@ -666,7 +605,7 @@ def test_get_fit_history(
     )
 
     do._initialise_run(4)
-    do._write_generation(root=".testcache", processes=4)
+    do._write_generation(root=".testcache")
 
     fit_history = _get_fit_history(".testcache")
     assert isinstance(fit_history, dd.DataFrame)
@@ -735,9 +674,7 @@ def test_run_serial(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert pdf["name"] in [
-                    distribution.name for distribution in distributions
-                ]
+                assert sum(pdf.family is family for family in families) == 1
 
 
 @OPTIMISER
@@ -797,9 +734,7 @@ def test_run_parallel(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert pdf["name"] in [
-                    distribution.name for distribution in distributions
-                ]
+                assert sum(pdf.family is family for family in families)
 
 
 @OPTIMISER
@@ -838,7 +773,7 @@ def test_run_on_disk_serial(
         maximise,
     )
 
-    pop_history, fit_history = do.run(root=".testcache", seed=size)
+    pop_history, fit_history = do.run(root=".testcache_serial", seed=size)
 
     assert isinstance(fit_history, dd.DataFrame)
     assert list(fit_history.columns) == ["fitness", "generation", "individual"]
@@ -849,6 +784,8 @@ def test_run_on_disk_serial(
     assert list(fit_history["individual"].unique().compute()) == list(
         range(size)
     )
+
+    os.system("rm -r .testcache_serial")
 
     for generation in pop_history:
         assert len(generation) == size
@@ -862,11 +799,13 @@ def test_run_on_disk_serial(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert pdf["name"] in [
-                    distribution.name for distribution in distributions
-                ]
-
-    os.system("rm -r .testcache")
+                assert (
+                    sum(
+                        pdf.family.distribution is family.distribution
+                        for family in families
+                    )
+                    == 1
+                )
 
 
 @OPTIMISER
@@ -905,7 +844,9 @@ def test_run_on_disk_parallel(
         maximise,
     )
 
-    pop_history, fit_history = do.run(root=".testcache", processes=4, seed=size)
+    pop_history, fit_history = do.run(
+        root=".testcache_parallel", processes=4, seed=size
+    )
 
     assert isinstance(fit_history, dd.DataFrame)
     assert list(fit_history.columns) == ["fitness", "generation", "individual"]
@@ -916,6 +857,8 @@ def test_run_on_disk_parallel(
     assert list(fit_history["individual"].unique().compute()) == list(
         range(size)
     )
+
+    os.system("rm -r .testcache_parallel")
 
     for generation in pop_history:
         assert len(generation) == size
@@ -929,11 +872,13 @@ def test_run_on_disk_parallel(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert pdf["name"] in [
-                    distribution.name for distribution in distributions
-                ]
-
-    os.system("rm -r .testcache")
+                assert (
+                    sum(
+                        pdf.family.distribution is family.distribution
+                        for family in families
+                    )
+                    == 1
+                )
 
 
 @OPTIMISER
@@ -974,7 +919,7 @@ def test_run_is_reproducible(
     )
 
     pop_history_one, fit_history_one = do_one.run(
-        processes=4, seed=size, arg=None
+        processes=4, seed=size, kwargs={"arg": None}
     )
 
     families = [edo.Family(dist) for dist in distributions]

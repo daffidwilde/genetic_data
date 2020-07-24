@@ -57,6 +57,7 @@ class Family:
         subtype = type(subtype_name, (self.distribution,), attributes)
         subtype.subtype_id = self.subtype_id
         subtype.family = self
+        subtype.to_dict = _subtype_to_dict
 
         self.subtypes[self.subtype_id] = subtype
         self.all_subtypes[self.subtype_id] = subtype
@@ -131,5 +132,20 @@ def _get_attrs_for_subtype(obj):
         "__init__": obj.__init__,
         "__repr__": obj.__repr__,
     }
+
+    return attributes
+
+
+def _subtype_to_dict(self):
+    """ Convert an unpickleable subtype instance to a dictionary so it can be
+    recovered at a later date. """
+
+    attributes = {"name": self.name, "subtype_id": self.subtype_id}
+
+    params = {}
+    for param, val in vars(self).items():
+        params[param] = val
+
+    attributes["params"] = params
 
     return attributes

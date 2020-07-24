@@ -55,19 +55,6 @@ def test_sample(distribution, nrows):
 
 
 @given(distribution=sampled_from(all_distributions))
-def test_to_dict(distribution):
-    """ Verify that objects can pass their information to a dictionary of the
-    correct form. """
-
-    pdf = distribution()
-    pdf_dict = pdf.to_dict()
-    assert pdf_dict["name"] == pdf.name
-
-    for param in pdf.param_limits:
-        assert pdf_dict[param] == vars(pdf)[param]
-
-
-@given(distribution=sampled_from(all_distributions))
 def test_set_param_limits(distribution):
     """ Check distribution classes can have their default parameter limits
     changed. """

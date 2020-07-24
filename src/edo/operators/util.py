@@ -6,8 +6,6 @@ def get_family_counts(metadata, families):
     `families`. """
 
     return {
-        family: sum(
-            [pdf.family is family for pdf in metadata]
-        )
+        family: sum([pdf.family is family for pdf in metadata])
         for family in families
     }

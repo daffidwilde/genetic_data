@@ -69,7 +69,9 @@ def shrink(parents, families, itr, shrinkage):
 
     for family in families:
         for i, subtype in family.subtypes.items():
-            subtype = _adjust_subtype_param_limits(parents, subtype, itr, shrinkage)
+            subtype = _adjust_subtype_param_limits(
+                parents, subtype, itr, shrinkage
+            )
             family.subtypes[i] = subtype
 
     return families

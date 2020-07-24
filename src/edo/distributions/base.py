@@ -10,12 +10,3 @@ class Distribution(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def sample(self, nrows=None):
         """ A placeholder function for sampling from the distribution. """
-
-    def to_dict(self):
-        """ Returns a dictionary containing the name of distribution, and the
-        values of all its parameters. """
-
-        out = dict(vars(self))
-        out["name"] = self.name
-
-        return out

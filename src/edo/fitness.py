@@ -39,7 +39,6 @@ def get_population_fitness(population, fitness, processes=None, **kwargs):
     return list(out)
 
 
-@dask.delayed
 def write_fitness(fitness, generation, root):
     """ Write the generation fitness to file in the root directory. """
 

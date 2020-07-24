@@ -28,9 +28,7 @@ def test_get_fitness(row_limits, col_limits, weights):
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
     dataframe = individual.dataframe
 
     fit = get_fitness(dataframe, trivial_fitness).compute()
@@ -52,9 +50,7 @@ def test_get_fitness_kwargs(row_limits, col_limits, weights):
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
     dataframe = individual.dataframe
 
     fit = get_fitness(dataframe, trivial_fitness, **fitness_kwargs).compute()
@@ -123,8 +119,8 @@ def test_write_fitness(size):
     fitness = [trivial_fitness(pd.DataFrame()) for _ in range(size)]
     path = Path(".testcache")
 
-    write_fitness(fitness, generation=0, root=path).compute()
-    write_fitness(fitness, generation=1, root=path).compute()
+    write_fitness(fitness, generation=0, root=path)
+    write_fitness(fitness, generation=1, root=path)
     assert (path / "fitness.csv").exists()
 
     fit = pd.read_csv(path / "fitness.csv")

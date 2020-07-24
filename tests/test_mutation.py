@@ -35,9 +35,7 @@ def test_integer_limits(row_limits, col_limits, weights, prob):
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
 
     mutant = mutation(
         individual, prob, row_limits, col_limits, families, weights
@@ -57,9 +55,7 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
 
     mutant = mutation(
         individual, prob, row_limits, col_limits, families, weights
@@ -88,9 +84,7 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
 
     mutant = mutation(
         individual, prob, row_limits, col_limits, families, weights
@@ -119,9 +113,7 @@ def test_tuple_limits(row_limits, col_limits, weights, prob):
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
 
     mutant = mutation(
         individual, prob, row_limits, col_limits, families, weights

@@ -7,7 +7,9 @@ from .individual import create_individual
 from .operators import crossover, mutation
 
 
-def create_initial_population(size, row_limits, col_limits, families, weights=None):
+def create_initial_population(
+    size, row_limits, col_limits, families, weights=None
+):
     """ Create an initial population for the genetic algorithm based on the
     given parameters.
 
