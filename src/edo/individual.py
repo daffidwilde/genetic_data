@@ -1,7 +1,6 @@
 """ A collection of objects to facilitate an individual representation. """
 
 import json
-import pickle
 from pathlib import Path
 
 import numpy as np
@@ -39,25 +38,25 @@ class Individual:
             yield val
 
     @classmethod
-    def from_file(cls, distributions, generation, index, root):
+    def from_file(cls, path, distributions, cache_dir=".edocache", method=pd):
         """ Create an instance of `Individual` from files at `path`. """
 
-        path = Path(root) / str(generation) / str(index)
+        path = Path(path)
         distributions = {dist.name: dist for dist in distributions}
 
-        dataframe = pd.read_csv(path / "main.csv")
+        dataframe = method.read_csv(path / "main.csv")
+        dataframe.columns = map(int, dataframe.columns)
 
         with open(path / "main.meta", "r") as meta:
             meta_dicts = json.load(meta)
 
-        root = path.parts[-3]
         metadata = []
         for meta in meta_dicts:
             distribution = meta["name"]
             family = globals().get(f"{distribution}Family", None)
             if family is None:
                 distribution = distributions[distribution]
-                family = Family.load(distribution, root)
+                family = Family.load(distribution, cache_dir)
 
             subtype_id = meta["subtype_id"]
             subtype = family.subtypes[subtype_id]
@@ -68,17 +67,17 @@ class Individual:
 
         return Individual(dataframe, metadata)
 
-    def to_file(self, generation, index, root):
+    def to_file(self, path, cache_dir=".edocache"):
         """ Write self to file. """
 
-        path = Path(root) / str(generation) / str(index)
+        path = Path(path)
         path.mkdir(exist_ok=True, parents=True)
 
         self.dataframe.to_csv(path / "main.csv", index=False)
 
         meta_dicts = []
         for pdf in self.metadata:
-            pdf.family.save(root)
+            pdf.family.save(cache_dir)
             meta_dicts.append(pdf.to_dict())
 
         with open(path / "main.meta", "w") as meta:

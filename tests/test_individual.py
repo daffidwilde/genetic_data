@@ -160,7 +160,7 @@ def test_tuple_limits(row_limits, col_limits, weights):
 def test_to_and_from_file(row_limits, col_limits, weights):
     """ Test that an individual can be saved to and created from file. """
 
-    root = Path(".testcache")
+    path = Path(".testcache/individual")
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -169,11 +169,11 @@ def test_to_and_from_file(row_limits, col_limits, weights):
         row_limits, col_limits, families, weights
     )
 
-    individual.to_file(0, 0, root)
-    assert (root / "0/0/main.csv").exists()
-    assert (root / "0/0/main.meta").exists()
+    individual.to_file(path, ".testcache")
+    assert (path / "main.csv").exists()
+    assert (path / "main.meta").exists()
 
-    saved_individual = Individual.from_file(distributions, 0, 0, root)
+    saved_individual = Individual.from_file(path, distributions, ".testcache")
 
     assert np.allclose(
         saved_individual.dataframe.values, individual.dataframe.values
