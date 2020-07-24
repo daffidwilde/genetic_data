@@ -110,8 +110,8 @@ def test_init(
     assert do.generation == 0
     assert do.population is None
     assert do.pop_fitness is None
-    assert do.pop_history is None
-    assert do.fit_history is None
+    assert do.pop_history == []
+    assert do.fit_history.equals(pd.DataFrame())
 
     assert edo.cache == {}
 
@@ -327,15 +327,13 @@ def test_update_pop_history(
     )
 
     do._initialise_run(4)
-    assert do.pop_history is None
-
     do._update_pop_history()
     assert len(do.pop_history) == 1
     assert len(do.pop_history[0]) == size
     for i, individual in enumerate(do.population):
         hist_ind = do.pop_history[0][i]
         assert hist_ind.dataframe.equals(individual.dataframe)
-        assert hist_ind.metadata == individual.to_history().metadata
+        assert hist_ind.metadata == individual.metadata
 
 
 @OPTIMISER
@@ -374,8 +372,6 @@ def test_update_fit_history(
     )
 
     do._initialise_run(4)
-    assert do.fit_history is None
-
     do._update_fit_history()
     fit_history = do.fit_history
     assert fit_history.shape == (size, 3)
@@ -735,9 +731,7 @@ def test_run_serial(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert pdf["name"] in [
-                    distribution.name for distribution in distributions
-                ]
+                assert sum(pdf.family is family for family in families) == 1
 
 
 @OPTIMISER
@@ -797,9 +791,7 @@ def test_run_parallel(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert pdf["name"] in [
-                    distribution.name for distribution in distributions
-                ]
+                assert sum(pdf.family is family for family in families)
 
 
 @OPTIMISER

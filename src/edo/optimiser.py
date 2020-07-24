@@ -111,8 +111,8 @@ class DataOptimiser:
         self.generation = 0
         self.population = None
         self.pop_fitness = None
-        self.pop_history = None
-        self.fit_history = None
+        self.pop_history = []
+        self.fit_history = pd.DataFrame()
 
     def stop(self, **kwargs):
         """ A placeholder for a function which acts as a stopping condition on
@@ -225,14 +225,7 @@ class DataOptimiser:
     def _update_pop_history(self):
         """ Add the current generation to the history. """
 
-        population_with_dicts = []
-        for individual in self.population:
-            population_with_dicts.append(individual.to_history())
-
-        if self.pop_history is None:
-            self.pop_history = [population_with_dicts]
-        else:
-            self.pop_history.append(population_with_dicts)
+        self.pop_history.append(self.population)
 
     def _update_fit_history(self):
         """ Add the current generation's population fitness to the history. """
@@ -245,12 +238,9 @@ class DataOptimiser:
             }
         )
 
-        if self.fit_history is None:
-            self.fit_history = fitness_df
-        else:
-            self.fit_history = self.fit_history.append(
-                fitness_df, ignore_index=True
-            )
+        self.fit_history = self.fit_history.append(
+            fitness_df, ignore_index=True
+        )
 
     def _write_generation(self, root, processes):
         """ Write all individuals in a generation and their collective fitnesses
