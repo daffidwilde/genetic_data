@@ -35,6 +35,12 @@ class Gamma(Distribution):
         self.alpha = np.random.uniform(*self.param_limits["alpha"])
         self.theta = np.random.uniform(*self.param_limits["theta"])
 
+    def __repr__(self):
+
+        alpha = round(self.alpha, 2)
+        theta = round(self.theta, 2)
+        return f"Gamma(alpha={alpha}, theta={theta})"
+
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the gamma distribution with
         shape and scale parameters given by :code:`alpha` and :code:`theta`
@@ -55,7 +61,7 @@ class Normal(Distribution):
     param_limits : dict
         A dictionary of limits on the distribution parameters. Defaults to
         :code:`[-10, 10]` for :code:`mean` and :code:`[0, 10]` for :code:`std`.
-    mean : float
+    mean : float"
         The mean, sampled from :code:`param_limits["mean"]`. `Instance
         attribute.`
     std : float
@@ -72,6 +78,12 @@ class Normal(Distribution):
 
         self.mean = np.random.uniform(*self.param_limits["mean"])
         self.std = np.random.uniform(*self.param_limits["std"])
+
+    def __repr__(self):
+
+        mean = round(self.mean, 2)
+        std = round(self.std, 2)
+        return f"Normal(mean={mean}, std={std})"
 
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the normal distribution
@@ -93,10 +105,8 @@ class Uniform(Distribution):
     param_limits : dict
         A dictionary of limits on the distribution parameters. Defaults to
         :code:`[-10, 10]` for :code:`bounds`.
-    lower : float
-        The lower bound of the distribution.
-    upper : float
-        The upper bound of the distribution.
+    bounds : list of float
+        The lower and upper bounds of the distribution.
     """
 
     name = "Uniform"
@@ -106,9 +116,15 @@ class Uniform(Distribution):
 
     def __init__(self):
 
-        lower = np.random.uniform(*self.param_limits["bounds"])
-        upper = np.random.uniform(lower, max(self.param_limits["bounds"]))
-        self.bounds = [lower, upper]
+        self.bounds = sorted(
+            np.random.uniform(*self.param_limits["bounds"], size=2)
+        )
+
+    def __repr__(self):
+
+        lower = round(min(self.bounds), 2)
+        upper = round(max(self.bounds), 2)
+        return f"Uniform(bounds=[{lower}, {upper}])"
 
     def sample(self, nrows):
         """ Take a sample of size :code:`nrows` from the uniform distribution

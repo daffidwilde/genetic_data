@@ -6,26 +6,19 @@ from hypothesis import assume, given, settings
 from hypothesis.strategies import integers
 
 import edo
-from edo.families import Uniform
-
+from edo.distributions import Uniform
 
 ##########
 # CIRCLE #
 ##########
+
 
 class RadiusUniform(Uniform):
     """ A Uniform child for capturing the radius of a point in the unit
     circle. """
 
     name = "RadiusUniform"
-    dtype = "float"
-    param_limits = {}
-
-    def __init__(self):
-
-        lower = np.random.uniform(*self.param_limits["bounds"])
-        upper = np.random.uniform(lower, max(self.param_limits["bounds"]))
-        self.bounds = [lower, upper]
+    param_limits = {"bounds": [0, 1]}
 
 
 class AngleUniform(Uniform):
@@ -33,14 +26,7 @@ class AngleUniform(Uniform):
     circle. """
 
     name = "AngleUniform"
-    dtype = "float"
-    param_limits = {}
-
-    def __init__(self):
-
-        lower = np.random.uniform(*self.param_limits["bounds"])
-        upper = np.random.uniform(lower, max(self.param_limits["bounds"]))
-        self.bounds = [lower, upper]
+    param_limits = {"bounds": [-2 * np.pi, 2 * np.pi]}
 
 
 def circle_fitness(df):
@@ -48,18 +34,8 @@ def circle_fitness(df):
 
     return max(
         df[0].var() - (df[1] - 1).abs().max(),
-        df[1].var() - (df[0] - 1).abs().max()
+        df[1].var() - (df[0] - 1).abs().max(),
     )
-
-
-def split_dataframe(individual):
-
-    df, metadata = individual
-    families = [m["name"] for m in metadata]
-    radii = df[families.index("RadiusUniform")]
-    angles = df[families.index("AngleUniform")]
-
-    return radii, angles
 
 
 def run_circle_example():
@@ -68,15 +44,14 @@ def run_circle_example():
     fit_histories = []
     for seed in range(3):
 
-        RadiusUniform.param_limits["bounds"] = [0, 1]
-        AngleUniform.param_limits["bounds"] = [-2 * np.pi, 2 * np.pi]
+        families = [edo.Family(RadiusUniform), edo.Family(AngleUniform)]
 
         do = edo.DataOptimiser(
             fitness=circle_fitness,
             size=10,
             row_limits=[5, 10],
             col_limits=[(1, 1), (1, 1)],
-            families=[RadiusUniform, AngleUniform],
+            families=families,
             max_iter=3,
             best_prop=0.1,
             mutation_prob=0.01,

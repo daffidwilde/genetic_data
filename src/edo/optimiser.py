@@ -1,14 +1,11 @@
 """ .. The main script containing the evolutionary dataset algorithm. """
 
 from collections import defaultdict
-from glob import iglob
 from pathlib import Path
 
-import dask
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-import yaml
 
 import edo
 from edo.fitness import get_population_fitness, write_fitness
@@ -37,8 +34,8 @@ class DataOptimiser:
         Tuples can also be used to specify the min/maximum number of columns
         there can be of each type in :code:`families`.
     families : list
-        Used to create the initial population and instruct the EA how a column
-        should be manipulated in a dataset.
+        A list of `Family` instances that handle the distribution classes used
+        to populate the individuals in the EA.
 
         .. note::
             For reproducibility, a user-defined class' :code:`sample` method
@@ -69,9 +66,6 @@ class DataOptimiser:
     maximise : bool
         Determines whether :code:`fitness` is a function to be maximised or not.
         Fitness scores are minimised by default.
-    kwargs : dict
-        A dictionary of any keyword arguments to be shared amongst the `stop`
-        and `dwindle` methods as well as any for the fitness function.
     """
 
     def __init__(
@@ -92,8 +86,6 @@ class DataOptimiser:
     ):
 
         edo.cache.clear()
-        for family in families:
-            family.reset()
 
         self.fitness = fitness
         self.size = size
@@ -113,8 +105,8 @@ class DataOptimiser:
         self.generation = 0
         self.population = None
         self.pop_fitness = None
-        self.pop_history = None
-        self.fit_history = None
+        self.pop_history = []
+        self.fit_history = pd.DataFrame()
 
     def stop(self, **kwargs):
         """ A placeholder for a function which acts as a stopping condition on
@@ -124,25 +116,25 @@ class DataOptimiser:
         """ A placeholder for a function which can adjust (typically, reduce)
         the mutation probability over the run of the EA. """
 
-    def run(self, root=None, processes=None, seed=None, **kwargs):
+    def run(self, root=None, seed=None, processes=None, kwargs=None):
         """ Run the evolutionary algorithm under the given constraints.
 
         Parameters
         ----------
-        root : str
+        root : str, optional
             The directory in which to write all generations to file. Defaults to
             `None` where nothing is written to file. Instead, everything is kept
             in memory and returned at the end. If writing to file, one
             generation is held in memory at a time and everything is returned in
             `dask` objects.
-        processes : int
-            The number of processes to use in order to parallelise several
-            stages of the EA. Defaults to `None` where the algorithm is executed
-            serially.
-        seed : int
+        seed : int, optional
             The random seed for a particular run of the algorithm. If
             :code:`None`, no seed is set.
-        kwargs : dict
+        processes : int, optional
+            The number of parallel processes to use when calculating the
+            population fitness. If `None` then a single-thread scheduler is
+            used.
+        kwargs : dict, optional
             Any additional parameters that need to be passed to the functions
             for fitness, stopping or dwindling should be placed here as a
             dictionary or suitable mapping.
@@ -156,22 +148,28 @@ class DataOptimiser:
             Every individual's fitness in each generation.
         """
 
+        if kwargs is None:
+            kwargs = {}
+
         if seed is not None:
             np.random.seed(seed)
 
         self._initialise_run(processes, **kwargs)
-        self._update_histories(root, processes)
+        self._update_histories(root)
         self.stop(**kwargs)
         while self.generation < self.max_iter and not self.converged:
 
             self.generation += 1
             self._get_next_generation(processes, **kwargs)
-            self._update_histories(root, processes)
+            self._update_histories(root)
             self.stop(**kwargs)
             self.dwindle(**kwargs)
 
         if root is not None:
-            self.pop_history = _get_pop_history(root, self.generation)
+            distributions = [family.distribution for family in self.families]
+            self.pop_history = _get_pop_history(
+                root, self.generation, distributions
+            )
             self.fit_history = _get_fit_history(root)
 
         return self.pop_history, self.fit_history
@@ -227,14 +225,7 @@ class DataOptimiser:
     def _update_pop_history(self):
         """ Add the current generation to the history. """
 
-        population_with_dicts = []
-        for individual in self.population:
-            population_with_dicts.append(individual.to_history())
-
-        if self.pop_history is None:
-            self.pop_history = [population_with_dicts]
-        else:
-            self.pop_history.append(population_with_dicts)
+        self.pop_history.append(self.population)
 
     def _update_fit_history(self):
         """ Add the current generation's population fitness to the history. """
@@ -247,58 +238,58 @@ class DataOptimiser:
             }
         )
 
-        if self.fit_history is None:
-            self.fit_history = fitness_df
-        else:
-            self.fit_history = self.fit_history.append(
-                fitness_df, ignore_index=True
-            )
+        self.fit_history = self.fit_history.append(
+            fitness_df, ignore_index=True
+        )
 
-    def _write_generation(self, root, processes):
+    def _write_generation(self, root):
         """ Write all individuals in a generation and their collective fitnesses
         to file at the generation's directory in `root`. """
 
-        tasks = (
-            *[
-                individual.to_file(self.generation, idx, root)
-                for idx, individual in enumerate(self.population)
-            ],
-            write_fitness(self.pop_fitness, self.generation, root),
-        )
+        write_fitness(self.pop_fitness, self.generation, root)
+        for idx, individual in enumerate(self.population):
+            individual.to_file(f"{root}/{self.generation}/{idx}/", root)
 
-        if processes is None:
-            dask.compute(*tasks, scheduler="single-threaded")
-        else:
-            dask.compute(*tasks, num_workers=processes)
-
-    def _update_histories(self, root, processes):
+    def _update_histories(self, root):
         """ Update the population and fitness histories. """
 
         if root is None:
             self._update_pop_history()
             self._update_fit_history()
         else:
-            self._write_generation(root, processes)
+            self._write_generation(root)
+
+    def _get_current_subtypes(self, parents):
+        """ Get a dictionary mapping each family to all the subtype IDs that are
+        present in the parents. """
+
+        family_to_subtype_ids = defaultdict(list)
+        for parent in parents:
+            for pdf in parent.metadata:
+                family = pdf.family
+                subtype_id = pdf.subtype_id
+                record_subtypes = family_to_subtype_ids[family]
+                if subtype_id not in record_subtypes:
+                    family_to_subtype_ids[family].append(subtype_id)
+
+        return family_to_subtype_ids
 
     def _update_subtypes(self, parents):
-        """ Update the recorded subtypes for each pdf to be only those present
-        in the parents. """
+        """ Update the current subtypes for each family to be those present in
+        the parents. """
 
-        subtypes = defaultdict(list)
-        for parent in parents:
-            for column in parent.metadata:
-                column_subtype = column.__class__
-                if column_subtype not in subtypes[column.family]:
-                    subtypes[column.family].append(column_subtype)
-
-        for pdf in self.families:
-            pdf.subtypes = list(subtypes[pdf])
+        current_subtypes = self._get_current_subtypes(parents)
+        for family, current_ids in current_subtypes.items():
+            family.subtypes = {
+                subtype_id: family.all_subtypes[subtype_id]
+                for subtype_id in current_ids
+            }
 
 
-def _get_pop_history(root, generation):
+def _get_pop_history(root, generation, distributions):
     """ Read in the individuals from each generation. The dataset is given
-    as a `dask.dataframe.core.DataFrame` and the metadata as a list of
-    dictionaries. However, the individual is still an `Individual`. """
+    as a `dask.dataframe.core.DataFrame` but the metadata are recovered
+    instances of their original class subtypes. """
 
     pop_history = []
     for gen in range(generation):
@@ -306,14 +297,14 @@ def _get_pop_history(root, generation):
         population = []
         gen_path = Path(f"{root}/{gen}")
         for ind_dir in sorted(
-            iglob(f"{gen_path}/*"), key=lambda path: int(path.split("/")[-1])
+            gen_path.glob("*"), key=lambda path: int(path.stem)
         ):
-            ind_dir = Path(ind_dir)
-            dataframe = dd.read_csv(ind_dir / "main.csv")
-            with open(ind_dir / "main.meta", "r") as meta_file:
-                metadata = yaml.load(meta_file, Loader=yaml.FullLoader)
+            individual_dir = Path(ind_dir)
+            individual = Individual.from_file(
+                individual_dir, distributions, root, method=dd
+            )
 
-            population.append(Individual(dataframe, metadata))
+            population.append(individual)
 
         pop_history.append(population)
 

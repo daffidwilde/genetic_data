@@ -3,7 +3,8 @@
 import pandas as pd
 from hypothesis import settings
 
-from edo.families import Gamma, Normal, Poisson
+from edo import Family
+from edo.distributions import Gamma, Normal, Poisson
 from edo.individual import Individual, create_individual
 from edo.operators import crossover
 
@@ -21,9 +22,8 @@ def test_integer_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual with all integer
     column limits. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    families = [Family(distribution) for distribution in distributions]
 
     parent1, parent2 = [
         create_individual(row_limits, col_limits, families, weights)
@@ -56,9 +56,8 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual where the lower and
     upper column limits are integer and tuple respectively. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    families = [Family(distribution) for distribution in distributions]
 
     parent1, parent2 = [
         create_individual(row_limits, col_limits, families, weights)
@@ -86,7 +85,7 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
         ]
 
     for family, upper_limit in zip(families, col_limits[1]):
-        count = sum([pdf.name == family.name for pdf in metadata])
+        count = sum(pdf.family is family for pdf in metadata)
         assert count <= upper_limit
 
 
@@ -95,9 +94,8 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual where the lower and
     upper column limits are tuple and integer respectively. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    families = [Family(distribution) for distribution in distributions]
 
     parent1, parent2 = [
         create_individual(row_limits, col_limits, families, weights)
@@ -125,7 +123,7 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
         ]
 
     for family, lower_limit in zip(families, col_limits[0]):
-        count = sum([pdf.name == family.name for pdf in metadata])
+        count = sum(pdf.family is family for pdf in metadata)
         assert count >= lower_limit
 
 
@@ -134,9 +132,8 @@ def test_tuple_limits(row_limits, col_limits, weights, prob):
     """ Verify that `crossover` produces a valid individual with all tuple
     column limits. """
 
-    families = [Gamma, Normal, Poisson]
-    for family in families:
-        family.reset()
+    distributions = [Gamma, Normal, Poisson]
+    families = [Family(distribution) for distribution in distributions]
 
     parent1, parent2 = [
         create_individual(row_limits, col_limits, families, weights)
@@ -164,5 +161,5 @@ def test_tuple_limits(row_limits, col_limits, weights, prob):
         ]
 
     for i, family in enumerate(families):
-        count = sum([pdf.name == family.name for pdf in metadata])
+        count = sum(pdf.family is family for pdf in metadata)
         assert col_limits[0][i] <= count <= col_limits[1][i]

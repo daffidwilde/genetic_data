@@ -1,14 +1,12 @@
-""" A collection of objects related to the definition and creation of an
-individual in this EA. An individual is defined by a dataframe and its
-associated metadata. This metadata is simply a list of the distributions from
-which each column of the dataframe was generated. These are reused during
-mutation and for filling in missing values during crossover. """
+""" A collection of objects to facilitate an individual representation. """
 
+import json
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import yaml
+
+from .family import Family
 
 
 class Individual:
@@ -40,32 +38,50 @@ class Individual:
             yield val
 
     @classmethod
-    def from_file(cls, path):
+    def from_file(cls, path, distributions, cache_dir=".edocache", method=pd):
         """ Create an instance of `Individual` from files at `path`. """
 
-        dataframe = pd.read_csv(path / "main.csv")
-        with open(path / "main.meta", "r") as meta_file:
-            metadata = yaml.load(meta_file, Loader=yaml.FullLoader)
+        path = Path(path)
+        distributions = {dist.name: dist for dist in distributions}
+
+        dataframe = method.read_csv(path / "main.csv")
+        dataframe.columns = map(int, dataframe.columns)
+
+        with open(path / "main.meta", "r") as meta:
+            meta_dicts = json.load(meta)
+
+        metadata = []
+        for meta in meta_dicts:
+            distribution = meta["name"]
+            family = globals().get(f"{distribution}Family", None)
+            if family is None:
+                distribution = distributions[distribution]
+                family = Family.load(distribution, cache_dir)
+
+            subtype_id = meta["subtype_id"]
+            subtype = family.subtypes[subtype_id]
+
+            pdf = subtype.__new__(subtype)
+            pdf.__dict__.update(meta["params"])
+            metadata.append(pdf)
 
         return Individual(dataframe, metadata)
 
-    def to_history(self):
-        """ Export a copy of itself fit for a population history, i.e. with
-        dictionary metadata as sampling is no longer required. """
-
-        meta_dicts = [pdf.to_dict() for pdf in self.metadata]
-        return Individual(self.dataframe, meta_dicts)
-
-    def to_file(self, generation, index, root):
+    def to_file(self, path, cache_dir=".edocache"):
         """ Write self to file. """
 
-        path = Path(root) / str(generation) / str(index)
+        path = Path(path)
         path.mkdir(exist_ok=True, parents=True)
 
-        dataframe, metadata = self.to_history()
-        dataframe.to_csv(path / "main.csv", index=False)
-        with open(path / "main.meta", "w") as meta_file:
-            yaml.dump(metadata, meta_file)
+        self.dataframe.to_csv(path / "main.csv", index=False)
+
+        meta_dicts = []
+        for pdf in self.metadata:
+            pdf.family.save(cache_dir)
+            meta_dicts.append(pdf.to_dict())
+
+        with open(path / "main.meta", "w") as meta:
+            json.dump(meta_dicts, meta)
 
         return path
 
@@ -85,44 +101,51 @@ def _sample_ncols(col_limits):
     return np.random.randint(integer_limits[0], integer_limits[1] + 1)
 
 
-def _get_minimum_cols(nrows, col_limits, families, family_counts):
+def _get_minimum_columns(nrows, col_limits, families, family_counts):
     """ If :code:`col_limits` has a tuple lower limit then sample columns of the
     correct class from :code:`families` as needed to satisfy this bound. """
 
-    cols, metadata = [], []
+    columns, metadata = [], []
     for family, min_limit in zip(families, col_limits[0]):
         for _ in range(min_limit):
             meta = family.make_instance()
-            cols.append(meta.sample(nrows))
+            columns.append(meta.sample(nrows))
             metadata.append(meta)
             family_counts[family.name] += 1
 
-    return cols, metadata, family_counts
+    return columns, metadata, family_counts
 
 
-def _get_remaining_cols(
-    cols, metadata, nrows, ncols, col_limits, families, weights, family_counts
+def _get_remaining_columns(
+    columns,
+    metadata,
+    nrows,
+    ncols,
+    col_limits,
+    families,
+    weights,
+    family_counts,
 ):
     """ Sample all remaining columns for the current individual. If
     :code:`col_limits` has a tuple upper limit then sample all remaining
     columns for the individual without exceeding the bounds. """
 
-    while len(cols) < ncols:
+    while len(columns) < ncols:
         family = np.random.choice(families, p=weights)
         idx = families.index(family)
         try:
             if family_counts[family.name] < col_limits[1][idx]:
                 meta = family.make_instance()
-                cols.append(meta.sample(nrows))
+                columns.append(meta.sample(nrows))
                 metadata.append(meta)
                 family_counts[family.name] += 1
 
         except TypeError:
             meta = family.make_instance()
-            cols.append(meta.sample(nrows))
+            columns.append(meta.sample(nrows))
             metadata.append(meta)
 
-    return cols, metadata
+    return columns, metadata
 
 
 def create_individual(row_limits, col_limits, families, weights=None):
@@ -137,8 +160,8 @@ def create_individual(row_limits, col_limits, families, weights=None):
         Lower and upper bounds on the number of columns a dataset can have.
         Tuples can be used to indicate limits on the number of columns needed to
     families : list
-        A list of potential column pdf family classes to select from such as
-        those found in :code:`edo.pdfs`.
+        A list of `edo.Family` instances handling the column distributions that
+        can be selected from.
     weights : list
         A sequence of relative weights the same length as :code:`families`. This
         acts as a probability distribution from which to sample column classes.
@@ -149,15 +172,22 @@ def create_individual(row_limits, col_limits, families, weights=None):
     ncols = _sample_ncols(col_limits)
 
     cols, metadata = [], []
-    pdf_counts = {pdf_family.name: 0 for pdf_family in families}
+    family_counts = {family.name: 0 for family in families}
 
     if isinstance(col_limits[0], tuple):
-        cols, metadata, pdf_counts = _get_minimum_cols(
-            nrows, col_limits, families, pdf_counts
+        cols, metadata, pdf_counts = _get_minimum_columns(
+            nrows, col_limits, families, family_counts
         )
 
-    cols, metadata = _get_remaining_cols(
-        cols, metadata, nrows, ncols, col_limits, families, weights, pdf_counts
+    cols, metadata = _get_remaining_columns(
+        cols,
+        metadata,
+        nrows,
+        ncols,
+        col_limits,
+        families,
+        weights,
+        family_counts,
     )
 
     dataframe = pd.DataFrame({i: col for i, col in enumerate(cols)})

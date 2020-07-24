@@ -1,6 +1,6 @@
 *.aux
 *_build*
-.cache/
+*cache/
 *coverage*
 *.csv
 dask-worker-space
