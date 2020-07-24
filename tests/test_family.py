@@ -31,6 +31,16 @@ def test_init(distribution):
 
 
 @given(distribution=distributions())
+def test_repr(distribution):
+    """ Test that the string representation of a Family object is correct. """
+
+    family = Family(distribution)
+
+    assert repr(family).startswith(family.name)
+    assert str(family.subtype_id) in repr(family)
+
+
+@given(distribution=distributions())
 def test_add_subtype(distribution):
     """ Test that a new subtype can be created correctly. """
 

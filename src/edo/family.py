@@ -39,6 +39,10 @@ class Family:
         self.subtype_id = 0
         self.subtypes = {}
 
+    def __repr__(self):
+
+        return f"{self.name}(subtypes={self.subtype_id})"
+
     def add_subtype(self, subtype_name=None, attributes=None):
         """ Create a copy of the distribution class that is identical and
         independent of the original. """
