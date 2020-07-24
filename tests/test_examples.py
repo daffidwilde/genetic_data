@@ -18,14 +18,7 @@ class RadiusUniform(Uniform):
     circle. """
 
     name = "RadiusUniform"
-    dtype = "float"
-    param_limits = {}
-
-    def __init__(self):
-
-        lower = np.random.uniform(*self.param_limits["bounds"])
-        upper = np.random.uniform(lower, max(self.param_limits["bounds"]))
-        self.bounds = [lower, upper]
+    param_limits = {"bounds": [0, 1]}
 
 
 class AngleUniform(Uniform):
@@ -33,14 +26,7 @@ class AngleUniform(Uniform):
     circle. """
 
     name = "AngleUniform"
-    dtype = "float"
-    param_limits = {}
-
-    def __init__(self):
-
-        lower = np.random.uniform(*self.param_limits["bounds"])
-        upper = np.random.uniform(lower, max(self.param_limits["bounds"]))
-        self.bounds = [lower, upper]
+    param_limits = {"bounds": [-2 * np.pi, 2 * np.pi]}
 
 
 def circle_fitness(df):
@@ -52,24 +38,11 @@ def circle_fitness(df):
     )
 
 
-def split_dataframe(individual):
-
-    df, metadata = individual
-    distributions = [m["name"] for m in metadata]
-    radii = df[distributions.index("RadiusUniform")]
-    angles = df[distributions.index("AngleUniform")]
-
-    return radii, angles
-
-
 def run_circle_example():
     """ Run a smaller version of the circle example from the paper repo. """
 
     fit_histories = []
     for seed in range(3):
-
-        RadiusUniform.param_limits["bounds"] = [0, 1]
-        AngleUniform.param_limits["bounds"] = [-2 * np.pi, 2 * np.pi]
 
         do = edo.DataOptimiser(
             fitness=circle_fitness,
@@ -100,8 +73,6 @@ def test_circle_example(repetitions):
     `circle.csv` and run this test again. """
 
     history = run_circle_example()
-
-    print("\n", history)
 
     try:
         expected = pd.read_csv("tests/circle.csv")

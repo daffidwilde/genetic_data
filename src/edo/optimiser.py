@@ -37,8 +37,8 @@ class DataOptimiser:
         Tuples can also be used to specify the min/maximum number of columns
         there can be of each type in :code:`families`.
     families : list
-        Used to create the initial population and instruct the EA how a column
-        should be manipulated in a dataset.
+        A list of `Family` instances that handle the distribution classes used
+        to populate the individuals in the EA.
 
         .. note::
             For reproducibility, a user-defined class' :code:`sample` method
@@ -92,8 +92,6 @@ class DataOptimiser:
     ):
 
         edo.cache.clear()
-        for family in families:
-            family.reset()
 
         self.fitness = fitness
         self.size = size
@@ -280,19 +278,31 @@ class DataOptimiser:
         else:
             self._write_generation(root, processes)
 
-    def _update_subtypes(self, parents):
-        """ Update the recorded subtypes for each pdf to be only those present
-        in the parents. """
+    def _get_current_subtypes(self, parents):
+        """ Get a dictionary mapping each family to all the subtype IDs that are
+        present in the parents. """
 
-        subtypes = defaultdict(list)
+        family_to_subtype_ids = defaultdict(list)
         for parent in parents:
-            for column in parent.metadata:
-                column_subtype = column.__class__
-                if column_subtype not in subtypes[column.family]:
-                    subtypes[column.family].append(column_subtype)
+            for pdf in parent.metadata:
+                family = pdf.family
+                subtype_id = pdf.subtype_id
+                record_subtypes = family_to_subtype_ids[family]
+                if subtype_id not in record_subtypes:
+                    family_to_subtype_ids[family].append(subtype_id)
 
-        for pdf in self.families:
-            pdf.subtypes = list(subtypes[pdf])
+        return family_to_subtype_ids
+
+    def _update_subtypes(self, parents):
+        """ Update the current subtypes for each family to be those present in
+        the parents. """
+
+        current_subtypes = self._get_current_subtypes(parents)
+        for family, current_ids in current_subtypes.items():
+            family.subtypes = {
+                subtype_id: family.all_subtypes[subtype_id]
+                for subtype_id in current_ids
+            }
 
 
 def _get_pop_history(root, generation):

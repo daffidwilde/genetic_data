@@ -2,6 +2,7 @@
 
 import itertools as it
 import os
+from collections import defaultdict
 from pathlib import Path
 
 import dask.dataframe as dd
@@ -73,12 +74,14 @@ def test_init(
 ):
     """ Test that the `DataOptimiser` class can be instantiated correctly. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -93,7 +96,7 @@ def test_init(
     assert do.size == size
     assert do.row_limits == row_limits
     assert do.col_limits == col_limits
-    assert do.distributions == distributions
+    assert do.families == families
     assert do.weights == weights
     assert do.max_iter == max_iter
     assert do.best_prop == best_prop
@@ -130,12 +133,14 @@ def test_stop(
 ):
     """ Test that the default stopping method does nothing. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -171,12 +176,14 @@ def test_dwindle(
 ):
     """ Test that the default dwindling method does nothing. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -212,12 +219,14 @@ def test_initialise_run(
 ):
     """ Test that the EA can be initialised. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -254,12 +263,14 @@ def test_get_next_generation(
 ):
     """ Test that the EA can find the next generation. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -297,12 +308,14 @@ def test_update_pop_history(
 ):
     """ Test that the DataOptimiser can update its population history. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -342,12 +355,14 @@ def test_update_fit_history(
 ):
     """ Test that the DataOptimiser can update its fitness history. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -395,12 +410,14 @@ def test_update_subtypes(
 ):
     """ Test that the DataOptimiser can update the subtypes present. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -413,15 +430,11 @@ def test_update_subtypes(
 
     do._initialise_run(4)
     parents = do.population[: max(int(size / 5), 1)]
-    parent_subtypes = {
-        type(pdf) for parent in parents for pdf in parent.metadata
-    }
+    parent_subtypes = do._get_current_subtypes(parents)
 
     do._update_subtypes(parents)
     updated_subtypes = {
-        sub
-        for distribution in do.distributions
-        for sub in distribution.subtypes
+        family: list(family.subtypes.keys()) for family in parent_subtypes
     }
 
     assert parent_subtypes == updated_subtypes
@@ -446,12 +459,14 @@ def test_write_generation_serial(
     """ Test that the DataOptimiser can write a generation and its fitness to
     file with a single core. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -463,8 +478,8 @@ def test_write_generation_serial(
     )
 
     do._initialise_run(4)
-    do._write_generation(root="out", processes=None)
-    path = Path("out")
+    do._write_generation(root=".testcache", processes=None)
+    path = Path(".testcache")
 
     assert (path / "fitness.csv").exists()
     fit = pd.read_csv(path / "fitness.csv")
@@ -487,7 +502,7 @@ def test_write_generation_serial(
         assert np.allclose(df.values, ind.dataframe.values)
         assert meta == [m.to_dict() for m in ind.metadata]
 
-    os.system("rm -r out")
+    os.system("rm -r .testcache")
 
 
 @OPTIMISER
@@ -509,12 +524,14 @@ def test_write_generation_parallel(
     """ Test that the DataOptimiser can write a generation and its fitness to
     file using multiple cores in parallel. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -526,8 +543,8 @@ def test_write_generation_parallel(
     )
 
     do._initialise_run(4)
-    do._write_generation(root="out", processes=None)
-    path = Path("out")
+    do._write_generation(root=".testcache", processes=None)
+    path = Path(".testcache")
 
     assert (path / "fitness.csv").exists()
     fit = pd.read_csv(path / "fitness.csv")
@@ -550,7 +567,7 @@ def test_write_generation_parallel(
         assert np.allclose(df.values, ind.dataframe.values)
         assert meta == [m.to_dict() for m in ind.metadata]
 
-    os.system("rm -r out")
+    os.system("rm -r .testcache")
 
 
 @OPTIMISER
@@ -571,12 +588,14 @@ def test_get_pop_history(
 ):
     """ Test that the DataOptimiser can get the population history on disk. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -588,9 +607,9 @@ def test_get_pop_history(
     )
 
     do._initialise_run(4)
-    do._write_generation(root="out", processes=4)
+    do._write_generation(root=".testcache", processes=4)
 
-    pop_history = _get_pop_history("out", 1)
+    pop_history = _get_pop_history(".testcache", 1)
     assert isinstance(pop_history, list)
     for generation in pop_history:
 
@@ -607,7 +626,7 @@ def test_get_pop_history(
                 m.to_dict() for m in pop_ind.metadata
             ]
 
-    os.system("rm -r out")
+    os.system("rm -r .testcache")
 
 
 @OPTIMISER
@@ -628,12 +647,14 @@ def test_get_fit_history(
 ):
     """ Test that the DataOptimiser can get the fitness hsitory on disk. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -645,16 +666,16 @@ def test_get_fit_history(
     )
 
     do._initialise_run(4)
-    do._write_generation(root="out", processes=4)
+    do._write_generation(root=".testcache", processes=4)
 
-    fit_history = _get_fit_history("out")
+    fit_history = _get_fit_history(".testcache")
     assert isinstance(fit_history, dd.DataFrame)
     assert list(fit_history.columns) == ["fitness", "generation", "individual"]
     assert list(fit_history["fitness"].compute()) == do.pop_fitness
     assert list(fit_history["generation"].unique().compute()) == [0]
     assert list(fit_history["individual"].compute()) == list(range(size))
 
-    os.system("rm -r out")
+    os.system("rm -r .testcache")
 
 
 @OPTIMISER
@@ -675,12 +696,14 @@ def test_run_serial(
 ):
     """ Test that the EA can be run serially to produce valid histories. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -735,12 +758,14 @@ def test_run_parallel(
 ):
     """ Test that the EA can be run in parallel to produce valid histories. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -795,12 +820,14 @@ def test_run_on_disk_serial(
 ):
     """ Test that the EA can be run with histories on disk and serially. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -811,7 +838,7 @@ def test_run_on_disk_serial(
         maximise,
     )
 
-    pop_history, fit_history = do.run(root="out", seed=size)
+    pop_history, fit_history = do.run(root=".testcache", seed=size)
 
     assert isinstance(fit_history, dd.DataFrame)
     assert list(fit_history.columns) == ["fitness", "generation", "individual"]
@@ -839,7 +866,7 @@ def test_run_on_disk_serial(
                     distribution.name for distribution in distributions
                 ]
 
-    os.system("rm -r out")
+    os.system("rm -r .testcache")
 
 
 @OPTIMISER
@@ -860,12 +887,14 @@ def test_run_on_disk_parallel(
 ):
     """ Test that the EA can be run with histories on disk and in parallel. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -876,7 +905,7 @@ def test_run_on_disk_parallel(
         maximise,
     )
 
-    pop_history, fit_history = do.run(root="out", processes=4, seed=size)
+    pop_history, fit_history = do.run(root=".testcache", processes=4, seed=size)
 
     assert isinstance(fit_history, dd.DataFrame)
     assert list(fit_history.columns) == ["fitness", "generation", "individual"]
@@ -904,7 +933,7 @@ def test_run_on_disk_parallel(
                     distribution.name for distribution in distributions
                 ]
 
-    os.system("rm -r out")
+    os.system("rm -r .testcache")
 
 
 @OPTIMISER
@@ -926,12 +955,14 @@ def test_run_is_reproducible(
     """ Test that two runs of the EA with the same parameters produce the
     same population and fitness histories. """
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do_one = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
@@ -946,12 +977,14 @@ def test_run_is_reproducible(
         processes=4, seed=size, arg=None
     )
 
+    families = [edo.Family(dist) for dist in distributions]
+
     do_two = DataOptimiser(
         trivial_fitness,
         size,
         row_limits,
         col_limits,
-        distributions,
+        families,
         weights,
         max_iter,
         best_prop,
