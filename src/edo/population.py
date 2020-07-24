@@ -7,7 +7,7 @@ from .individual import create_individual
 from .operators import crossover, mutation
 
 
-def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
+def create_initial_population(size, row_limits, col_limits, families, weights=None):
     """ Create an initial population for the genetic algorithm based on the
     given parameters.
 
@@ -19,9 +19,9 @@ def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
         Limits on the number of rows a dataset can have.
     col_limits : list
         Limits on the number of columns a dataset can have.
-    pdfs : list
-        A list of potential column pdf classes such as those found in
-        `pdfs.py`. Must have a `.sample()` and `.mutate()` method.
+    families : list
+        A list of Family instances that handle the column distribution classes.
+        Each column distribution class must have a `.sample()` method.
     weights : list
         A sequence of relative weights the same length as `column_classes`. This
         acts as a loose probability distribution from which to sample column
@@ -39,7 +39,7 @@ def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
         )
 
     population = [
-        create_individual(row_limits, col_limits, pdfs, weights)
+        create_individual(row_limits, col_limits, families, weights)
         for _ in range(size)
     ]
 
@@ -53,7 +53,7 @@ def create_new_population(
     mutation_prob,
     row_limits,
     col_limits,
-    pdfs,
+    families,
     weights,
 ):
     """ Given a set of potential parents to be carried into the next generation,
@@ -66,9 +66,9 @@ def create_new_population(
     while len(population) < size:
         parent1_idx, parent2_idx = np.random.choice(len(parents), size=2)
         parents_ = parents[parent1_idx], parents[parent2_idx]
-        offspring = crossover(*parents_, col_limits, pdfs, crossover_prob)
+        offspring = crossover(*parents_, col_limits, families, crossover_prob)
         mutant = mutation(
-            offspring, mutation_prob, row_limits, col_limits, pdfs, weights
+            offspring, mutation_prob, row_limits, col_limits, families, weights
         )
         for col, meta in zip(*mutant):
             mutant.dataframe[col] = mutant.dataframe[col].astype(meta.dtype)

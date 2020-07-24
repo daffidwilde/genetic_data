@@ -31,7 +31,7 @@ def _cross_minimum_columns(parent_cols, parent_meta, col_limits, families):
         family_instances = [
             (col, pdf)
             for col, pdf in zip(parent_cols, parent_meta)
-            if pdf.name == family.name
+            if pdf.family is family
         ]
 
         for _ in range(limit):
