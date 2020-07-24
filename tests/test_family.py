@@ -53,6 +53,7 @@ def test_add_subtype(distribution):
     assert issubclass(subtype, distribution)
     assert subtype.__name__ == f"{distribution.name}Subtype"
     assert subtype.subtype_id == 0
+    assert subtype.family is family
 
 
 @given(distribution=distributions())
@@ -66,6 +67,7 @@ def test_make_instance(distribution):
     assert family.subtypes == {0: pdf.__class__}
     assert isinstance(pdf, distribution)
     assert isinstance(pdf, family.subtypes[0])
+    assert pdf.family is family
 
 
 @given(distribution=distributions())
@@ -128,6 +130,9 @@ def test_load(distribution):
     assert pickled_subtype.__name__ == subtype.__name__
     assert pickled_subtype.name == subtype.name
     assert pickled_subtype.dtype == subtype.dtype
+    assert pickled_subtype.subtype_id == 0
+    assert pickled_subtype.family is pickled
+
     assert pickled_subtype.hard_limits == subtype.hard_limits
     assert pickled_subtype.param_limits == subtype.param_limits
     assert pickled_subtype.__init__ is subtype.__init__

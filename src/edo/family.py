@@ -55,6 +55,7 @@ class Family:
 
         subtype = type(subtype_name, (self.distribution,), attributes)
         subtype.subtype_id = self.subtype_id
+        subtype.family = self
 
         self.subtypes[self.subtype_id] = subtype
         self.subtype_id += 1
