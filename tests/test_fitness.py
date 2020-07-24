@@ -123,8 +123,8 @@ def test_write_fitness(size):
     fitness = [trivial_fitness(pd.DataFrame()) for _ in range(size)]
     path = Path(".testcache")
 
-    write_fitness(fitness, generation=0, root=path).compute()
-    write_fitness(fitness, generation=1, root=path).compute()
+    write_fitness(fitness, generation=0, root=path)
+    write_fitness(fitness, generation=1, root=path)
     assert (path / "fitness.csv").exists()
 
     fit = pd.read_csv(path / "fitness.csv")
