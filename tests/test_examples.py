@@ -44,12 +44,14 @@ def run_circle_example():
     fit_histories = []
     for seed in range(3):
 
+        families = [edo.Family(RadiusUniform), edo.Family(AngleUniform)]
+
         do = edo.DataOptimiser(
             fitness=circle_fitness,
             size=10,
             row_limits=[5, 10],
             col_limits=[(1, 1), (1, 1)],
-            distributions=[RadiusUniform, AngleUniform],
+            families=families,
             max_iter=3,
             best_prop=0.1,
             mutation_prob=0.01,
