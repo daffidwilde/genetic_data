@@ -37,6 +37,8 @@ def test_repr(distribution):
 
     pdf = distribution()
     assert str(pdf).startswith(pdf.name)
+    for name in vars(pdf):
+        assert name in str(pdf)
 
 
 @given(
@@ -60,7 +62,6 @@ def test_to_dict(distribution):
     pdf = distribution()
     pdf_dict = pdf.to_dict()
     assert pdf_dict["name"] == pdf.name
-    assert pdf_dict["subtype_id"] == pdf.subtype_id
 
     for param in pdf.param_limits:
         assert pdf_dict[param] == vars(pdf)[param]

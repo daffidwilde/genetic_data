@@ -17,6 +17,5 @@ class Distribution(metaclass=abc.ABCMeta):
 
         out = dict(vars(self))
         out["name"] = self.name
-        out["subtype_id"] = self.subtype_id
 
         return out
