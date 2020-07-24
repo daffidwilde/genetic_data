@@ -28,9 +28,7 @@ def test_get_fitness(row_limits, col_limits, weights):
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
     dataframe = individual.dataframe
 
     fit = get_fitness(dataframe, trivial_fitness).compute()
@@ -52,9 +50,7 @@ def test_get_fitness_kwargs(row_limits, col_limits, weights):
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
     dataframe = individual.dataframe
 
     fit = get_fitness(dataframe, trivial_fitness, **fitness_kwargs).compute()

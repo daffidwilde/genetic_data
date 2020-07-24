@@ -34,4 +34,7 @@ def test_shrink(
     families = shrink(parents, families, itr, compact_ratio)
 
     for family in families:
-        assert family.distribution.param_limits.keys() == vars(family.make_instance()).keys()
+        assert (
+            family.distribution.param_limits.keys()
+            == vars(family.make_instance()).keys()
+        )

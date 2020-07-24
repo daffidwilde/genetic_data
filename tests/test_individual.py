@@ -5,7 +5,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import yaml
 from hypothesis import given
 from hypothesis.strategies import text
 
@@ -41,9 +40,7 @@ def test_integer_limits(row_limits, col_limits, weights):
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -69,9 +66,7 @@ def test_integer_tuple_limits(row_limits, col_limits, weights):
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -101,9 +96,7 @@ def test_tuple_integer_limits(row_limits, col_limits, weights):
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -133,9 +126,7 @@ def test_tuple_limits(row_limits, col_limits, weights):
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
     dataframe, metadata = individual
 
     assert isinstance(individual, Individual)
@@ -165,9 +156,7 @@ def test_to_and_from_file(row_limits, col_limits, weights):
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
 
-    individual = create_individual(
-        row_limits, col_limits, families, weights
-    )
+    individual = create_individual(row_limits, col_limits, families, weights)
 
     individual.to_file(path, ".testcache")
     assert (path / "main.csv").exists()

@@ -555,9 +555,14 @@ def test_get_pop_history(
                 pop_ind.dataframe.values, individual.dataframe.values.compute()
             )
 
-            for ind_meta, pop_ind_meta in zip(individual.metadata, pop_ind.metadata):
+            for ind_meta, pop_ind_meta in zip(
+                individual.metadata, pop_ind.metadata
+            ):
                 assert ind_meta.family.name == pop_ind_meta.family.name
-                assert ind_meta.family.distribution is pop_ind_meta.family.distribution
+                assert (
+                    ind_meta.family.distribution
+                    is pop_ind_meta.family.distribution
+                )
                 assert ind_meta.to_dict() == pop_ind_meta.to_dict()
 
     os.system("rm -r .testcache")
@@ -794,10 +799,13 @@ def test_run_on_disk_serial(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert sum(
-                    pdf.family.distribution is family.distribution
-                    for family in families
-                ) == 1
+                assert (
+                    sum(
+                        pdf.family.distribution is family.distribution
+                        for family in families
+                    )
+                    == 1
+                )
 
 
 @OPTIMISER
@@ -864,10 +872,13 @@ def test_run_on_disk_parallel(
             assert len(metadata) == len(dataframe.columns)
 
             for pdf in metadata:
-                assert sum(
-                    pdf.family.distribution is family.distribution
-                    for family in families
-                ) == 1
+                assert (
+                    sum(
+                        pdf.family.distribution is family.distribution
+                        for family in families
+                    )
+                    == 1
+                )
 
 
 @OPTIMISER

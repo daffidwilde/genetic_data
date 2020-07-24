@@ -1,10 +1,8 @@
 """ .. The main script containing the evolutionary dataset algorithm. """
 
 from collections import defaultdict
-from glob import iglob
 from pathlib import Path
 
-import dask
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd

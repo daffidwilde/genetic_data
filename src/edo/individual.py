@@ -117,7 +117,14 @@ def _get_minimum_columns(nrows, col_limits, families, family_counts):
 
 
 def _get_remaining_columns(
-    columns, metadata, nrows, ncols, col_limits, families, weights, family_counts
+    columns,
+    metadata,
+    nrows,
+    ncols,
+    col_limits,
+    families,
+    weights,
+    family_counts,
 ):
     """ Sample all remaining columns for the current individual. If
     :code:`col_limits` has a tuple upper limit then sample all remaining
@@ -173,7 +180,14 @@ def create_individual(row_limits, col_limits, families, weights=None):
         )
 
     cols, metadata = _get_remaining_columns(
-        cols, metadata, nrows, ncols, col_limits, families, weights, family_counts
+        cols,
+        metadata,
+        nrows,
+        ncols,
+        col_limits,
+        families,
+        weights,
+        family_counts,
     )
 
     dataframe = pd.DataFrame({i: col for i, col in enumerate(cols)})

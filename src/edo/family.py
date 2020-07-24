@@ -1,6 +1,5 @@
 """ The distribution-subtype handler and its supporting functions. """
 
-import json
 import os
 import pathlib
 import pickle
