@@ -1,5 +1,6 @@
 """ Tests for the shrinking of the search space. """
 
+from edo import Family
 from edo.distributions import Gamma, Normal, Poisson
 from edo.fitness import get_population_fitness
 from edo.operators import selection, shrink
@@ -18,9 +19,11 @@ def test_shrink(
     parameters at a particular iteration. """
 
     best_prop, lucky_prop = props
-    pdfs = [Gamma, Normal, Poisson]
+    distributions = [Gamma, Normal, Poisson]
+    families = [Family(dist) for dist in distributions]
+
     population = create_initial_population(
-        size, row_limits, col_limits, pdfs, weights
+        size, row_limits, col_limits, families, weights
     )
 
     pop_fitness = get_population_fitness(population, trivial_fitness)
@@ -28,8 +31,7 @@ def test_shrink(
         population, pop_fitness, best_prop, lucky_prop, maximise
     )
 
-    pdfs = shrink(parents, pdfs, itr, compact_ratio)
+    families = shrink(parents, families, itr, compact_ratio)
 
-    for pdf in pdfs:
-        assert pdf.param_limits.keys() == vars(pdf()).keys()
-        pdf.reset()
+    for family in families:
+        assert family.distribution.param_limits.keys() == vars(family.make_instance()).keys()

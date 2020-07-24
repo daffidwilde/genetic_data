@@ -1,25 +1,26 @@
 """ Functions for shrinking the search space. """
 
 
-def _get_param_values(parents, pdf, name):
-    """ Get the values of a distribution present amongst all parents. """
+def _get_param_values(parents, subtype, name):
+    """ Get the parameter values from the parents for a particular distribution
+    subtype parameter. """
 
     values = []
     for _, metadata in parents:
-        for column in metadata:
-            if isinstance(column, pdf):
+        for pdf in metadata:
+            if isinstance(pdf, subtype):
                 try:
-                    for val in vars(column)[name]:
+                    for val in vars(pdf)[name]:
                         values.append(val)
                 except TypeError:
-                    values.append(vars(column)[name])
+                    values.append(vars(pdf)[name])
 
     return values
 
 
-def _adjust_pdf_params(parents, pdf, itr, shrinkage):
-    r""" Adjust the search space of a distribution's parameters according to a
-    power law on its limits:
+def _adjust_subtype_param_limits(parents, subtype, itr, shrinkage):
+    r""" Adjust the search space of a distribution subtype's parameters
+    according to a power law on its limits:
 
     .. math::
 
@@ -30,8 +31,8 @@ def _adjust_pdf_params(parents, pdf, itr, shrinkage):
     (0, 1)` is some :code:`shrinkage` factor.
     """
 
-    for name, limits in pdf.param_limits.items():
-        values = _get_param_values(parents, pdf, name)
+    for name, limits in subtype.param_limits.items():
+        values = _get_param_values(parents, subtype, name)
         if values:
             midpoint = sum(values) / len(values)
             shift = (max(limits) - min(limits)) * (shrinkage ** itr) / 2
@@ -39,9 +40,9 @@ def _adjust_pdf_params(parents, pdf, itr, shrinkage):
             lower = max(min(limits), midpoint - shift)
             upper = min(min(limits), midpoint + shift)
 
-            pdf.param_limits[name] = sorted([lower, upper])
+            subtype.param_limits[name] = sorted([lower, upper])
 
-    return pdf
+    return subtype
 
 
 def shrink(parents, families, itr, shrinkage):
@@ -67,7 +68,8 @@ def shrink(parents, families, itr, shrinkage):
     """
 
     for family in families:
-        for pdf in family.subtypes:
-            pdf = _adjust_pdf_params(parents, pdf, itr, shrinkage)
+        for i, subtype in family.subtypes.items():
+            subtype = _adjust_subtype_param_limits(parents, subtype, itr, shrinkage)
+            family.subtypes[i] = subtype
 
     return families
