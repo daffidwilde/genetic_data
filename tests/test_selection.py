@@ -3,6 +3,7 @@
 import pandas as pd
 import pytest
 
+from edo import Family
 from edo.distributions import Gamma, Normal, Poisson
 from edo.fitness import get_population_fitness
 from edo.individual import Individual
@@ -20,8 +21,10 @@ def test_parents(size, row_limits, col_limits, weights, props, maximise):
 
     best_prop, lucky_prop = props
     distributions = [Gamma, Normal, Poisson]
+    families = [Family(dist) for dist in distributions]
+
     population = create_initial_population(
-        size, row_limits, col_limits, distributions, weights
+        size, row_limits, col_limits, families, weights
     )
 
     pop_fitness = get_population_fitness(population, trivial_fitness)
@@ -42,15 +45,7 @@ def test_parents(size, row_limits, col_limits, weights, props, maximise):
         assert len(metadata) == len(dataframe.columns)
 
         for pdf in metadata:
-            assert (
-                sum(
-                    [
-                        pdf.name == distribution.name
-                        for distribution in distributions
-                    ]
-                )
-                == 1
-            )
+            assert sum(pdf.family is family for family in families) == 1
 
         for i, limits in enumerate([row_limits, col_limits]):
             assert limits[0] <= dataframe.shape[i] <= limits[1]
@@ -65,8 +60,10 @@ def test_smallprops_error(
     with pytest.raises(ValueError):
         best_prop, lucky_prop = props
         distributions = [Gamma, Normal, Poisson]
+        families = [Family(dist) for dist in distributions]
+
         population = create_initial_population(
-            size, row_limits, col_limits, distributions, weights
+            size, row_limits, col_limits, families, weights
         )
 
         pop_fitness = get_population_fitness(population, trivial_fitness)
