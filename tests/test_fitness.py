@@ -26,8 +26,10 @@ def test_get_fitness(row_limits, col_limits, weights):
     cache = edo.cache
 
     distributions = [Normal, Poisson, Uniform]
+    families = [edo.Family(dist) for dist in distributions]
+
     individual = create_individual(
-        row_limits, col_limits, distributions, weights
+        row_limits, col_limits, families, weights
     )
     dataframe = individual.dataframe
 
@@ -48,8 +50,10 @@ def test_get_fitness_kwargs(row_limits, col_limits, weights):
 
     fitness_kwargs = {"arg": None}
     distributions = [Normal, Poisson, Uniform]
+    families = [edo.Family(dist) for dist in distributions]
+
     individual = create_individual(
-        row_limits, col_limits, distributions, weights
+        row_limits, col_limits, families, weights
     )
     dataframe = individual.dataframe
 
@@ -70,8 +74,10 @@ def test_get_population_fitness_serial(size, row_limits, col_limits, weights):
     cache = edo.cache
 
     distributions = [Normal, Poisson, Uniform]
+    families = [edo.Family(dist) for dist in distributions]
+
     population = create_initial_population(
-        size, row_limits, col_limits, distributions, weights
+        size, row_limits, col_limits, families, weights
     )
 
     pop_fit = get_population_fitness(population, trivial_fitness)
@@ -95,8 +101,10 @@ def test_get_population_fitness_parallel(
     cache = edo.cache
 
     distributions = [Normal, Poisson, Uniform]
+    families = [edo.Family(dist) for dist in distributions]
+
     population = create_initial_population(
-        size, row_limits, col_limits, distributions, weights
+        size, row_limits, col_limits, families, weights
     )
 
     pop_fit = get_population_fitness(population, trivial_fitness, processes)
@@ -113,10 +121,10 @@ def test_write_fitness(size):
     """ Test that a generation's fitness can be written to file correctly. """
 
     fitness = [trivial_fitness(pd.DataFrame()) for _ in range(size)]
+    path = Path(".testcache")
 
-    write_fitness(fitness, generation=0, root="out").compute()
-    write_fitness(fitness, generation=1, root="out").compute()
-    path = Path("out")
+    write_fitness(fitness, generation=0, root=path).compute()
+    write_fitness(fitness, generation=1, root=path).compute()
     assert (path / "fitness.csv").exists()
 
     fit = pd.read_csv(path / "fitness.csv")
@@ -126,4 +134,4 @@ def test_write_fitness(size):
     assert list(fit["individual"]) == list(range(size)) * 2
     assert np.allclose(fit["fitness"].values, fitness * 2)
 
-    os.system("rm -r out")
+    os.system("rm -r .testcache")
