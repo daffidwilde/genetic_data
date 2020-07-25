@@ -1,9 +1,8 @@
 *.aux
-*.bbl
-*.blg
 *_build*
-.cache/
+*cache/
 *coverage*
+*.csv
 dask-worker-space
 dist
 *egg-info*
@@ -11,8 +10,6 @@ htmlcov/
 *.hypothesis/*
 *ipynb*
 *.log
-*.out
 *.pdf
 *.png
 *pyc
-*.swp

@@ -1,6 +1,4 @@
-""" All currently implemented, discrete distribution classes. """
-
-import numpy as np
+""" All currently implemented discrete distribution classes. """
 
 from .base import Distribution
 
@@ -28,15 +26,20 @@ class Bernoulli(Distribution):
     hard_limits = {"prob": [0, 1]}
     param_limits = {"prob": [0, 1]}
 
-    def __init__(self):
+    def __init__(self, random_state):
 
-        self.prob = np.random.uniform(*self.param_limits["prob"])
+        self.prob = random_state.uniform(*self.param_limits["prob"])
 
-    def sample(self, nrows):
+    def __repr__(self):
+
+        return f"Bernoulli(prob={round(self.prob, 2)})"
+
+    def sample(self, nrows, random_state):
         """ Take a sample of size :code:`nrows` from the Bernoulli distribution
-        with success probability :code:`prob`. """
+        with success probability :code:`prob`. The sampling uses the provided
+        `np.random.RandomState` instance. """
 
-        return np.random.binomial(n=1, p=self.prob, size=nrows)
+        return random_state.binomial(n=1, p=self.prob, size=nrows)
 
 
 class Poisson(Distribution):
@@ -61,12 +64,17 @@ class Poisson(Distribution):
     hard_limits = {"lam": [0, 10]}
     param_limits = {"lam": [0, 10]}
 
-    def __init__(self):
+    def __init__(self, random_state):
 
-        self.lam = np.random.uniform(*self.param_limits["lam"])
+        self.lam = random_state.uniform(*self.param_limits["lam"])
 
-    def sample(self, nrows):
+    def __repr__(self):
+
+        return f"Poisson(lam={round(self.lam, 2)})"
+
+    def sample(self, nrows, random_state):
         """ Take a sample of size :code:`nrows` from the Poisson distribution
-        with rate parameter :code:`lam`. """
+        with rate parameter :code:`lam`. The sampling uses the provided
+        `np.random.RandomState` instance. """
 
-        return np.random.poisson(lam=self.lam, size=nrows)
+        return random_state.poisson(lam=self.lam, size=nrows)

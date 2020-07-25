@@ -1,13 +1,13 @@
 """ A script containing functions for each of the components of the genetic
 algorithm. """
 
-import numpy as np
-
 from .individual import create_individual
 from .operators import crossover, mutation
 
 
-def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
+def create_initial_population(
+    row_limits, col_limits, families, weights, random_states
+):
     """ Create an initial population for the genetic algorithm based on the
     given parameters.
 
@@ -19,13 +19,16 @@ def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
         Limits on the number of rows a dataset can have.
     col_limits : list
         Limits on the number of columns a dataset can have.
-    pdfs : list
-        A list of potential column pdf classes such as those found in
-        `pdfs.py`. Must have a `.sample()` and `.mutate()` method.
+    families : list
+        A list of Family instances that handle the column distribution classes.
+        Each column distribution class must have a `.sample()` method.
     weights : list
         A sequence of relative weights the same length as `column_classes`. This
         acts as a loose probability distribution from which to sample column
         classes. If `None`, column classes are sampled equally.
+    random_states : dict
+        The `numpy.random.RandomState` instances to be assigned to the
+        individuals in the population.
 
     Returns
     -------
@@ -33,14 +36,9 @@ def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
         A collection of individuals.
     """
 
-    if size <= 1:
-        raise ValueError(
-            "There must be more than one individual in a population"
-        )
-
     population = [
-        create_individual(row_limits, col_limits, pdfs, weights)
-        for _ in range(size)
+        create_individual(row_limits, col_limits, families, weights, state)
+        for _, state in random_states.items()
     ]
 
     return population
@@ -48,30 +46,38 @@ def create_initial_population(size, row_limits, col_limits, pdfs, weights=None):
 
 def create_new_population(
     parents,
-    size,
+    population,
     crossover_prob,
     mutation_prob,
     row_limits,
     col_limits,
-    pdfs,
+    families,
     weights,
+    random_states,
 ):
     """ Given a set of potential parents to be carried into the next generation,
-    create offspring from pairs within that set until there are enough
+    create offspring from pairs withi} that set until there are enough
     individuals. Each individual offspring is formed using a crossover operator
     on the two parent individuals and then mutating them according to the
     probability `mutation_prob`. """
 
-    population = parents
-    while len(population) < size:
-        parent1_idx, parent2_idx = np.random.choice(len(parents), size=2)
+    parent_idxs = [population.index(parent) for parent in parents]
+    available_states = [
+        state for i, state in random_states.items() if i not in parent_idxs
+    ]
+
+    new_population = parents
+    for state in available_states:
+        parent1_idx, parent2_idx = state.choice(len(parents), size=2)
         parents_ = parents[parent1_idx], parents[parent2_idx]
-        offspring = crossover(*parents_, col_limits, pdfs, crossover_prob)
+        offspring = crossover(
+            *parents_, col_limits, families, state, crossover_prob
+        )
         mutant = mutation(
-            offspring, mutation_prob, row_limits, col_limits, pdfs, weights
+            offspring, mutation_prob, row_limits, col_limits, families, weights
         )
         for col, meta in zip(*mutant):
             mutant.dataframe[col] = mutant.dataframe[col].astype(meta.dtype)
-        population.append(mutant)
+        new_population.append(mutant)
 
-    return population
+    return new_population

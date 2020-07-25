@@ -1,6 +1,9 @@
 """ Tests for the shrinking of the search space. """
 
-from edo.families import Gamma, Normal, Poisson
+import numpy as np
+
+from edo import Family
+from edo.distributions import Gamma, Normal, Poisson
 from edo.fitness import get_population_fitness
 from edo.operators import selection, shrink
 from edo.population import create_initial_population
@@ -18,18 +21,25 @@ def test_shrink(
     parameters at a particular iteration. """
 
     best_prop, lucky_prop = props
-    pdfs = [Gamma, Normal, Poisson]
+    distributions = [Gamma, Normal, Poisson]
+    families = [Family(dist) for dist in distributions]
+    states = {i: np.random.RandomState(i) for i in range(size)}
+    state = np.random.RandomState(size)
+
     population = create_initial_population(
-        size, row_limits, col_limits, pdfs, weights
+        row_limits, col_limits, families, weights, states
     )
 
     pop_fitness = get_population_fitness(population, trivial_fitness)
     parents = selection(
-        population, pop_fitness, best_prop, lucky_prop, maximise
+        population, pop_fitness, best_prop, lucky_prop, state, maximise
     )
 
-    pdfs = shrink(parents, pdfs, itr, compact_ratio)
+    families = shrink(parents, families, itr, compact_ratio)
 
-    for pdf in pdfs:
-        assert pdf.param_limits.keys() == vars(pdf()).keys()
-        pdf.reset()
+    for family in families:
+        for _, subtype in family.subtypes.items():
+            state = np.random.RandomState(0)
+            pdf = subtype(state)
+
+            assert subtype.param_limits == pdf.param_limits

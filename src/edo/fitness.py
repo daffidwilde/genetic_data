@@ -5,35 +5,24 @@ from pathlib import Path
 import dask
 import pandas as pd
 
-import edo
-
 
 @dask.delayed
-def get_fitness(dataframe, fitness, fitness_kwargs=None):
+def get_fitness(individual, fitness, **kwargs):
     """ Return the fitness score of the individual. """
 
-    cache = edo.cache
-    key = repr(dataframe)
+    if individual.fitness is None:
+        individual.fitness = fitness(individual.dataframe, **kwargs)
 
-    if key not in cache:
-        if fitness_kwargs:
-            cache[key] = fitness(dataframe, **fitness_kwargs)
-        else:
-            cache[key] = fitness(dataframe)
-
-    return cache[key]
+    return individual.fitness
 
 
-def get_population_fitness(
-    population, fitness, processes=None, fitness_kwargs=None
-):
+def get_population_fitness(population, fitness, processes=None, **kwargs):
     """ Return the fitness of each individual in the population. This can be
     done in parallel by specifying a number of cores to use for independent
     processes. """
 
     tasks = (
-        get_fitness(individual.dataframe, fitness, fitness_kwargs)
-        for individual in population
+        get_fitness(individual, fitness, **kwargs) for individual in population
     )
 
     if processes is None:
@@ -44,7 +33,6 @@ def get_population_fitness(
     return list(out)
 
 
-@dask.delayed
 def write_fitness(fitness, generation, root):
     """ Write the generation fitness to file in the root directory. """
 

@@ -1,12 +1,12 @@
 """ .. Function(s) for the selection operator. """
 
-from copy import deepcopy
-
 import numpy as np
 
 
-def selection(population, pop_fitness, best_prop, lucky_prop, maximise=False):
-    """ Given a population, select a proportion of the "best"" individuals and
+def selection(
+    population, pop_fitness, best_prop, lucky_prop, random_state, maximise=False
+):
+    """ Given a population, select a proportion of the "best" individuals and
     another of the "lucky" individuals (if they are available) to form a set of
     potential parents.
 
@@ -28,8 +28,9 @@ def selection(population, pop_fitness, best_prop, lucky_prop, maximise=False):
 
     Returns
     -------
-    parents : list
-        The individuals chosen to potentially become parents.
+    parents : dict
+        The individuals chosen to potentially become parents and their index in
+        the current population.
 
     Raises
     ------
@@ -47,14 +48,8 @@ def selection(population, pop_fitness, best_prop, lucky_prop, maximise=False):
     else:
         best_choice = np.argmin
 
-    if num_best == 0 and num_lucky == 0:
-        raise ValueError(
-            'Not a large enough proportion of "best" and/or \
-                          "lucky" individuals chosen. Reconsider these values.'
-        )
-
-    population = deepcopy(population)
-    pop_fitness = deepcopy(pop_fitness)
+    population = population[:]
+    pop_fitness = pop_fitness[:]
     parents = []
     for _ in range(num_best):
         if population != []:
@@ -64,7 +59,7 @@ def selection(population, pop_fitness, best_prop, lucky_prop, maximise=False):
 
     for _ in range(num_lucky):
         if population != []:
-            lucky = np.random.choice(len(population))
+            lucky = random_state.choice(len(population))
             parents.append(population.pop(lucky))
 
     return parents
