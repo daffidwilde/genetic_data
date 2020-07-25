@@ -1,7 +1,5 @@
 """ .. Functions related to the mutation operator. """
 
-import numpy as np
-
 from edo.individual import Individual
 
 from .util import get_family_counts
@@ -38,7 +36,9 @@ def mutation(individual, prob, row_limits, col_limits, families, weights=None):
 
     dataframe, metadata = individual
     random_state = individual.random_state
-    dataframe, metadata = mutate_nrows(dataframe, metadata, row_limits, random_state, prob)
+    dataframe, metadata = mutate_nrows(
+        dataframe, metadata, row_limits, random_state, prob
+    )
     dataframe, metadata = mutate_ncols(
         dataframe, metadata, col_limits, families, weights, random_state, prob
     )
@@ -62,7 +62,9 @@ def mutate_nrows(dataframe, metadata, row_limits, random_state, prob):
     return dataframe, metadata
 
 
-def mutate_ncols(dataframe, metadata, col_limits, families, weights, random_state, prob):
+def mutate_ncols(
+    dataframe, metadata, col_limits, families, weights, random_state, prob
+):
     """ Mutate the number of columns an individual has by adding a new column
     and/or dropping a column at random. In either case, the bounds defined in
     :code:`col_limits` cannot be exceeded. """
