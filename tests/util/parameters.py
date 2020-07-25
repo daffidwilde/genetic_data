@@ -83,11 +83,19 @@ INTEGER_CROSSOVER = given(
 )
 
 INTEGER_TUPLE_CROSSOVER = given(
-    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS, prob=PROB, seed=INTS
+    row_limits=SHAPES,
+    col_limits=INT_TUPS,
+    weights=WEIGHTS,
+    prob=PROB,
+    seed=INTS,
 )
 
 TUPLE_INTEGER_CROSSOVER = given(
-    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS, prob=PROB, seed=INTS
+    row_limits=SHAPES,
+    col_limits=TUP_INTS,
+    weights=WEIGHTS,
+    prob=PROB,
+    seed=INTS,
 )
 
 TUPLE_CROSSOVER = given(
@@ -99,11 +107,19 @@ INTEGER_MUTATION = given(
 )
 
 INTEGER_TUPLE_MUTATION = given(
-    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS, prob=PROB, seed=INTS
+    row_limits=SHAPES,
+    col_limits=INT_TUPS,
+    weights=WEIGHTS,
+    prob=PROB,
+    seed=INTS,
 )
 
 TUPLE_INTEGER_MUTATION = given(
-    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS, prob=PROB, seed=INTS
+    row_limits=SHAPES,
+    col_limits=TUP_INTS,
+    weights=WEIGHTS,
+    prob=PROB,
+    seed=INTS,
 )
 
 TUPLE_MUTATION = given(

@@ -52,7 +52,9 @@ def test_integer_limits(row_limits, col_limits, weights, prob, seed):
     random_state = np.random.RandomState(seed)
 
     parents = [
-        create_individual(row_limits, col_limits, families, weights, random_state)
+        create_individual(
+            row_limits, col_limits, families, weights, random_state
+        )
         for _ in [0, 1]
     ]
 
@@ -71,7 +73,9 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob, seed):
     random_state = np.random.RandomState(seed)
 
     parents = [
-        create_individual(row_limits, col_limits, families, weights, random_state)
+        create_individual(
+            row_limits, col_limits, families, weights, random_state
+        )
         for _ in [0, 1]
     ]
 
@@ -94,7 +98,9 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob, seed):
     random_state = np.random.RandomState(seed)
 
     parents = [
-        create_individual(row_limits, col_limits, families, weights, random_state)
+        create_individual(
+            row_limits, col_limits, families, weights, random_state
+        )
         for _ in [0, 1]
     ]
 
@@ -117,7 +123,9 @@ def test_tuple_limits(row_limits, col_limits, weights, prob, seed):
     random_state = np.random.RandomState(seed)
 
     parents = [
-        create_individual(row_limits, col_limits, families, weights, random_state)
+        create_individual(
+            row_limits, col_limits, families, weights, random_state
+        )
         for _ in [0, 1]
     ]
 

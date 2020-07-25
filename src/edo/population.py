@@ -70,7 +70,9 @@ def create_new_population(
     for state in available_states:
         parent1_idx, parent2_idx = state.choice(len(parents), size=2)
         parents_ = parents[parent1_idx], parents[parent2_idx]
-        offspring = crossover(*parents_, col_limits, families, state, crossover_prob)
+        offspring = crossover(
+            *parents_, col_limits, families, state, crossover_prob
+        )
         mutant = mutation(
             offspring, mutation_prob, row_limits, col_limits, families, weights
         )

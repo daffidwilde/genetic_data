@@ -58,7 +58,7 @@ def run_circle_example():
             maximise=True,
         )
 
-        _, fits = do.run(seed=seed)
+        _, fits = do.run(random_state=seed)
 
         fits["seed"] = seed
         fit_histories.append(fits)

@@ -782,7 +782,9 @@ def test_run_on_disk_serial(
         maximise,
     )
 
-    pop_history, fit_history = do.run(root=".testcache_serial", random_state=size)
+    pop_history, fit_history = do.run(
+        root=".testcache_serial", random_state=size
+    )
 
     assert isinstance(fit_history, dd.DataFrame)
     assert list(fit_history.columns) == ["fitness", "generation", "individual"]
@@ -949,7 +951,9 @@ def test_run_is_reproducible(
         maximise,
     )
 
-    pop_history_two, fit_history_two = do_two.run(processes=4, random_state=size)
+    pop_history_two, fit_history_two = do_two.run(
+        processes=4, random_state=size
+    )
 
     assert fit_history_one.equals(fit_history_two)
 

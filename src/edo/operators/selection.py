@@ -3,7 +3,9 @@
 import numpy as np
 
 
-def selection(population, pop_fitness, best_prop, lucky_prop, maximise=False):
+def selection(
+    population, pop_fitness, best_prop, lucky_prop, random_state, maximise=False
+):
     """ Given a population, select a proportion of the "best" individuals and
     another of the "lucky" individuals (if they are available) to form a set of
     potential parents.
@@ -57,7 +59,7 @@ def selection(population, pop_fitness, best_prop, lucky_prop, maximise=False):
 
     for _ in range(num_lucky):
         if population != []:
-            lucky = np.random.choice(len(population))
+            lucky = random_state.choice(len(population))
             parents.append(population.pop(lucky))
 
     return parents

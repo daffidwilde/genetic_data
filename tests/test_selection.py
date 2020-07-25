@@ -25,6 +25,7 @@ def test_selection_by_parents(
     distributions = [Gamma, Normal, Poisson]
     families = [Family(dist) for dist in distributions]
     states = {i: np.random.RandomState(i) for i in range(size)}
+    state = np.random.RandomState(size)
 
     population = create_initial_population(
         row_limits, col_limits, families, weights, states
@@ -32,7 +33,7 @@ def test_selection_by_parents(
 
     pop_fitness = get_population_fitness(population, trivial_fitness)
     parents = selection(
-        population, pop_fitness, best_prop, lucky_prop, maximise
+        population, pop_fitness, best_prop, lucky_prop, state, maximise
     )
 
     assert len(parents) == min(

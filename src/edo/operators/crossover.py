@@ -45,7 +45,14 @@ def _cross_minimum_columns(
 
 
 def _cross_remaining_columns(
-    columns, metadata, ncols, parent_cols, parent_meta, col_limits, families, random_state
+    columns,
+    metadata,
+    ncols,
+    parent_cols,
+    parent_meta,
+    col_limits,
+    families,
+    random_state,
 ):
     """ Regardless of whether :code:`col_limits` has a tuple upper limit or not,
     inherit all remaining columns from the two parents so as not to exceed these
@@ -81,11 +88,13 @@ def _adjust_column_lengths(columns, metadata, nrows, random_state):
         size = abs(difference)
         if difference > 0:
             if idxs is None:
-                idxs = random_state.choice(len(column), size=size, replace=False)
+                idxs = random_state.choice(
+                    len(column), size=size, replace=False
+                )
             column = column.drop(idxs, axis=0).reset_index(drop=True)
         else:
             column = column.append(
-                pd.Series(meta.sample(size)), ignore_index=False
+                pd.Series(meta.sample(size, random_state)), ignore_index=False
             ).reset_index(drop=True)
 
         adjusted_columns.append(column)
@@ -140,8 +149,14 @@ def crossover(parent1, parent2, col_limits, families, random_state, prob=0.5):
         )
 
     columns, metadata = _cross_remaining_columns(
-        columns, metadata, ncols, parent_cols, parent_meta, col_limits,
-        families, random_state
+        columns,
+        metadata,
+        ncols,
+        parent_cols,
+        parent_meta,
+        col_limits,
+        families,
+        random_state,
     )
     columns = _adjust_column_lengths(columns, metadata, nrows, random_state)
 

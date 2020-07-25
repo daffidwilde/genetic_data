@@ -181,10 +181,18 @@ class DataOptimiser:
     def _initialise_run(self, processes, **kwargs):
         """ Create the initial population and get its fitness. """
 
-        state_seeds = self.random_state.permutation(range(self.size))
+        state_seeds = self.random_state.randint(
+            np.iinfo(np.int32).max, size=self.size
+        )
         self.states = {
             i: np.random.RandomState(seed) for i, seed in enumerate(state_seeds)
         }
+
+        family_seeds = self.random_state.randint(
+            np.iinfo(np.int32).max, size=len(self.families)
+        )
+        for family, seed in zip(self.families, family_seeds):
+            family.random_state = np.random.RandomState(seed)
 
         self.population = create_initial_population(
             self.row_limits,
@@ -207,6 +215,7 @@ class DataOptimiser:
             self.pop_fitness,
             self.best_prop,
             self.lucky_prop,
+            self.random_state,
             self.maximise,
         )
 
@@ -221,7 +230,7 @@ class DataOptimiser:
             self.col_limits,
             self.families,
             self.weights,
-            self.states
+            self.states,
         )
 
         self.pop_fitness = get_population_fitness(
