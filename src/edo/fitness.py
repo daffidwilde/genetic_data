@@ -5,20 +5,15 @@ from pathlib import Path
 import dask
 import pandas as pd
 
-import edo
-
 
 @dask.delayed
-def get_fitness(dataframe, fitness, **kwargs):
+def get_fitness(individual, fitness, **kwargs):
     """ Return the fitness score of the individual. """
 
-    cache = edo.cache
-    key = repr(dataframe)
+    if individual.fitness is None:
+        individual.fitness = fitness(individual.dataframe, **kwargs)
 
-    if key not in cache:
-        cache[key] = fitness(dataframe, **kwargs)
-
-    return cache[key]
+    return individual.fitness
 
 
 def get_population_fitness(population, fitness, processes=None, **kwargs):
@@ -27,8 +22,7 @@ def get_population_fitness(population, fitness, processes=None, **kwargs):
     processes. """
 
     tasks = (
-        get_fitness(individual.dataframe, fitness, **kwargs)
-        for individual in population
+        get_fitness(individual, fitness, **kwargs) for individual in population
     )
 
     if processes is None:

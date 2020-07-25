@@ -20,6 +20,10 @@ class Individual:
     metadata : list
         A list of distributions that are associated with the respective column
         of `dataframe`.
+    random_state : np.random.RandomState, optional
+        The PRNG for the individual. If not provided, the default PRNG is used.
+    fitness : float
+        The fitness of the individual.
     """
 
     def __init__(self, dataframe, metadata, random_state=None):
@@ -31,6 +35,7 @@ class Individual:
             random_state = np.random.mtrand._rand
 
         self.random_state = random_state
+        self.fitness = None
 
     def __repr__(self):
 
