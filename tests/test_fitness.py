@@ -19,45 +19,41 @@ from .util.trivials import trivial_fitness
 
 
 @INTEGER_INDIVIDUAL
-def test_get_fitness(row_limits, col_limits, weights):
+def test_get_fitness(row_limits, col_limits, weights, seed):
     """ Create an individual and get its fitness. Then verify that the fitness
     is of the correct data type and has been added to the cache. """
 
-    cache = edo.cache
-
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
+    random_state = np.random.RandomState(seed)
 
-    individual = create_individual(row_limits, col_limits, families, weights)
-    dataframe = individual.dataframe
+    individual = create_individual(
+        row_limits, col_limits, families, weights, random_state
+    )
 
-    fit = get_fitness(dataframe, trivial_fitness).compute()
-    assert repr(dataframe) in cache
+    fit = get_fitness(individual, trivial_fitness).compute()
     assert isinstance(fit, float)
-
-    cache.clear()
+    assert individual.fitness == fit
 
 
 @INTEGER_INDIVIDUAL
-def test_get_fitness_kwargs(row_limits, col_limits, weights):
+def test_get_fitness_kwargs(row_limits, col_limits, weights, seed):
     """ Create an individual and get its fitness with keyword arguments. Then
     verify that the fitness is of the correct data type and has been added to
     the cache. """
 
-    cache = edo.cache
-
     fitness_kwargs = {"arg": None}
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
+    random_state = np.random.RandomState(seed)
 
-    individual = create_individual(row_limits, col_limits, families, weights)
-    dataframe = individual.dataframe
+    individual = create_individual(
+        row_limits, col_limits, families, weights, random_state
+    )
 
-    fit = get_fitness(dataframe, trivial_fitness, **fitness_kwargs).compute()
-    assert repr(dataframe) in cache
+    fit = get_fitness(individual, trivial_fitness, **fitness_kwargs).compute()
     assert isinstance(fit, float)
-
-    cache.clear()
+    assert individual.fitness == fit
 
 
 @POPULATION
@@ -67,22 +63,19 @@ def test_get_population_fitness_serial(size, row_limits, col_limits, weights):
     fitness array is of the correct data type and size, and that they have each
     been added to the cache. """
 
-    cache = edo.cache
-
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
+    random_states = {i: np.random.RandomState(i) for i in range(size)}
 
     population = create_initial_population(
-        size, row_limits, col_limits, families, weights
+        row_limits, col_limits, families, weights, random_states
     )
 
     pop_fit = get_population_fitness(population, trivial_fitness)
     assert len(pop_fit) == size
     for ind, fit in zip(population, pop_fit):
-        assert repr(ind.dataframe) in cache
         assert isinstance(fit, float)
-
-    cache.clear()
+        assert ind.fitness == fit
 
 
 @POP_FITNESS
@@ -94,22 +87,19 @@ def test_get_population_fitness_parallel(
     fitness array is of the correct data type and size, and that they have each
     been added to the cache. """
 
-    cache = edo.cache
-
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
+    random_states = {i: np.random.RandomState(i) for i in range(size)}
 
     population = create_initial_population(
-        size, row_limits, col_limits, families, weights
+        row_limits, col_limits, families, weights, random_states
     )
 
     pop_fit = get_population_fitness(population, trivial_fitness, processes)
     assert len(pop_fit) == size
     for ind, fit in zip(population, pop_fit):
-        assert repr(ind.dataframe) in cache
         assert isinstance(fit, float)
-
-    cache.clear()
+        assert ind.fitness == fit
 
 
 @given(size=integers(min_value=1, max_value=100))

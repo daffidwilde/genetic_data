@@ -39,6 +39,7 @@ class Family:
         self.subtype_id = 0
         self.subtypes = {}
         self.all_subtypes = {}
+        self.random_state = np.random.mtrand._rand
 
     def __repr__(self):
 
@@ -63,7 +64,7 @@ class Family:
         self.all_subtypes[self.subtype_id] = subtype
         self.subtype_id += 1
 
-    def make_instance(self):
+    def make_instance(self, random_state):
         """ Select an existing subtype at random -- or create a new one if there
         is space available -- and return an instance of that subtype. """
 
@@ -71,11 +72,11 @@ class Family:
         if self.max_subtypes is None or len(choices) < self.max_subtypes:
             choices.append(self.subtype_id)
 
-        choice = np.random.choice(choices)
+        choice = self.random_state.choice(choices)
         if choice == self.subtype_id:
             self.add_subtype()
 
-        instance = self.subtypes[choice]()
+        instance = self.subtypes[choice](random_state)
         return instance
 
     def save(self, cache_dir=".edocache"):
@@ -84,6 +85,11 @@ class Family:
 
         path = pathlib.Path(f"{cache_dir}/subtypes/{self.distribution.name}")
         path.mkdir(exist_ok=True, parents=True)
+
+        with open(path / "state.pkl", "wb") as state:
+            pickle.dump(
+                self.random_state, state, protocol=pickle.HIGHEST_PROTOCOL
+            )
 
         for subtype_id, subtype in self.all_subtypes.items():
 
@@ -98,6 +104,7 @@ class Family:
         self.subtype_id = 0
         self.subtypes.clear()
         self.all_subtypes.clear()
+        self.random_state = np.random.mtrand._rand
 
         if cache_dir is not None:
             os.system(f"rm -r {cache_dir}/subtypes/{self.distribution.name}")
@@ -111,7 +118,12 @@ class Family:
         name = distribution.name
         path = pathlib.Path(f"{cache_dir}/subtypes/{name}/")
 
-        subtype_paths = sorted(path.glob("*.pkl"), key=lambda p: int(p.stem))
+        with open(path / "state.pkl", "rb") as state:
+            family.random_state = pickle.load(state)
+
+        subtype_paths = sorted(
+            path.glob(r"[0-9].pkl"), key=lambda p: int(p.stem)
+        )
         for path in subtype_paths:
 
             with open(path, "rb") as sub:

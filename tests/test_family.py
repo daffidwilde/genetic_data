@@ -3,8 +3,9 @@
 import os
 import pathlib
 
+import numpy as np
 from hypothesis import given
-from hypothesis.strategies import composite, sampled_from
+from hypothesis.strategies import composite, integers, sampled_from
 
 from edo import Family
 from edo.distributions import all_distributions
@@ -15,6 +16,14 @@ def distributions(draw, pool=all_distributions):
     """ Draw a distribution from the pool. """
 
     return draw(sampled_from(pool))
+
+
+@composite
+def states(draw, min_value=0, max_value=1000):
+    """ Create an instance of `np.random.RandomState`. """
+
+    seed = draw(integers(min_value, max_value))
+    return np.random.RandomState(seed)
 
 
 @given(distribution=distributions())
@@ -29,6 +38,7 @@ def test_init(distribution):
     assert family.subtype_id == 0
     assert family.subtypes == {}
     assert family.all_subtypes == {}
+    assert family.random_state is np.random.mtrand._rand
 
 
 @given(distribution=distributions())
@@ -58,12 +68,12 @@ def test_add_subtype(distribution):
     assert subtype is family.all_subtypes.get(0)
 
 
-@given(distribution=distributions())
-def test_make_instance(distribution):
+@given(distribution=distributions(), state=states())
+def test_make_instance(distribution, state):
     """ Test that an instance can be created correctly. """
 
     family = Family(distribution)
-    pdf = family.make_instance()
+    pdf = family.make_instance(state)
 
     assert family.subtype_id == 1
     assert family.subtypes == {0: pdf.__class__}
@@ -96,8 +106,9 @@ def test_save(distribution):
     family.add_subtype()
     family.save(".testcache")
 
-    path = pathlib.Path(f".testcache/subtypes/{distribution.name}/0.pkl")
-    assert path.exists()
+    path = pathlib.Path(f".testcache/subtypes/{distribution.name}/")
+    assert (path / "0.pkl").exists()
+    assert (path / "state.pkl").exists()
 
     os.system("rm -r .testcache")
 
@@ -110,8 +121,9 @@ def test_reset(distribution):
     family.add_subtype()
     family.reset()
 
-    assert family.subtype_id == 0
-    assert family.subtypes == {}
+    fresh_family = Family(distribution)
+
+    assert vars(family) == vars(fresh_family)
 
 
 @given(distribution=distributions())
@@ -156,5 +168,13 @@ def test_load(distribution):
     assert pickled_subtype.__init__ is subtype.__init__
     assert pickled_subtype.__repr__ is subtype.__repr__
     assert pickled_subtype.sample is subtype.sample
+
+    for fpart, ppart in zip(
+        family.random_state.get_state(), pickled.random_state.get_state()
+    ):
+        try:
+            assert all(fpart == ppart)
+        except TypeError:
+            assert fpart == ppart
 
     os.system("rm -r .testcache")

@@ -1,5 +1,6 @@
 """ Tests for the mutation operator. """
 
+import numpy as np
 import pandas as pd
 
 from edo import Family
@@ -22,20 +23,24 @@ def _common_asserts(mutant, families):
     assert isinstance(metadata, list)
     assert len(metadata) == len(dataframe.columns)
     assert isinstance(dataframe, pd.DataFrame)
+    assert isinstance(mutant.random_state, np.random.RandomState)
 
     for pdf in metadata:
         assert sum(pdf.family is family for family in families) == 1
 
 
 @INTEGER_MUTATION
-def test_integer_limits(row_limits, col_limits, weights, prob):
+def test_integer_limits(row_limits, col_limits, weights, prob, seed):
     """ Verify that `mutation` creates a valid individual with all integer
     column limits. """
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
+    state = np.random.RandomState(seed)
 
-    individual = create_individual(row_limits, col_limits, families, weights)
+    individual = create_individual(
+        row_limits, col_limits, families, weights, state
+    )
 
     mutant = mutation(
         individual, prob, row_limits, col_limits, families, weights
@@ -48,14 +53,17 @@ def test_integer_limits(row_limits, col_limits, weights, prob):
 
 
 @INTEGER_TUPLE_MUTATION
-def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
+def test_integer_tuple_limits(row_limits, col_limits, weights, prob, seed):
     """ Verify that `mutation` creates a valid individual where the lower and
     upper column limits are integer and tuple respectively. """
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
+    state = np.random.RandomState(seed)
 
-    individual = create_individual(row_limits, col_limits, families, weights)
+    individual = create_individual(
+        row_limits, col_limits, families, weights, state
+    )
 
     mutant = mutation(
         individual, prob, row_limits, col_limits, families, weights
@@ -77,14 +85,17 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob):
 
 
 @TUPLE_INTEGER_MUTATION
-def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
+def test_tuple_integer_limits(row_limits, col_limits, weights, prob, seed):
     """ Verify that `mutation` creates a valid individual where the lower and
     upper column limits and tuple and integer respectively. """
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
+    state = np.random.RandomState(seed)
 
-    individual = create_individual(row_limits, col_limits, families, weights)
+    individual = create_individual(
+        row_limits, col_limits, families, weights, state
+    )
 
     mutant = mutation(
         individual, prob, row_limits, col_limits, families, weights
@@ -106,14 +117,17 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob):
 
 
 @TUPLE_MUTATION
-def test_tuple_limits(row_limits, col_limits, weights, prob):
+def test_tuple_limits(row_limits, col_limits, weights, prob, seed):
     """ Verify that `mutation` creates a valid individual with all tuple column
     limits. """
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
+    state = np.random.RandomState(seed)
 
-    individual = create_individual(row_limits, col_limits, families, weights)
+    individual = create_individual(
+        row_limits, col_limits, families, weights, state
+    )
 
     mutant = mutation(
         individual, prob, row_limits, col_limits, families, weights

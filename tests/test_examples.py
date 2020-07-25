@@ -58,7 +58,7 @@ def run_circle_example():
             maximise=True,
         )
 
-        _, fits = do.run(seed=seed)
+        _, fits = do.run(random_state=seed)
 
         fits["seed"] = seed
         fit_histories.append(fits)
@@ -78,8 +78,47 @@ def test_circle_example(repetitions):
 
     try:
         expected = pd.read_csv("tests/circle.csv")
-        assert np.allclose(history.values, expected.values, 1e-5)
+        assert np.allclose(history.values, expected.values)
 
     except FileNotFoundError:
         history.to_csv("tests/circle.csv", index=False)
+        assume(False)
+
+
+def sample_fitness(df):
+    """ Take a sample of 10% of the rows and find their mean. """
+
+    return df.sample(frac=0.1, random_state=0).mean().mean()
+
+
+def run_sample_example():
+    """ Run the sample example used in debugging the random leak. """
+
+    opt = edo.DataOptimiser(
+        sample_fitness,
+        size=100,
+        row_limits=[50, 100],
+        col_limits=[1, 3],
+        families=[edo.Family(Uniform)],
+        max_iter=10,
+    )
+
+    _, fit_history = opt.run(processes=4, random_state=0)
+    return fit_history
+
+
+@given(repetitions=integers())
+@settings(deadline=None, max_examples=5)
+def test_sample_example(repetitions):
+    """ Check that the sample example dataset never changes (with the same
+    caveat as the circle example above). """
+
+    history = run_sample_example()
+
+    try:
+        expected = pd.read_csv("tests/sample.csv")
+        assert np.allclose(history.values, expected.values)
+
+    except FileNotFoundError:
+        history.to_csv("tests/sample.csv", index=False)
         assume(False)

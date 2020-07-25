@@ -26,8 +26,8 @@ def test_gamma_set_param_limits(first_limits, second_limits, seed):
 
     Gamma.param_limits = {"alpha": first_limits, "theta": second_limits}
 
-    np.random.seed(seed)
-    gamma = Gamma()
+    state = np.random.RandomState(seed)
+    gamma = Gamma(state)
     assert first_limits[0] <= gamma.alpha <= first_limits[1]
     assert second_limits[0] <= gamma.theta <= second_limits[1]
 
@@ -40,7 +40,8 @@ def test_normal_set_param_limits(first_limits, second_limits, seed):
     Normal.param_limits = {"mean": first_limits, "std": second_limits}
 
     np.random.seed(seed)
-    normal = Normal()
+    state = np.random.RandomState(seed)
+    normal = Normal(state)
     assert first_limits[0] <= normal.mean <= first_limits[1]
     assert second_limits[0] <= normal.std <= second_limits[1]
 
@@ -52,7 +53,7 @@ def test_uniform_set_param_limits(first_limits, second_limits, seed):
 
     Uniform.param_limits = {"bounds": first_limits}
 
-    np.random.seed(seed)
-    uniform = Uniform()
+    state = np.random.RandomState(seed)
+    uniform = Uniform(state)
     for bound in uniform.bounds:
         assert first_limits[0] <= bound <= first_limits[1]

@@ -1,7 +1,5 @@
 """ All currently implemented, continuous distributions. """
 
-import numpy as np
-
 from .base import Distribution
 
 
@@ -30,10 +28,10 @@ class Gamma(Distribution):
     hard_limits = {"alpha": [0, 10], "theta": [0, 10]}
     param_limits = {"alpha": [0, 10], "theta": [0, 10]}
 
-    def __init__(self):
+    def __init__(self, random_state):
 
-        self.alpha = np.random.uniform(*self.param_limits["alpha"])
-        self.theta = np.random.uniform(*self.param_limits["theta"])
+        self.alpha = random_state.uniform(*self.param_limits["alpha"])
+        self.theta = random_state.uniform(*self.param_limits["theta"])
 
     def __repr__(self):
 
@@ -41,12 +39,15 @@ class Gamma(Distribution):
         theta = round(self.theta, 2)
         return f"Gamma(alpha={alpha}, theta={theta})"
 
-    def sample(self, nrows):
+    def sample(self, nrows, random_state):
         """ Take a sample of size :code:`nrows` from the gamma distribution with
         shape and scale parameters given by :code:`alpha` and :code:`theta`
-        respectively. """
+        respectively. The sampling uses the provided `np.random.RandomState`
+        instance. """
 
-        return np.random.gamma(shape=self.alpha, scale=self.theta, size=nrows)
+        return random_state.gamma(
+            shape=self.alpha, scale=self.theta, size=nrows
+        )
 
 
 class Normal(Distribution):
@@ -74,10 +75,10 @@ class Normal(Distribution):
     hard_limits = {"mean": [-10, 10], "std": [0, 10]}
     param_limits = {"mean": [-10, 10], "std": [0, 10]}
 
-    def __init__(self):
+    def __init__(self, random_state):
 
-        self.mean = np.random.uniform(*self.param_limits["mean"])
-        self.std = np.random.uniform(*self.param_limits["std"])
+        self.mean = random_state.uniform(*self.param_limits["mean"])
+        self.std = random_state.uniform(*self.param_limits["std"])
 
     def __repr__(self):
 
@@ -85,12 +86,13 @@ class Normal(Distribution):
         std = round(self.std, 2)
         return f"Normal(mean={mean}, std={std})"
 
-    def sample(self, nrows):
+    def sample(self, nrows, random_state):
         """ Take a sample of size :code:`nrows` from the normal distribution
         with mean and standard deviation given by :code:`mean` and :code:`std`
-        respectively. """
+        respectively. The sampling uses the provided `np.random.RandomState`
+        instance. """
 
-        return np.random.normal(loc=self.mean, scale=self.std, size=nrows)
+        return random_state.normal(loc=self.mean, scale=self.std, size=nrows)
 
 
 class Uniform(Distribution):
@@ -114,10 +116,10 @@ class Uniform(Distribution):
     hard_limits = {"bounds": [-10, 10]}
     param_limits = {"bounds": [-10, 10]}
 
-    def __init__(self):
+    def __init__(self, random_state):
 
         self.bounds = sorted(
-            np.random.uniform(*self.param_limits["bounds"], size=2)
+            random_state.uniform(*self.param_limits["bounds"], size=2)
         )
 
     def __repr__(self):
@@ -126,9 +128,10 @@ class Uniform(Distribution):
         upper = round(max(self.bounds), 2)
         return f"Uniform(bounds=[{lower}, {upper}])"
 
-    def sample(self, nrows):
+    def sample(self, nrows, random_state):
         """ Take a sample of size :code:`nrows` from the uniform distribution
         with lower and upper limits given by :code:`lower` and :code:`upper`
-        respectively. """
+        respectively. The sampling uses the provided `np.random.RandomState`
+        instance. """
 
-        return np.random.uniform(*self.bounds, size=nrows)
+        return random_state.uniform(*self.bounds, size=nrows)

@@ -1,5 +1,6 @@
 """ Test base distribution class and the methods shared by all pdf classes. """
 
+import numpy as np
 import pytest
 from hypothesis import given
 from hypothesis.strategies import integers, sampled_from
@@ -14,11 +15,19 @@ def test_distribution_instantiation():
         Distribution()
 
 
-@given(distribution=sampled_from(all_distributions))
-def test_init(distribution):
+params = given(
+    distribution=sampled_from(all_distributions),
+    seed=integers(min_value=0, max_value=1000),
+)
+
+
+@params
+def test_init(distribution, seed):
     """ Check defaults of distribution objects. """
 
-    pdf = distribution()
+    state = np.random.RandomState(seed)
+    pdf = distribution(state)
+
     assert pdf.name == distribution.name
     assert pdf.param_limits == distribution.param_limits
 
@@ -31,31 +40,20 @@ def test_init(distribution):
             assert min(limits) <= value <= max(limits)
 
 
-@given(distribution=sampled_from(all_distributions))
-def test_repr(distribution):
+@params
+def test_repr(distribution, seed):
     """ Assert that distribution objects have the correct string. """
 
-    pdf = distribution()
+    state = np.random.RandomState(seed)
+    pdf = distribution(state)
+
     assert str(pdf).startswith(pdf.name)
     for name in vars(pdf):
         assert name in str(pdf)
 
 
-@given(
-    distribution=sampled_from(all_distributions),
-    nrows=integers(min_value=0, max_value=99),
-)
-def test_sample(distribution, nrows):
-    """ Verify that distribution objects can sample correctly. """
-
-    pdf = distribution()
-    sample = pdf.sample(nrows)
-    assert sample.shape == (nrows,)
-    assert sample.dtype == pdf.dtype
-
-
-@given(distribution=sampled_from(all_distributions))
-def test_set_param_limits(distribution):
+@params
+def test_set_param_limits(distribution, seed):
     """ Check distribution classes can have their default parameter limits
     changed. """
 
@@ -65,3 +63,19 @@ def test_set_param_limits(distribution):
 
     assert distribution.param_limits != param_limits
     distribution.param_limits = param_limits
+
+
+@given(
+    distribution=sampled_from(all_distributions),
+    nrows=integers(min_value=1, max_value=100),
+    seed=integers(min_value=0, max_value=100),
+)
+def test_sample(distribution, nrows, seed):
+    """ Verify that distribution objects can sample correctly. """
+
+    state = np.random.RandomState(seed)
+    pdf = distribution(state)
+
+    sample = pdf.sample(nrows, state)
+    assert sample.shape == (nrows,)
+    assert sample.dtype == pdf.dtype

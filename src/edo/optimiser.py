@@ -85,8 +85,6 @@ class DataOptimiser:
         maximise=False,
     ):
 
-        edo.cache.clear()
-
         self.fitness = fitness
         self.size = size
         self.row_limits = row_limits
@@ -116,7 +114,7 @@ class DataOptimiser:
         """ A placeholder for a function which can adjust (typically, reduce)
         the mutation probability over the run of the EA. """
 
-    def run(self, root=None, seed=None, processes=None, kwargs=None):
+    def run(self, root=None, random_state=None, processes=None, kwargs=None):
         """ Run the evolutionary algorithm under the given constraints.
 
         Parameters
@@ -127,7 +125,7 @@ class DataOptimiser:
             in memory and returned at the end. If writing to file, one
             generation is held in memory at a time and everything is returned in
             `dask` objects.
-        seed : int, optional
+        random_state : int, optional
             The random seed for a particular run of the algorithm. If
             :code:`None`, no seed is set.
         processes : int, optional
@@ -151,8 +149,12 @@ class DataOptimiser:
         if kwargs is None:
             kwargs = {}
 
-        if seed is not None:
-            np.random.seed(seed)
+        if isinstance(random_state, int):
+            self.random_state = np.random.RandomState(random_state)
+        elif isinstance(random_state, np.random.RandomState):
+            self.random_state = random_state
+        else:
+            self.random_state = np.random.mtrand._rand
 
         self._initialise_run(processes, **kwargs)
         self._update_histories(root)
@@ -177,13 +179,27 @@ class DataOptimiser:
     def _initialise_run(self, processes, **kwargs):
         """ Create the initial population and get its fitness. """
 
+        state_seeds = self.random_state.randint(
+            np.iinfo(np.int32).max, size=self.size
+        )
+        self.states = {
+            i: np.random.RandomState(seed) for i, seed in enumerate(state_seeds)
+        }
+
+        family_seeds = self.random_state.randint(
+            np.iinfo(np.int32).max, size=len(self.families)
+        )
+        for family, seed in zip(self.families, family_seeds):
+            family.random_state = np.random.RandomState(seed)
+
         self.population = create_initial_population(
-            self.size,
             self.row_limits,
             self.col_limits,
             self.families,
             self.weights,
+            self.states,
         )
+
         self.pop_fitness = get_population_fitness(
             self.population, self.fitness, processes, **kwargs
         )
@@ -197,6 +213,7 @@ class DataOptimiser:
             self.pop_fitness,
             self.best_prop,
             self.lucky_prop,
+            self.random_state,
             self.maximise,
         )
 
@@ -204,13 +221,14 @@ class DataOptimiser:
 
         self.population = create_new_population(
             parents,
-            self.size,
+            self.population,
             self.crossover_prob,
             self.mutation_prob,
             self.row_limits,
             self.col_limits,
             self.families,
             self.weights,
+            self.states,
         )
 
         self.pop_fitness = get_population_fitness(
