@@ -440,8 +440,8 @@ def test_update_subtypes(
 
 
 @OPTIMISER
-@settings(max_examples=30)
-def test_write_generation_serial(
+@settings(deadline=None, max_examples=30)
+def test_write_generation(
     size,
     row_limits,
     col_limits,
@@ -575,7 +575,7 @@ def test_get_pop_history(
 
 
 @OPTIMISER
-@settings(max_examples=10)
+@settings(deadline=None, max_examples=10)
 def test_get_fit_history(
     size,
     row_limits,
