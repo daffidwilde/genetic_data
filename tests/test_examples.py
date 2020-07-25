@@ -85,6 +85,11 @@ def test_circle_example(repetitions):
         assume(False)
 
 
+##########
+# SAMPLE #
+##########
+
+
 def sample_fitness(df):
     """ Take a sample of 10% of the rows and find their mean. """
 
@@ -103,7 +108,8 @@ def run_sample_example():
         max_iter=10,
     )
 
-    _, fit_history = opt.run(processes=4, random_state=0)
+    state = np.random.RandomState(0)
+    _, fit_history = opt.run(processes=4, random_state=state)
     return fit_history
 
 

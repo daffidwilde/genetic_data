@@ -958,3 +958,67 @@ def test_run_is_reproducible(
     for gen_from_one, gen_from_two in zip(pop_history_one, pop_history_two):
         for ind_from_one, ind_from_two in zip(gen_from_one, gen_from_two):
             assert ind_from_one.dataframe.equals(ind_from_two.dataframe)
+
+
+@OPTIMISER
+@settings(deadline=None, max_examples=10)
+def test_run_not_reproducible_without_seed(
+    size,
+    row_limits,
+    col_limits,
+    distributions,
+    weights,
+    max_iter,
+    best_prop,
+    lucky_prop,
+    crossover_prob,
+    mutation_prob,
+    shrinkage,
+    maximise,
+):
+    """ Test that two runs of the EA with the same parameters will likely
+    produce different populations if they aren't seeded. """
+
+    families = [edo.Family(dist) for dist in distributions]
+
+    do_one = DataOptimiser(
+        lambda df: np.random.randint(len(df)),
+        size,
+        row_limits,
+        col_limits,
+        families,
+        weights,
+        max_iter,
+        best_prop,
+        lucky_prop,
+        crossover_prob,
+        mutation_prob,
+        shrinkage,
+        maximise,
+    )
+
+    pop_history_one, fit_history_one = do_one.run(processes=4)
+
+    families = [edo.Family(dist) for dist in distributions]
+
+    do_two = DataOptimiser(
+        lambda df: np.random.randint(len(df)),
+        size,
+        row_limits,
+        col_limits,
+        families,
+        weights,
+        max_iter,
+        best_prop,
+        lucky_prop,
+        crossover_prob,
+        mutation_prob,
+        shrinkage,
+        maximise,
+    )
+
+    pop_history_two, fit_history_two = do_two.run(processes=4)
+
+    for gen_from_one, gen_from_two in zip(pop_history_one, pop_history_two):
+        for ind_from_one, ind_from_two in zip(gen_from_one, gen_from_two):
+            assert not ind_from_one.dataframe.equals(ind_from_two.dataframe)
