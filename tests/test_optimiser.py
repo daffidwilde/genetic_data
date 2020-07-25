@@ -112,8 +112,6 @@ def test_init(
     assert do.pop_history == []
     assert do.fit_history.equals(pd.DataFrame())
 
-    assert edo.cache == {}
-
 
 @OPTIMISER
 def test_stop(

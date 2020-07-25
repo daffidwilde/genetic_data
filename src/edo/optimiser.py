@@ -85,8 +85,6 @@ class DataOptimiser:
         maximise=False,
     ):
 
-        edo.cache.clear()
-
         self.fitness = fitness
         self.size = size
         self.row_limits = row_limits
