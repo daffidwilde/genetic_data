@@ -7,7 +7,6 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 
-import edo
 from edo.fitness import get_population_fitness, write_fitness
 from edo.individual import Individual
 from edo.operators import selection, shrink
