@@ -236,6 +236,7 @@ def test_initialise_run(
         maximise,
     )
 
+    do.random_state = np.random.RandomState(size)
     do._initialise_run(4)
     assert isinstance(do.population, list)
     assert len(do.population) == len(do.pop_fitness) == size
@@ -280,10 +281,12 @@ def test_get_next_generation(
         maximise,
     )
 
+    do.random_state = np.random.RandomState(size)
     do._initialise_run(4)
     do._get_next_generation(4)
     assert isinstance(do.population, list)
-    assert len(do.population) == len(do.pop_fitness) == size
+    assert len(do.population) == len(do.pop_fitness)
+    assert len(do.population) == size
 
     for individual, fitness in zip(do.population, do.pop_fitness):
         assert isinstance(individual, Individual)
@@ -325,6 +328,7 @@ def test_update_pop_history(
         maximise,
     )
 
+    do.random_state = np.random.RandomState(size)
     do._initialise_run(4)
     do._update_pop_history()
     assert len(do.pop_history) == 1
@@ -370,6 +374,7 @@ def test_update_fit_history(
         maximise,
     )
 
+    do.random_state = np.random.RandomState(size)
     do._initialise_run(4)
     do._update_fit_history()
     fit_history = do.fit_history
@@ -423,6 +428,7 @@ def test_update_subtypes(
         maximise,
     )
 
+    do.random_state = np.random.RandomState(size)
     do._initialise_run(4)
     parents = do.population[: max(int(size / 5), 1)]
     parent_subtypes = do._get_current_subtypes(parents)
@@ -472,6 +478,7 @@ def test_write_generation_serial(
         maximise,
     )
 
+    do.random_state = np.random.RandomState(size)
     do._initialise_run(4)
     do._write_generation(root=".testcache")
     path = Path(".testcache")
@@ -501,7 +508,7 @@ def test_write_generation_serial(
 
 
 @OPTIMISER
-@settings(max_examples=10)
+@settings(deadline=None, max_examples=10)
 def test_get_pop_history(
     size,
     row_limits,
@@ -536,6 +543,7 @@ def test_get_pop_history(
         maximise,
     )
 
+    do.random_state = np.random.RandomState(size)
     do._initialise_run(4)
     do._write_generation(root=".testcache")
 
@@ -604,6 +612,7 @@ def test_get_fit_history(
         maximise,
     )
 
+    do.random_state = np.random.RandomState(size)
     do._initialise_run(4)
     do._write_generation(root=".testcache")
 
@@ -653,7 +662,7 @@ def test_run_serial(
         maximise,
     )
 
-    pop_history, fit_history = do.run(seed=size)
+    pop_history, fit_history = do.run(random_state=size)
 
     assert isinstance(fit_history, pd.DataFrame)
     assert all(fit_history.columns == ["fitness", "generation", "individual"])
@@ -713,7 +722,7 @@ def test_run_parallel(
         maximise,
     )
 
-    pop_history, fit_history = do.run(processes=4, seed=size)
+    pop_history, fit_history = do.run(processes=4, random_state=size)
 
     assert isinstance(fit_history, pd.DataFrame)
     assert all(fit_history.columns == ["fitness", "generation", "individual"])
@@ -773,7 +782,7 @@ def test_run_on_disk_serial(
         maximise,
     )
 
-    pop_history, fit_history = do.run(root=".testcache_serial", seed=size)
+    pop_history, fit_history = do.run(root=".testcache_serial", random_state=size)
 
     assert isinstance(fit_history, dd.DataFrame)
     assert list(fit_history.columns) == ["fitness", "generation", "individual"]
@@ -845,7 +854,7 @@ def test_run_on_disk_parallel(
     )
 
     pop_history, fit_history = do.run(
-        root=".testcache_parallel", processes=4, seed=size
+        root=".testcache_parallel", processes=4, random_state=size
     )
 
     assert isinstance(fit_history, dd.DataFrame)
@@ -919,7 +928,7 @@ def test_run_is_reproducible(
     )
 
     pop_history_one, fit_history_one = do_one.run(
-        processes=4, seed=size, kwargs={"arg": None}
+        processes=4, random_state=size, kwargs={"arg": None}
     )
 
     families = [edo.Family(dist) for dist in distributions]
@@ -940,7 +949,7 @@ def test_run_is_reproducible(
         maximise,
     )
 
-    pop_history_two, fit_history_two = do_two.run(processes=4, seed=size)
+    pop_history_two, fit_history_two = do_two.run(processes=4, random_state=size)
 
     assert fit_history_one.equals(fit_history_two)
 
