@@ -22,4 +22,5 @@ setup(
     keywords=["genetic-algorithm" "data" "evolution"],
     packages=find_packages("src"),
     package_dir={"": "src"},
+    tests_require=["pytest", "hypothesis", "numpy"],
 )
