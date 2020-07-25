@@ -36,11 +36,12 @@ class Bernoulli(Distribution):
 
         return f"Bernoulli(prob={round(self.prob, 2)})"
 
-    def sample(self, nrows):
+    def sample(self, nrows, random_state):
         """ Take a sample of size :code:`nrows` from the Bernoulli distribution
-        with success probability :code:`prob`. """
+        with success probability :code:`prob`. The sampling uses the provided
+        `np.random.RandomState` instance. """
 
-        return np.random.binomial(n=1, p=self.prob, size=nrows)
+        return random_state.binomial(n=1, p=self.prob, size=nrows)
 
 
 class Poisson(Distribution):
@@ -73,8 +74,9 @@ class Poisson(Distribution):
 
         return f"Poisson(lam={round(self.lam, 2)})"
 
-    def sample(self, nrows):
+    def sample(self, nrows, random_state):
         """ Take a sample of size :code:`nrows` from the Poisson distribution
-        with rate parameter :code:`lam`. """
+        with rate parameter :code:`lam`. The sampling uses the provided
+        `np.random.RandomState` instance. """
 
-        return np.random.poisson(lam=self.lam, size=nrows)
+        return random_state.poisson(lam=self.lam, size=nrows)

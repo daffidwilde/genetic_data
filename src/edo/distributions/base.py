@@ -8,5 +8,5 @@ class Distribution(metaclass=abc.ABCMeta):
     those defined by users. """
 
     @abc.abstractmethod
-    def sample(self, nrows=None):
+    def sample(self, nrows=None, random_state=None):
         """ A placeholder function for sampling from the distribution. """

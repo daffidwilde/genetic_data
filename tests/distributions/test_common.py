@@ -1,5 +1,6 @@
 """ Test base distribution class and the methods shared by all pdf classes. """
 
+import numpy as np
 import pytest
 from hypothesis import given
 from hypothesis.strategies import integers, sampled_from
@@ -43,13 +44,16 @@ def test_repr(distribution):
 
 @given(
     distribution=sampled_from(all_distributions),
-    nrows=integers(min_value=0, max_value=99),
+    nrows=integers(min_value=1, max_value=100),
+    seed=integers(min_value=0, max_value=100),
 )
-def test_sample(distribution, nrows):
+def test_sample(distribution, nrows, seed):
     """ Verify that distribution objects can sample correctly. """
 
     pdf = distribution()
-    sample = pdf.sample(nrows)
+    state = np.random.RandomState(seed)
+
+    sample = pdf.sample(nrows, state)
     assert sample.shape == (nrows,)
     assert sample.dtype == pdf.dtype
 
