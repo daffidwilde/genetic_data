@@ -38,6 +38,7 @@ def test_init(distribution):
     assert family.subtype_id == 0
     assert family.subtypes == {}
     assert family.all_subtypes == {}
+    assert family.random_state is np.random.mtrand._rand
 
 
 @given(distribution=distributions())
@@ -105,8 +106,9 @@ def test_save(distribution):
     family.add_subtype()
     family.save(".testcache")
 
-    path = pathlib.Path(f".testcache/subtypes/{distribution.name}/0.pkl")
-    assert path.exists()
+    path = pathlib.Path(f".testcache/subtypes/{distribution.name}/")
+    assert (path / "0.pkl").exists()
+    assert (path / "state.pkl").exists()
 
     os.system("rm -r .testcache")
 
@@ -119,8 +121,9 @@ def test_reset(distribution):
     family.add_subtype()
     family.reset()
 
-    assert family.subtype_id == 0
-    assert family.subtypes == {}
+    fresh_family = Family(distribution)
+
+    assert vars(family) == vars(fresh_family)
 
 
 @given(distribution=distributions())
@@ -165,5 +168,13 @@ def test_load(distribution):
     assert pickled_subtype.__init__ is subtype.__init__
     assert pickled_subtype.__repr__ is subtype.__repr__
     assert pickled_subtype.sample is subtype.sample
+
+    for fpart, ppart in zip(
+        family.random_state.get_state(), pickled.random_state.get_state()
+    ):
+        try:
+            assert all(fpart == ppart)
+        except TypeError:
+            assert fpart == ppart
 
     os.system("rm -r .testcache")
