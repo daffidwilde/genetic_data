@@ -982,7 +982,7 @@ def test_run_not_reproducible_without_seed(
     families = [edo.Family(dist) for dist in distributions]
 
     do_one = DataOptimiser(
-        lambda df: np.random.randint(len(df)),
+        lambda df: np.random.random(),
         size,
         row_limits,
         col_limits,
@@ -1002,7 +1002,7 @@ def test_run_not_reproducible_without_seed(
     families = [edo.Family(dist) for dist in distributions]
 
     do_two = DataOptimiser(
-        lambda df: np.random.randint(len(df)),
+        lambda df: np.random.random(),
         size,
         row_limits,
         col_limits,
