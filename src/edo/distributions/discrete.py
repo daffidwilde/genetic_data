@@ -1,7 +1,5 @@
 """ All currently implemented discrete distribution classes. """
 
-import numpy as np
-
 from .base import Distribution
 
 
@@ -28,9 +26,9 @@ class Bernoulli(Distribution):
     hard_limits = {"prob": [0, 1]}
     param_limits = {"prob": [0, 1]}
 
-    def __init__(self):
+    def __init__(self, random_state):
 
-        self.prob = np.random.uniform(*self.param_limits["prob"])
+        self.prob = random_state.uniform(*self.param_limits["prob"])
 
     def __repr__(self):
 
@@ -66,9 +64,9 @@ class Poisson(Distribution):
     hard_limits = {"lam": [0, 10]}
     param_limits = {"lam": [0, 10]}
 
-    def __init__(self):
+    def __init__(self, random_state):
 
-        self.lam = np.random.uniform(*self.param_limits["lam"])
+        self.lam = random_state.uniform(*self.param_limits["lam"])
 
     def __repr__(self):
 

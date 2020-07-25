@@ -1,7 +1,5 @@
 """ All currently implemented, continuous distributions. """
 
-import numpy as np
-
 from .base import Distribution
 
 
@@ -30,10 +28,10 @@ class Gamma(Distribution):
     hard_limits = {"alpha": [0, 10], "theta": [0, 10]}
     param_limits = {"alpha": [0, 10], "theta": [0, 10]}
 
-    def __init__(self):
+    def __init__(self, random_state):
 
-        self.alpha = np.random.uniform(*self.param_limits["alpha"])
-        self.theta = np.random.uniform(*self.param_limits["theta"])
+        self.alpha = random_state.uniform(*self.param_limits["alpha"])
+        self.theta = random_state.uniform(*self.param_limits["theta"])
 
     def __repr__(self):
 
@@ -77,10 +75,10 @@ class Normal(Distribution):
     hard_limits = {"mean": [-10, 10], "std": [0, 10]}
     param_limits = {"mean": [-10, 10], "std": [0, 10]}
 
-    def __init__(self):
+    def __init__(self, random_state):
 
-        self.mean = np.random.uniform(*self.param_limits["mean"])
-        self.std = np.random.uniform(*self.param_limits["std"])
+        self.mean = random_state.uniform(*self.param_limits["mean"])
+        self.std = random_state.uniform(*self.param_limits["std"])
 
     def __repr__(self):
 
@@ -118,10 +116,10 @@ class Uniform(Distribution):
     hard_limits = {"bounds": [-10, 10]}
     param_limits = {"bounds": [-10, 10]}
 
-    def __init__(self):
+    def __init__(self, random_state):
 
         self.bounds = sorted(
-            np.random.uniform(*self.param_limits["bounds"], size=2)
+            random_state.uniform(*self.param_limits["bounds"], size=2)
         )
 
     def __repr__(self):
