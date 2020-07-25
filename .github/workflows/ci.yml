@@ -27,7 +27,8 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         python -m pip install -r requirements.txt
         python -m pip install -q --no-cache-dir -e .
-        python -m pip install -q --no-cache-dir pytest pytest-cov isort black
+        python -m pip install -q --no-cache-dir pytest pytest-cov hypothesis
+        python -m pip install -q --no-cache-dir black flake8 isort
         python -m pip list
     - name: Run tests
       run: python -m pytest --cov=edo --cov-fail-under=100 tests
