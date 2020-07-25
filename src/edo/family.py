@@ -63,7 +63,7 @@ class Family:
         self.all_subtypes[self.subtype_id] = subtype
         self.subtype_id += 1
 
-    def make_instance(self):
+    def make_instance(self, random_state):
         """ Select an existing subtype at random -- or create a new one if there
         is space available -- and return an instance of that subtype. """
 
@@ -75,7 +75,7 @@ class Family:
         if choice == self.subtype_id:
             self.add_subtype()
 
-        instance = self.subtypes[choice]()
+        instance = self.subtypes[choice](random_state)
         return instance
 
     def save(self, cache_dir=".edocache"):

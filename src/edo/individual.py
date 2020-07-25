@@ -115,15 +115,17 @@ def _sample_ncols(col_limits, random_state):
     return random_state.randint(integer_limits[0], integer_limits[1] + 1)
 
 
-def _get_minimum_columns(nrows, col_limits, families, family_counts):
+def _get_minimum_columns(
+    nrows, col_limits, families, family_counts, random_state
+):
     """ If :code:`col_limits` has a tuple lower limit then sample columns of the
     correct class from :code:`families` as needed to satisfy this bound. """
 
     columns, metadata = [], []
     for family, min_limit in zip(families, col_limits[0]):
         for _ in range(min_limit):
-            meta = family.make_instance()
-            columns.append(meta.sample(nrows))
+            meta = family.make_instance(random_state)
+            columns.append(meta.sample(nrows, random_state))
             metadata.append(meta)
             family_counts[family.name] += 1
 
@@ -150,17 +152,17 @@ def _get_remaining_columns(
         idx = families.index(family)
         try:
             if family_counts[family.name] < col_limits[1][idx]:
-                meta = family.make_instance()
-                columns.append(meta.sample(nrows))
+                meta = family.make_instance(random_state)
+                columns.append(meta.sample(nrows, random_state))
                 metadata.append(meta)
                 family_counts[family.name] += 1
 
         except TypeError:
-            meta = family.make_instance()
-            columns.append(meta.sample(nrows))
+            meta = family.make_instance(random_state)
+            columns.append(meta.sample(nrows, random_state))
             metadata.append(meta)
 
-    return columns, metadata, random_state
+    return columns, metadata
 
 
 def create_individual(row_limits, col_limits, families, weights, random_state):
@@ -193,10 +195,10 @@ def create_individual(row_limits, col_limits, families, weights, random_state):
 
     if isinstance(col_limits[0], tuple):
         columns, metadata, pdf_counts = _get_minimum_columns(
-            nrows, col_limits, families, family_counts
+            nrows, col_limits, families, family_counts, random_state
         )
 
-    columns, metadata, random_state = _get_remaining_columns(
+    columns, metadata = _get_remaining_columns(
         columns,
         metadata,
         nrows,
