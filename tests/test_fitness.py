@@ -19,7 +19,7 @@ from .util.trivials import trivial_fitness
 
 
 @INTEGER_INDIVIDUAL
-def test_get_fitness(row_limits, col_limits, weights):
+def test_get_fitness(row_limits, col_limits, weights, seed):
     """ Create an individual and get its fitness. Then verify that the fitness
     is of the correct data type and has been added to the cache. """
 
@@ -27,8 +27,11 @@ def test_get_fitness(row_limits, col_limits, weights):
 
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
+    random_state = np.random.RandomState(seed)
 
-    individual = create_individual(row_limits, col_limits, families, weights)
+    individual = create_individual(
+        row_limits, col_limits, families, weights, random_state
+    )
     dataframe = individual.dataframe
 
     fit = get_fitness(dataframe, trivial_fitness).compute()
@@ -39,7 +42,7 @@ def test_get_fitness(row_limits, col_limits, weights):
 
 
 @INTEGER_INDIVIDUAL
-def test_get_fitness_kwargs(row_limits, col_limits, weights):
+def test_get_fitness_kwargs(row_limits, col_limits, weights, seed):
     """ Create an individual and get its fitness with keyword arguments. Then
     verify that the fitness is of the correct data type and has been added to
     the cache. """
@@ -49,8 +52,11 @@ def test_get_fitness_kwargs(row_limits, col_limits, weights):
     fitness_kwargs = {"arg": None}
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
+    random_state = np.random.RandomState(seed)
 
-    individual = create_individual(row_limits, col_limits, families, weights)
+    individual = create_individual(
+        row_limits, col_limits, families, weights, random_state
+    )
     dataframe = individual.dataframe
 
     fit = get_fitness(dataframe, trivial_fitness, **fitness_kwargs).compute()
@@ -71,9 +77,10 @@ def test_get_population_fitness_serial(size, row_limits, col_limits, weights):
 
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
+    random_states = {i: np.random.RandomState(i) for i in range(size)}
 
     population = create_initial_population(
-        size, row_limits, col_limits, families, weights
+        row_limits, col_limits, families, weights, random_states
     )
 
     pop_fit = get_population_fitness(population, trivial_fitness)
@@ -98,9 +105,10 @@ def test_get_population_fitness_parallel(
 
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
+    random_states = {i: np.random.RandomState(i) for i in range(size)}
 
     population = create_initial_population(
-        size, row_limits, col_limits, families, weights
+        row_limits, col_limits, families, weights, random_states
     )
 
     pop_fit = get_population_fitness(population, trivial_fitness, processes)

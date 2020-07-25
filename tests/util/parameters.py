@@ -79,35 +79,35 @@ POP_FITNESS = given(
 )
 
 INTEGER_CROSSOVER = given(
-    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, prob=PROB
+    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, prob=PROB, seed=INTS
 )
 
 INTEGER_TUPLE_CROSSOVER = given(
-    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS, prob=PROB
+    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS, prob=PROB, seed=INTS
 )
 
 TUPLE_INTEGER_CROSSOVER = given(
-    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS, prob=PROB
+    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS, prob=PROB, seed=INTS
 )
 
 TUPLE_CROSSOVER = given(
-    row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS, prob=PROB
+    row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS, prob=PROB, seed=INTS
 )
 
 INTEGER_MUTATION = given(
-    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, prob=PROB
+    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, prob=PROB, seed=INTS
 )
 
 INTEGER_TUPLE_MUTATION = given(
-    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS, prob=PROB
+    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS, prob=PROB, seed=INTS
 )
 
 TUPLE_INTEGER_MUTATION = given(
-    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS, prob=PROB
+    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS, prob=PROB, seed=INTS
 )
 
 TUPLE_MUTATION = given(
-    row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS, prob=PROB
+    row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS, prob=PROB, seed=INTS
 )
 
 OFFSPRING = given(
