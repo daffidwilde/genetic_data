@@ -51,18 +51,20 @@ WEIGHTS = sampled_from(
 
 
 INTEGER_INDIVIDUAL = given(
-    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS
+    row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS, seed=INTS
 )
 
 INTEGER_TUPLE_INDIVIDUAL = given(
-    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS
+    row_limits=SHAPES, col_limits=INT_TUPS, weights=WEIGHTS, seed=INTS
 )
 
 TUPLE_INTEGER_INDIVIDUAL = given(
-    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS
+    row_limits=SHAPES, col_limits=TUP_INTS, weights=WEIGHTS, seed=INTS
 )
 
-TUPLE_INDIVIDUAL = given(row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS)
+TUPLE_INDIVIDUAL = given(
+    row_limits=SHAPES, col_limits=TUPLES, weights=WEIGHTS, seed=INTS
+)
 
 POPULATION = given(
     size=SIZE, row_limits=SHAPES, col_limits=SHAPES, weights=WEIGHTS

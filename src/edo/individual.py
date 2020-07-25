@@ -1,6 +1,7 @@
 """ A collection of objects to facilitate an individual representation. """
 
 import json
+import pickle
 from pathlib import Path
 
 import numpy as np
@@ -21,10 +22,15 @@ class Individual:
         of `dataframe`.
     """
 
-    def __init__(self, dataframe, metadata):
+    def __init__(self, dataframe, metadata, random_state=None):
 
         self.dataframe = dataframe
         self.metadata = metadata
+
+        if random_state is None:
+            random_state = np.random.mtrand._rand
+
+        self.random_state = random_state
 
     def __repr__(self):
 
@@ -34,8 +40,8 @@ class Individual:
 
     def __iter__(self):
 
-        for _, val in vars(self).items():
-            yield val
+        for part in [self.dataframe, self.metadata]:
+            yield part
 
     @classmethod
     def from_file(cls, path, distributions, cache_dir=".edocache", method=pd):
@@ -65,7 +71,10 @@ class Individual:
             pdf.__dict__.update(meta["params"])
             metadata.append(pdf)
 
-        return Individual(dataframe, metadata)
+        with open(path / "main.state", "rb") as state:
+            random_state = pickle.load(state)
+
+        return Individual(dataframe, metadata, random_state)
 
     def to_file(self, path, cache_dir=".edocache"):
         """ Write self to file. """
@@ -83,10 +92,15 @@ class Individual:
         with open(path / "main.meta", "w") as meta:
             json.dump(meta_dicts, meta)
 
+        with open(path / "main.state", "wb") as state:
+            pickle.dump(
+                self.random_state, state, protocol=pickle.HIGHEST_PROTOCOL
+            )
+
         return path
 
 
-def _sample_ncols(col_limits):
+def _sample_ncols(col_limits, random_state):
     """ Sample a valid number of columns from the column limits, even if those
     limits contain tuples. """
 
@@ -98,7 +112,7 @@ def _sample_ncols(col_limits):
             integer_lim = lim
         integer_limits.append(integer_lim)
 
-    return np.random.randint(integer_limits[0], integer_limits[1] + 1)
+    return random_state.randint(integer_limits[0], integer_limits[1] + 1)
 
 
 def _get_minimum_columns(nrows, col_limits, families, family_counts):
@@ -125,13 +139,14 @@ def _get_remaining_columns(
     families,
     weights,
     family_counts,
+    random_state,
 ):
     """ Sample all remaining columns for the current individual. If
     :code:`col_limits` has a tuple upper limit then sample all remaining
     columns for the individual without exceeding the bounds. """
 
     while len(columns) < ncols:
-        family = np.random.choice(families, p=weights)
+        family = random_state.choice(families, p=weights)
         idx = families.index(family)
         try:
             if family_counts[family.name] < col_limits[1][idx]:
@@ -145,10 +160,10 @@ def _get_remaining_columns(
             columns.append(meta.sample(nrows))
             metadata.append(meta)
 
-    return columns, metadata
+    return columns, metadata, random_state
 
 
-def create_individual(row_limits, col_limits, families, weights=None):
+def create_individual(row_limits, col_limits, families, weights, random_state):
     """ Create an individual dataset-metadata representation within the limits
     provided. An individual is contained within a :code:`namedtuple` object.
 
@@ -166,21 +181,23 @@ def create_individual(row_limits, col_limits, families, weights=None):
         A sequence of relative weights the same length as :code:`families`. This
         acts as a probability distribution from which to sample column classes.
         If :code:`None`, column classes are sampled uniformly.
+    random_state : numpy.random.RandomState
+        The PRNG associated with the individual to use for random sampling.
     """
 
-    nrows = np.random.randint(row_limits[0], row_limits[1] + 1)
-    ncols = _sample_ncols(col_limits)
+    nrows = random_state.randint(row_limits[0], row_limits[1] + 1)
+    ncols = _sample_ncols(col_limits, random_state)
 
-    cols, metadata = [], []
+    columns, metadata = [], []
     family_counts = {family.name: 0 for family in families}
 
     if isinstance(col_limits[0], tuple):
-        cols, metadata, pdf_counts = _get_minimum_columns(
+        columns, metadata, pdf_counts = _get_minimum_columns(
             nrows, col_limits, families, family_counts
         )
 
-    cols, metadata = _get_remaining_columns(
-        cols,
+    columns, metadata, random_state = _get_remaining_columns(
+        columns,
         metadata,
         nrows,
         ncols,
@@ -188,7 +205,8 @@ def create_individual(row_limits, col_limits, families, weights=None):
         families,
         weights,
         family_counts,
+        random_state,
     )
 
-    dataframe = pd.DataFrame({i: col for i, col in enumerate(cols)})
-    return Individual(dataframe, metadata)
+    dataframe = pd.DataFrame({i: col for i, col in enumerate(columns)})
+    return Individual(dataframe, metadata, random_state)
