@@ -1,6 +1,5 @@
 """ A collection of trivial objects for use in tests. """
 
-import numpy as np
 import pandas as pd
 
 

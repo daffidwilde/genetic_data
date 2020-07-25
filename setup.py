@@ -1,17 +1,17 @@
 """ Setup script. """
 
-# pylint: disable=exec-used,undefined-variable
-
 from setuptools import find_packages, setup
 
 with open("README.rst", "r") as readme_file:
     README = readme_file.read()
 
-exec(open("src/edo/version.py", "r").read())
+version = {}
+with open("src/edo/version.py", "r") as f:
+    exec(f.read(), version)
 
 setup(
     name="edo",
-    version=__version__,
+    version=version["__version__"],
     description="Generating artificial datasets through genetic evolution.",
     long_description=README,
     long_description_content_type="text/x-rst",
@@ -22,5 +22,5 @@ setup(
     keywords=["genetic-algorithm" "data" "evolution"],
     packages=find_packages("src"),
     package_dir={"": "src"},
-    tests_require=["pytest", "hypothesis", "numpy"]
+    tests_require=["pytest", "hypothesis", "numpy"],
 )
