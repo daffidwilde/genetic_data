@@ -1,4 +1,4 @@
-""" .. Functions related to the mutation operator. """
+""" Functions related to the mutation operator. """
 
 from edo.individual import Individual
 
@@ -9,15 +9,15 @@ def mutation(individual, prob, row_limits, col_limits, families, weights=None):
     """ Mutate an individual. Here, the characteristics of an individual can be
     split into two parts: their dimensions, and their values. Each of these
     parts is mutated in a different way using the same probability,
-    :code:`prob`.
+    ``prob``.
 
     Parameters
     ----------
     individual : Individual
         The individual to be mutated.
     prob : float
-        The probability with which any characteristic of :code:`individual`
-        should be mutated.
+        The probability with which any characteristic of ``individual`` should
+        be mutated.
     row_limits : list
         Lower and upper limits on the number of rows an individual can have.
     col_limits : list
@@ -25,8 +25,8 @@ def mutation(individual, prob, row_limits, col_limits, families, weights=None):
     families: list
         Families of distributions with which to create new columns.
     weights : list, optional
-        Probability with which to sample a distribution from :code:`families`.
-        If :code:`None`, sample uniformly.
+        Probabilities with which to sample a distribution ``families``. If
+        ``None``, sample uniformly.
 
     Returns
     -------
@@ -51,7 +51,7 @@ def mutation(individual, prob, row_limits, col_limits, families, weights=None):
 def mutate_nrows(dataframe, metadata, row_limits, random_state, prob):
     """ Mutate the number of rows an individual has by adding a new row and/or
     dropping a row at random so as not to exceed the bounds of
-    :code:`row_limits`. """
+    ``row_limits``. """
 
     if random_state.random() < prob and dataframe.shape[0] < row_limits[1]:
         dataframe = _add_row(dataframe, metadata, random_state)
@@ -67,7 +67,7 @@ def mutate_ncols(
 ):
     """ Mutate the number of columns an individual has by adding a new column
     and/or dropping a column at random. In either case, the bounds defined in
-    :code:`col_limits` cannot be exceeded. """
+    ``col_limits`` cannot be exceeded. """
 
     if isinstance(col_limits[1], tuple):
         condition = dataframe.shape[1] < sum(col_limits[1])
@@ -94,7 +94,7 @@ def mutate_ncols(
 
 def mutate_params(metadata, random_state, prob):
     """ Mutate the parameters of each column in the metadata of an individual.
-    Each mutation has probability :code:`prob`. """
+    Each mutation has probability ``prob``. """
 
     for pdf in metadata:
         subtype = pdf.__class__
@@ -107,9 +107,9 @@ def mutate_params(metadata, random_state, prob):
 
 
 def mutate_values(dataframe, metadata, random_state, prob):
-    """ Iterate over the values of :code:`dataframe`, mutating them with
-    probability :code:`prob`. Mutation is done by resampling from each column's
-    associated distribution in :code:`metadata`. """
+    """ Iterate over the values of ``dataframe`` and mutate them each with
+    probability ``prob``. Mutating a value is done by resampling from the
+    associated column distribution in ``metadata``. """
 
     for j, col in enumerate(dataframe.columns):
         pdf = metadata[j]
@@ -152,8 +152,8 @@ def _remove_row(dataframe, random_state):
 
 def _add_col(dataframe, metadata, col_limits, families, weights, random_state):
     """ Add a new column to the end of the dataframe by sampling a distribution
-    from :code:`families` according to the column limits and distribution
-    weights. """
+    from ``families`` according to the column limits and distribution weights
+    and sampling the required number of values from that distribution. """
 
     nrows, ncols = dataframe.shape
     if isinstance(col_limits[1], tuple):
@@ -179,7 +179,7 @@ def _add_col(dataframe, metadata, col_limits, families, weights, random_state):
 
 
 def _remove_col(dataframe, metadata, col_limits, families, random_state):
-    """ Remove a column (and its metadata) from a dataframe at random. """
+    """ Remove a column (and its metadata) from an individual at random. """
 
     if isinstance(col_limits[0], tuple):
         ncols = dataframe.shape[1]

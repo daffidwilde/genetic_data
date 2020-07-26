@@ -28,7 +28,7 @@ def _adjust_subtype_param_limits(parents, subtype, itr, shrinkage):
 
     where :math:`t` is the current timestep, :math:`u_t, l_t` denote the upper
     and lower limits of the parameter at iteration :math:`t`, and :math:`k \in
-    (0, 1)` is some :code:`shrinkage` factor.
+    (0, 1)` is some ``shrinkage`` factor.
     """
 
     for name, limits in subtype.param_limits.items():
@@ -48,7 +48,7 @@ def _adjust_subtype_param_limits(parents, subtype, itr, shrinkage):
 def shrink(parents, families, itr, shrinkage):
     """ Given the current progress of the evolutionary algorithm, shrink its
     search space, i.e. the parameter spaces for each of the distribution classes
-    in :code:`families`.
+    in ``families``.
 
     Parameters
     ----------

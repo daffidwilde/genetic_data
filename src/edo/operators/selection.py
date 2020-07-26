@@ -1,4 +1,4 @@
-""" .. Function(s) for the selection operator. """
+""" The selection operator. """
 
 import numpy as np
 
@@ -15,28 +15,22 @@ def selection(
     population : list
         All current individuals.
     pop_fitness : list
-        The fitness of each individual in :code:`population`.
+        The fitness of each individual in ``population``.
     best_prop : float
-        The proportion of the fittest individuals in :code:`population` to be
+        The proportion of the fittest individuals in ``population`` to be
         selected.
     lucky_prop : float
-        The proportion of lucky individuals in :code:`population` to be
-        selected.
+        The proportion of lucky individuals left in ``population`` to be
+        selected after the "best" have been selected.
     maximise : bool, optional
         Determines whether an individual's fitness should be maximal or not.
-        Defaults to :code:`False`.
+        Defaults to ``False``.
 
     Returns
     -------
     parents : dict
         The individuals chosen to potentially become parents and their index in
         the current population.
-
-    Raises
-    ------
-    ValueError
-        If :code:`int(best_prop * len(population)) == 0` and
-        :code:`int(lucky_prop * len(population)) == 0`.
     """
 
     size = len(population)

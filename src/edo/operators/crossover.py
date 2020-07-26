@@ -1,4 +1,4 @@
-""" .. A script containing all relevant functions for the crossover process. """
+""" Functions for the crossover process. """
 
 import pandas as pd
 
@@ -8,8 +8,8 @@ from .util import get_family_counts
 
 
 def _collate_parents(parent1, parent2):
-    """ Concatenate the columns and metadata from each parent together. These
-    lists form a pool from which information is inherited during the crossover
+    """ Collect the columns and metadata from each parent together. These lists
+    form a pool from which information is inherited during the crossover
     process. """
 
     parent_cols, parent_meta = [], []
@@ -23,9 +23,9 @@ def _collate_parents(parent1, parent2):
 def _cross_minimum_columns(
     parent_cols, parent_meta, col_limits, families, random_state
 ):
-    """ If :code:`col_limits` has a tuple lower limit, inherit the minimum
-    number of columns from two parents to satisfy this limit. Return part of a
-    whole individual and the adjusted parent information. """
+    """ In the case where ``col_limits`` has a tuple lower limit, inherit the
+    minimum number of columns from two parents to satisfy this limit. Return
+    part of a whole individual and the adjusted parent information. """
 
     columns, metadata = [], []
     for limit, family in zip(col_limits[0], families):
@@ -54,9 +54,9 @@ def _cross_remaining_columns(
     families,
     random_state,
 ):
-    """ Regardless of whether :code:`col_limits` has a tuple upper limit or not,
-    inherit all remaining columns from the two parents so as not to exceed these
-    bounds. Return the components of a full individual. """
+    """ Regardless of whether ``col_limits`` has a tuple upper limit or not,
+    inherit all remaining columns from the two parents so as not to exceed this
+    upper bound. Return the components of a full individual. """
 
     family_counts = get_family_counts(metadata, families)
     while len(columns) < ncols:
@@ -103,10 +103,11 @@ def _adjust_column_lengths(columns, metadata, nrows, random_state):
 
 
 def crossover(parent1, parent2, col_limits, families, random_state, prob=0.5):
-    """ Blend the information from two parents to create a new
-    :code:`Individual`. Dimensions are inherited first, and then column-metadata
-    pairs are inherited from either parent uniformly. Missing values are filled
-    in as necessary.
+    """ Blend the information from two parents to create a new ``Individual``.
+    Dimensions are inherited first, forming a "skeleton" that is filled with
+    column-metadata pairs. These pairs are selected from either parent
+    uniformly. Missing values are filled in as necessary.
+
     Parameters
     ----------
     parent1 : Individual
@@ -114,7 +115,7 @@ def crossover(parent1, parent2, col_limits, families, random_state, prob=0.5):
     parent2 : Individual
         The second individual to be blended.
     col_limits : list
-        Lower and upper bounds on the number of columns :code:`offspring` can
+        Lower and upper bounds on the number of columns ``offspring`` can
         have. Used in case of tuple limits.
     families : list
         Families of distributions with which to create new columns. Used in case
@@ -123,7 +124,7 @@ def crossover(parent1, parent2, col_limits, families, random_state, prob=0.5):
         The PRNG associated with the offspring.
     prob : float, optional
         The cut-off probability with which to inherit dimensions from
-        :code:`parent1` over :code:`parent2`.
+        ``parent1`` over ``parent2``.
     Returns
     -------
     offspring : Individual
