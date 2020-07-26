@@ -1,5 +1,4 @@
-""" A script containing functions for each of the components of the genetic
-algorithm. """
+""" Functions for the creation and updating of a population. """
 
 from .individual import create_individual
 from .operators import crossover, mutation
@@ -20,20 +19,20 @@ def create_initial_population(
     col_limits : list
         Limits on the number of columns a dataset can have.
     families : list
-        A list of Family instances that handle the column distribution classes.
-        Each column distribution class must have a `.sample()` method.
+        A list of ``edo.Family`` instances that handle the column distribution
+        classes.
     weights : list
-        A sequence of relative weights the same length as `column_classes`. This
-        acts as a loose probability distribution from which to sample column
-        classes. If `None`, column classes are sampled equally.
+        Relative weights with which to sample from ``families``. If ``None``,
+        sampling is done uniformly.
     random_states : dict
-        The `numpy.random.RandomState` instances to be assigned to the
-        individuals in the population.
+        A mapping of the index of the population to a
+        ``numpy.random.RandomState`` instance that is to be assigned to the
+        individual at that index in the population.
 
     Returns
     -------
     population : list
-        A collection of individuals.
+        A population of newly created individuals.
     """
 
     population = [
@@ -56,10 +55,33 @@ def create_new_population(
     random_states,
 ):
     """ Given a set of potential parents to be carried into the next generation,
-    create offspring from pairs withi} that set until there are enough
-    individuals. Each individual offspring is formed using a crossover operator
-    on the two parent individuals and then mutating them according to the
-    probability `mutation_prob`. """
+    create offspring from pairs within that set until there are enough
+    individuals.
+
+    Parameters
+    ----------
+    parents : list
+        A list of `edo.individual.Individual` instances used to create new
+        offspring.
+    population : list
+        The current population.
+    crossover_prob : float
+        The probability with which to sample dimensions from the first parent
+        over the second during crossover.
+    mutation_prob : float
+        The probability with which to mutate a component of a newly created
+        individual.
+    row_limits : list
+        Limits on the number of rows a dataset can have.
+    col_limits : list
+        Limits on the number of columns a dataset can have.
+    families : list
+        The ``edo.Family`` instances from which to draw distribution instances.
+    weights : list
+        Weights used to sample elements from ``families``.
+    random_states : dict
+        The PRNGs assigned to each individual in the population.
+    """
 
     parent_idxs = [population.index(parent) for parent in parents]
     available_states = [

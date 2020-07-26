@@ -1,4 +1,4 @@
-""" Fitness-related functions. """
+""" Functions for calculating individual and population fitness. """
 
 from pathlib import Path
 
@@ -34,7 +34,7 @@ def get_population_fitness(population, fitness, processes=None, **kwargs):
 
 
 def write_fitness(fitness, generation, root):
-    """ Write the generation fitness to file in the root directory. """
+    """ Write the generation fitness to file in the ``root`` directory. """
 
     path = Path(root)
     path.mkdir(parents=True, exist_ok=True)

@@ -1,4 +1,4 @@
-""" The distribution-subtype handler and its supporting functions. """
+""" The distribution subtype handler. """
 
 import os
 import pathlib
@@ -8,26 +8,35 @@ import numpy as np
 
 
 class Family:
-    """ A class for handling all concurrent subtypes of a distribution class.
+    """ A class for handling all concurrent subtypes of a distribution class. A
+    subtype is an independent copy of the distribution class allowing more of
+    the search space to be explored.
 
     Parameters
     ----------
-    distribution : edo.families.base.Distribution
-        The distribution class to keep track of.
+    distribution : edo.distributions.Distribution
+        The distribution class to keep track of. Must be of the same form as
+        those in ``edo.distributions``.
     max_subtypes : int
-        The maximum number of concurrent subtypes in the family. There is no
-        limit by default.
+        The maximum number of subtypes in the family that are currently being
+        used in a run of the EA. There is no limit by default.
 
     Attributes
     ----------
     name : str
-        The name of the family's distribution followed by `Family`.
+        The name of the family's distribution followed by ``Family``.
     subtype_id : int
         A counter that increments when new subtypes are created. Used as an
         identifier for a given subtype.
     subtypes : dict
         A dictionary that maps subtype identifiers to their corresponding
-        subtype.
+        subtype. This gets updated during a run to those that are currently
+        being used in the population.
+    all_subtypes : dict
+        A dictionary of all subtypes that have been created in the family.
+    random_state : np.random.RandomState
+        The PRNG associated with this family to be used for the sampling and
+        creation of subtypes.
     """
 
     def __init__(self, distribution, max_subtypes=None):
@@ -79,11 +88,11 @@ class Family:
         instance = self.subtypes[choice](random_state)
         return instance
 
-    def save(self, cache_dir=".edocache"):
-        """ Save the current subtypes in the family in the `cache_dir` directory
-        tree. """
+    def save(self, root=".edocache"):
+        """ Save the current subtypes in the family and the family's random
+        state in the ``root`` directory. """
 
-        path = pathlib.Path(f"{cache_dir}/subtypes/{self.distribution.name}")
+        path = pathlib.Path(f"{root}/subtypes/{self.distribution.name}")
         path.mkdir(exist_ok=True, parents=True)
 
         with open(path / "state.pkl", "wb") as state:
@@ -97,26 +106,28 @@ class Family:
             with open(path / f"{subtype_id}.pkl", "wb") as sub:
                 pickle.dump(attributes, sub, protocol=pickle.HIGHEST_PROTOCOL)
 
-    def reset(self, cache_dir=None):
-        """ Reset the family to have no subtypes. If a `cache_dir` is passed
-        then any cached subtype attribute dictionaries are deleted. """
+    def reset(self, root=None):
+        """ Reset the family to have no subtypes and the default ``numpy`` PRNG.
+        If ``root`` is passed then any cached information about the family is
+        deleted. """
 
         self.subtype_id = 0
         self.subtypes.clear()
         self.all_subtypes.clear()
         self.random_state = np.random.mtrand._rand
 
-        if cache_dir is not None:
-            os.system(f"rm -r {cache_dir}/subtypes/{self.distribution.name}")
+        if root is not None:
+            os.system(f"rm -r {root}/subtypes/{self.distribution.name}")
 
     @classmethod
-    def load(cls, distribution, cache_dir=".edocache"):
-        """ Load in any existing cached subtypes for `distribution`. If there
-        aren't any, then a clean instance is returned. """
+    def load(cls, distribution, root=".edocache"):
+        """ Load in any existing cached subtype dictionaries for
+        ``distribution`` and restore the subtype along with the family's random
+        state. """
 
         family = Family(distribution)
         name = distribution.name
-        path = pathlib.Path(f"{cache_dir}/subtypes/{name}/")
+        path = pathlib.Path(f"{root}/subtypes/{name}/")
 
         with open(path / "state.pkl", "rb") as state:
             family.random_state = pickle.load(state)
@@ -134,7 +145,7 @@ class Family:
 
 
 def _get_attrs_for_subtype(obj):
-    """ Get the attributes needed from `obj` to make or save a subtype. """
+    """ Get the attributes needed from ``obj`` to make or save a subtype. """
 
     attributes = {
         "name": obj.name,

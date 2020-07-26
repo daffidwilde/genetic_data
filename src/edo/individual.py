@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import dask.dataframe as dd
 
 from .family import Family
 
@@ -19,11 +20,14 @@ class Individual:
         The dataframe of the individual.
     metadata : list
         A list of distributions that are associated with the respective column
-        of `dataframe`.
+        of ``dataframe``.
     random_state : np.random.RandomState, optional
         The PRNG for the individual. If not provided, the default PRNG is used.
+
+    Attributes
+    ----------
     fitness : float
-        The fitness of the individual.
+        The fitness of the individual. Initialises as ``None``.
     """
 
     def __init__(self, dataframe, metadata, random_state=None):
@@ -49,11 +53,19 @@ class Individual:
             yield part
 
     @classmethod
-    def from_file(cls, path, distributions, cache_dir=".edocache", method=pd):
-        """ Create an instance of `Individual` from files at `path`. """
+    def from_file(
+        cls, path, distributions, family_root=".edocache", method="pandas"
+    ):
+        """ Create an instance of ``Individual`` from the files at ``path`` and
+        ``family_root`` using either ``pandas`` or ``dask``. """
 
         path = Path(path)
         distributions = {dist.name: dist for dist in distributions}
+
+        if method == "pandas":
+            method = pd
+        if method == "dask":
+            method = dd
 
         dataframe = method.read_csv(path / "main.csv")
         dataframe.columns = map(int, dataframe.columns)
@@ -67,7 +79,7 @@ class Individual:
             family = globals().get(f"{distribution}Family", None)
             if family is None:
                 distribution = distributions[distribution]
-                family = Family.load(distribution, cache_dir)
+                family = Family.load(distribution, family_root)
 
             subtype_id = meta["subtype_id"]
             subtype = family.subtypes[subtype_id]
@@ -81,7 +93,7 @@ class Individual:
 
         return Individual(dataframe, metadata, random_state)
 
-    def to_file(self, path, cache_dir=".edocache"):
+    def to_file(self, path, family_root=".edocache"):
         """ Write self to file. """
 
         path = Path(path)
@@ -91,7 +103,7 @@ class Individual:
 
         meta_dicts = []
         for pdf in self.metadata:
-            pdf.family.save(cache_dir)
+            pdf.family.save(family_root)
             meta_dicts.append(pdf.to_dict())
 
         with open(path / "main.meta", "w") as meta:
@@ -106,8 +118,7 @@ class Individual:
 
 
 def _sample_ncols(col_limits, random_state):
-    """ Sample a valid number of columns from the column limits, even if those
-    limits contain tuples. """
+    """ Sample a valid number of columns from the column limits. """
 
     integer_limits = []
     for lim in col_limits:
@@ -123,8 +134,8 @@ def _sample_ncols(col_limits, random_state):
 def _get_minimum_columns(
     nrows, col_limits, families, family_counts, random_state
 ):
-    """ If :code:`col_limits` has a tuple lower limit then sample columns of the
-    correct class from :code:`families` as needed to satisfy this bound. """
+    """ If ``col_limits`` has a tuple lower limit then sample columns of the
+    corresponding element of ``families`` as needed to satisfy this bound. """
 
     columns, metadata = [], []
     for family, min_limit in zip(families, col_limits[0]):
@@ -149,7 +160,7 @@ def _get_remaining_columns(
     random_state,
 ):
     """ Sample all remaining columns for the current individual. If
-    :code:`col_limits` has a tuple upper limit then sample all remaining
+    ``col_limits`` has a tuple upper limit then sample all remaining
     columns for the individual without exceeding the bounds. """
 
     while len(columns) < ncols:
@@ -171,8 +182,7 @@ def _get_remaining_columns(
 
 
 def create_individual(row_limits, col_limits, families, weights, random_state):
-    """ Create an individual dataset-metadata representation within the limits
-    provided. An individual is contained within a :code:`namedtuple` object.
+    """ Create an individual within the limits provided.
 
     Parameters
     ----------
@@ -180,16 +190,16 @@ def create_individual(row_limits, col_limits, families, weights, random_state):
         Lower and upper bounds on the number of rows a dataset can have.
     col_limits : list
         Lower and upper bounds on the number of columns a dataset can have.
-        Tuples can be used to indicate limits on the number of columns needed to
+        Tuples can be used to indicate limits on the number of columns needed
+        from each family in ``families``.
     families : list
-        A list of `edo.Family` instances handling the column distributions that
-        can be selected from.
+        A list of ``edo.Family`` instances handling the column distributions
+        that can be selected from.
     weights : list
-        A sequence of relative weights the same length as :code:`families`. This
-        acts as a probability distribution from which to sample column classes.
-        If :code:`None`, column classes are sampled uniformly.
+        A sequence of relative weights with which to sample from ``families``.
+        If ``None``, then sampling is uniform.
     random_state : numpy.random.RandomState
-        The PRNG associated with the individual to use for random sampling.
+        The PRNG associated with the individual to use for its random sampling.
     """
 
     nrows = random_state.randint(row_limits[0], row_limits[1] + 1)

@@ -1,4 +1,4 @@
-""" .. The main script containing the evolutionary dataset algorithm. """
+""" .. The evolutionary algorithm class. """
 
 from collections import defaultdict
 from pathlib import Path
@@ -14,15 +14,14 @@ from edo.population import create_initial_population, create_new_population
 
 
 class DataOptimiser:
-    """ The (evolutionary) dataset optimiser. A class for generating data for a
+    """ The (evolutionary) dataset optimiser. A class that generates data for a
     given fitness function and evolutionary parameters.
 
     Parameters
     ----------
     fitness : func
-        Any real-valued function that takes one :class:`pandas.DataFrame` as
-        argument. Any further arguments should be passed to
-        :code:`fitness_kwargs`.
+        Any real-valued function that takes one ``pandas.DataFrame`` as
+        argument. Any further arguments should be passed in ``kwargs``.
     size : int
         The size of the population to create.
     row_limits : list
@@ -31,39 +30,33 @@ class DataOptimiser:
         Lower and upper bounds on the number of columns a dataset can have.
 
         Tuples can also be used to specify the min/maximum number of columns
-        there can be of each type in :code:`families`.
+        there can be of each element in ``families``.
     families : list
-        A list of `Family` instances that handle the distribution classes used
-        to populate the individuals in the EA.
-
-        .. note::
-            For reproducibility, a user-defined class' :code:`sample` method
-            should use NumPy for any random elements as the seed for the EA is
-            set using :func:`np.random.seed`.
+        A list of ``edo.Family`` instances that handle the distribution classes
+        used to populate the individuals in the EA.
     weights : list
-        A probability distribution on how to select columns from
-        :code:`families`. If :code:`None`, families will be chosen uniformly.
+        A set of relative weights on how to select elements from ``families``.
+        If ``None``, they will be chosen uniformly.
     max_iter : int
         The maximum number of iterations to be carried out before terminating.
     best_prop : float
-        The proportion of a population from which to select the "best" potential
-        parents.
+        The proportion of a population from which to select the "best"
+        individuals to be parents.
     lucky_prop : float
         The proportion of a population from which to sample some "lucky"
-        potential parents. Set to zero as standard.
+        individuals to be parents. Defaults to ``0``.
     crossover_prob : float
         The probability with which to sample dimensions from the first parent
-        over the second in a crossover operation. Defaults to 0.5.
+        over the second in a crossover operation. Defaults to ``0.5``.
     mutation_prob : float
-        The probability of a particular characteristic in an individual's
-        dataset being mutated. If using :code:`dwindle`, this is an initial
-        probability.
+        The probability of a particular characteristic of an individual being
+        mutated. If using a ``dwindle`` method, this is an initial probability.
     shrinkage : float
         The relative size to shrink each parameter's limits by for each
-        distribution in :code:`families`. Defaults to `None` but must be between
-        0 and 1 (not inclusive).
+        distribution in ``families``. Defaults to ``None`` but must be between
+        0 and 1 (exclusive).
     maximise : bool
-        Determines whether :code:`fitness` is a function to be maximised or not.
+        Determines whether ``fitness`` is a function to be maximised or not.
         Fitness scores are minimised by default.
     """
 
@@ -119,17 +112,17 @@ class DataOptimiser:
         Parameters
         ----------
         root : str, optional
-            The directory in which to write all generations to file. Defaults to
-            `None` where nothing is written to file. Instead, everything is kept
-            in memory and returned at the end. If writing to file, one
-            generation is held in memory at a time and everything is returned in
-            `dask` objects.
-        random_state : int, optional
-            The random seed for a particular run of the algorithm. If
-            :code:`None`, no seed is set.
+            The directory in which to write all generations to file. If
+            ``None``, nothing is written to file. Instead, every generation is
+            kept in memory and is returned at the end. If writing to file, one
+            generation is held in memory at a time and everything is returned
+            upon termination as a tuple containing ``dask`` objects.
+        random_state : int or np.ran.RandomState, optional
+            The random seed or state for a particular run of the algorithm. If
+            ``None``, the default PRNG is used.
         processes : int, optional
             The number of parallel processes to use when calculating the
-            population fitness. If `None` then a single-thread scheduler is
+            population fitness. If ``None`` then a single-thread scheduler is
             used.
         kwargs : dict, optional
             Any additional parameters that need to be passed to the functions
@@ -139,9 +132,9 @@ class DataOptimiser:
         Returns
         -------
         pop_history : list
-            Every individual in each generation as a nested list of `Individual`
-            instances.
-        fit_history : `pd.DataFrame` or `dask.core.dataframe.DataFrame`
+            Every individual in each generation as a nested list of
+            ``Individual`` instances.
+        fit_history : ``pd.DataFrame`` or ``dask.dataframe.DataFrame``
             Every individual's fitness in each generation.
         """
 
