@@ -311,7 +311,7 @@ def _get_pop_history(root, generation, distributions):
         ):
             individual_dir = Path(ind_dir)
             individual = Individual.from_file(
-                individual_dir, distributions, root, method=dd
+                individual_dir, distributions, root, method="dask"
             )
 
             population.append(individual)

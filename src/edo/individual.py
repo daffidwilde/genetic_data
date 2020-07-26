@@ -57,15 +57,16 @@ class Individual:
         cls, path, distributions, family_root=".edocache", method="pandas"
     ):
         """ Create an instance of ``Individual`` from the files at ``path`` and
-        ``family_root`` using either ``pandas`` or ``dask``. """
+        ``family_root`` using either ``pandas`` or ``dask`` to read in
+        individuals. Always fall back on ``pandas``. """
 
         path = Path(path)
         distributions = {dist.name: dist for dist in distributions}
 
-        if method == "pandas":
-            method = pd
         if method == "dask":
             method = dd
+        else:
+            method = pd
 
         dataframe = method.read_csv(path / "main.csv")
         dataframe.columns = map(int, dataframe.columns)
