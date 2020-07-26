@@ -1,4 +1,4 @@
-""" .. Base inheritance class for all distributions. """
+""" The base class from which all distributions inherit. """
 
 import abc
 

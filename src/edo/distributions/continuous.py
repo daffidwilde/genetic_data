@@ -1,30 +1,35 @@
-""" All currently implemented, continuous distributions. """
+""" All currently implemented continuous distributions. """
 
 from .base import Distribution
 
 
 class Gamma(Distribution):
-    """ Continuous column class given by the gamma distribution.
+    """ The gamma distribution class.
+
+    Parameters
+    ----------
+    random_state : numpy.random.RandomState
+        The PRNG used to sample instance parameters from ``param_limits``.
 
     Attributes
     ----------
     name : str
-        Name of the distribution, :code:`"Gamma"`.
-    dtype : str
-        Preferred datatype of distribution, :code:`"float"`.
+        Name of the distribution, ``"Gamma"``.
+    dtype : float
+        Preferred datatype of distribution, ``float``.
     param_limits : dict
         A dictionary of limits on the distribution parameters. Defaults to
-        :code:`[0, 10]` for both :code:`alpha` and :code:`theta`.
+        ``[0, 10]`` for both ``alpha`` and ``theta``.
     alpha : float
-        The shape parameter sampled from :code:`param_limits["alpha"]`.
+        The shape parameter sampled from ``param_limits["alpha"]``.
         `Instance attribute.`
     theta : float
-        The scale parameter sampled from :code:`param_limits["theta"]`.
+        The scale parameter sampled from ``param_limits["theta"]``.
         `Instance attribute.`
     """
 
     name = "Gamma"
-    dtype = "float"
+    dtype = float
     hard_limits = {"alpha": [0, 10], "theta": [0, 10]}
     param_limits = {"alpha": [0, 10], "theta": [0, 10]}
 
@@ -40,10 +45,8 @@ class Gamma(Distribution):
         return f"Gamma(alpha={alpha}, theta={theta})"
 
     def sample(self, nrows, random_state):
-        """ Take a sample of size :code:`nrows` from the gamma distribution with
-        shape and scale parameters given by :code:`alpha` and :code:`theta`
-        respectively. The sampling uses the provided `np.random.RandomState`
-        instance. """
+        """ Take a sample of size ``nrows`` from the gamma distribution using
+        the provided ``np.random.RandomState`` instance. """
 
         return random_state.gamma(
             shape=self.alpha, scale=self.theta, size=nrows
@@ -51,27 +54,31 @@ class Gamma(Distribution):
 
 
 class Normal(Distribution):
-    """ Continuous column class given by the normal distribution.
+    """ The normal distribution class.
+
+    Parameters
+    ----------
+    random_state : numpy.random.RandomState
+        The PRNG used to sample instance parameters from ``param_limits``.
 
     Attributes
     ----------
     name : str
-        Name of the distribution, :code:`"Normal"`.
-    dtype : str
-        Preferred datatype of distribution, :code:`"float"`.
+        Name of the distribution, ``"Normal"``.
+    dtype : float
+        Preferred datatype of distribution, ``float``.
     param_limits : dict
         A dictionary of limits on the distribution parameters. Defaults to
-        :code:`[-10, 10]` for :code:`mean` and :code:`[0, 10]` for :code:`std`.
+        ``[-10, 10]`` for ``mean`` and ``[0, 10]`` for ``std``.
     mean : float"
-        The mean, sampled from :code:`param_limits["mean"]`. `Instance
-        attribute.`
+        The mean, sampled from ``param_limits["mean"]``. `Instance attribute.`
     std : float
-        The standard deviation, sampled from :code:`param_limits["std"]`.
+        The standard deviation, sampled from ``param_limits["std"]``.
         `Instance attribute.`
     """
 
     name = "Normal"
-    dtype = "float"
+    dtype = float
     hard_limits = {"mean": [-10, 10], "std": [0, 10]}
     param_limits = {"mean": [-10, 10], "std": [0, 10]}
 
@@ -87,32 +94,35 @@ class Normal(Distribution):
         return f"Normal(mean={mean}, std={std})"
 
     def sample(self, nrows, random_state):
-        """ Take a sample of size :code:`nrows` from the normal distribution
-        with mean and standard deviation given by :code:`mean` and :code:`std`
-        respectively. The sampling uses the provided `np.random.RandomState`
-        instance. """
+        """ Take a sample of size ``nrows`` from the normal distribution using
+        the provided ``np.random.RandomState`` instance. """
 
         return random_state.normal(loc=self.mean, scale=self.std, size=nrows)
 
 
 class Uniform(Distribution):
-    """ Continuous column class given by the uniform distribution.
+    """ The uniform distribution class.
+
+    Parameters
+    ----------
+    random_state : numpy.random.RandomState
+        The PRNG used to sample instance parameters from ``param_limits``.
 
     Attributes
     ----------
     name : str
-        Name of the distribution, :code:`Uniform`
-    dtype : str
-        Preferred datatype of distribution, :code:`float`.
+        Name of the distribution, ``Uniform``.
+    dtype : float
+        Preferred datatype of distribution, ``float``.
     param_limits : dict
         A dictionary of limits on the distribution parameters. Defaults to
-        :code:`[-10, 10]` for :code:`bounds`.
+        ``[-10, 10]`` for ``bounds``.
     bounds : list of float
-        The lower and upper bounds of the distribution.
+        The lower and upper bounds of the distribution. `Instance attribute`.
     """
 
     name = "Uniform"
-    dtype = "float"
+    dtype = float
     hard_limits = {"bounds": [-10, 10]}
     param_limits = {"bounds": [-10, 10]}
 
@@ -129,9 +139,7 @@ class Uniform(Distribution):
         return f"Uniform(bounds=[{lower}, {upper}])"
 
     def sample(self, nrows, random_state):
-        """ Take a sample of size :code:`nrows` from the uniform distribution
-        with lower and upper limits given by :code:`lower` and :code:`upper`
-        respectively. The sampling uses the provided `np.random.RandomState`
-        instance. """
+        """ Take a sample of size ``nrows`` from the uniform distribution using
+        the provided ``np.random.RandomState`` instance. """
 
         return random_state.uniform(*self.bounds, size=nrows)
