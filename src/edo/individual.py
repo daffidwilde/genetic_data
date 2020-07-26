@@ -16,7 +16,7 @@ class Individual:
 
     Parameters
     ----------
-    dataframe : pd.DataFrame
+    dataframe : pd.DataFrame or dd.DataFrame
         The dataframe of the individual.
     metadata : list
         A list of distributions that are associated with the respective column
