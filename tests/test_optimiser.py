@@ -8,7 +8,7 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 import yaml
-from hypothesis import assume, given, settings
+from hypothesis import given, settings
 from hypothesis.strategies import (
     booleans,
     floats,
