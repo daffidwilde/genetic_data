@@ -1,4 +1,4 @@
-""" .. The evolutionary algorithm class. """
+""" The evolutionary dataset optimisation algorithm class. """
 
 from collections import defaultdict
 from pathlib import Path
