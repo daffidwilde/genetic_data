@@ -148,7 +148,7 @@ def test_load(distribution):
     subtype = family.subtypes[0]
     family.save(".testcache")
 
-    pickled = Family.load(distribution, cache_dir=".testcache")
+    pickled = Family.load(distribution, root=".testcache")
     pickled_subtype = pickled.subtypes[0]
 
     assert isinstance(pickled, Family)
