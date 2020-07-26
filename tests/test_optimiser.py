@@ -8,7 +8,7 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 import yaml
-from hypothesis import given, settings
+from hypothesis import assume, given, settings
 from hypothesis.strategies import (
     booleans,
     floats,
@@ -979,6 +979,8 @@ def test_run_not_reproducible_without_seed(
     """ Test that two runs of the EA with the same parameters will likely
     produce different populations if they aren't seeded. """
 
+    assume(row_limits[0] > 1 and size > 2)
+
     families = [edo.Family(dist) for dist in distributions]
 
     do_one = DataOptimiser(
@@ -1019,6 +1021,9 @@ def test_run_not_reproducible_without_seed(
 
     pop_history_two, fit_history_two = do_two.run(processes=4)
 
+    checks = []
     for gen_from_one, gen_from_two in zip(pop_history_one, pop_history_two):
         for ind_from_one, ind_from_two in zip(gen_from_one, gen_from_two):
-            assert not ind_from_one.dataframe.equals(ind_from_two.dataframe)
+            checks.append(ind_from_one.dataframe.equals(ind_from_two.dataframe))
+
+    assert not all(checks)
