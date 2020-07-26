@@ -960,70 +960,50 @@ def test_run_is_reproducible(
             assert ind_from_one.dataframe.equals(ind_from_two.dataframe)
 
 
-@OPTIMISER
+@given(
+    size=integers(min_value=10, max_value=50),
+    distributions=lists(
+        sampled_from(all_distributions), min_size=3, max_size=3, unique=True
+    ),
+    maximise=booleans(),
+)
 @settings(deadline=None, max_examples=10)
-def test_run_not_reproducible_without_seed(
-    size,
-    row_limits,
-    col_limits,
-    distributions,
-    weights,
-    max_iter,
-    best_prop,
-    lucky_prop,
-    crossover_prob,
-    mutation_prob,
-    shrinkage,
-    maximise,
-):
+def test_run_not_reproducible_without_seed(size, distributions, maximise):
     """ Test that two runs of the EA with the same parameters will likely
     produce different populations if they aren't seeded. """
 
-    assume(row_limits[0] > 1 and size > 2)
-
+    row_limits = [10, 30]
+    col_limits = [2, 5]
     families = [edo.Family(dist) for dist in distributions]
+    max_iter = 5
 
-    do_one = DataOptimiser(
+    opt_one = DataOptimiser(
         lambda df: np.random.random(),
         size,
         row_limits,
         col_limits,
         families,
-        weights,
-        max_iter,
-        best_prop,
-        lucky_prop,
-        crossover_prob,
-        mutation_prob,
-        shrinkage,
-        maximise,
+        max_iter=max_iter,
+        maximise=maximise,
     )
 
-    pop_history_one, fit_history_one = do_one.run(processes=4)
+    pop_history_one, fit_history_one = opt_one.run(processes=4)
 
-    families = [edo.Family(dist) for dist in distributions]
-
-    do_two = DataOptimiser(
+    opt_two = DataOptimiser(
         lambda df: np.random.random(),
         size,
         row_limits,
         col_limits,
         families,
-        weights,
-        max_iter,
-        best_prop,
-        lucky_prop,
-        crossover_prob,
-        mutation_prob,
-        shrinkage,
-        maximise,
+        max_iter=max_iter,
+        maximise=maximise,
     )
 
-    pop_history_two, fit_history_two = do_two.run(processes=4)
+    pop_history_two, fit_history_two = opt_two.run(processes=4)
 
     checks = []
-    for gen_from_one, gen_from_two in zip(pop_history_one, pop_history_two):
-        for ind_from_one, ind_from_two in zip(gen_from_one, gen_from_two):
-            checks.append(ind_from_one.dataframe.equals(ind_from_two.dataframe))
+    for gen_one, gen_two in zip(pop_history_one, pop_history_two):
+        for ind_one, ind_two in zip(gen_one, gen_two):
+            checks.append(ind_one.dataframe.equals(ind_two.dataframe))
 
     assert not all(checks)
