@@ -1,17 +1,28 @@
-Please use the following to cite the latest version of the Edo library::
+Please use the following to cite the library::
 
-   @misc{edo-project,
-      author        = {{ {The EDO library developers} }},
-      title         = {EDO: <RELEASE TITLE>},
-      year          = 2018,
-      doi           = {<DOI INFORMATION>},
-      url           = {http://dx.doi.org/10.5281/zenodo.<DOI NUMBER>}
-   }
+    @misc{edo-library,
+        author = {{The EDO library developers}},
+        title = {edo: <RELEASE TITLE>},
+        year = <RELEASE YEAR>,
+        doi = {<DOI INFORMATION>},
+        url = {http://doi.org/<DOI INFORMATION>}
+    }
 
-To check the details (RELEASE TITLE, DOI INFORMATION and DOI NUMBER) please view
-the Zenodo page for the project.
-
-Click on the badge/link below:
+To check the relevant details (i.e. ``RELEASE TITLE``, ``RELEASE YEAR`` and
+``DOI NUMBER``) head to the library's Zenodo page:
 
 .. image:: https://zenodo.org/badge/139703799.svg
    :target: https://zenodo.org/badge/latestdoi/139703799
+
+If you wish to cite the paper, then use the following::
+
+    @article{edo-paper,
+        title = {Evolutionary dataset optimisation: learning algorithm quality
+                 through evolution},
+        author = {Wilde, Henry and Knight, Vincent and Gillard, Jonathan},
+        journal = {Applied Intelligence},
+        year = 2020,
+        volume = 50,
+        pages = {1172--1191},
+        doi = {10.1007/s10489-019-01592-4},
+    }

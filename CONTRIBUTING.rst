@@ -1,24 +1,30 @@
 Contributing to the library
 ===========================
 
-Whether they come in the form of providing a fix for a current `issue
-<https://github.com/daffidwilde/edo/issues>`_, reporting a bug, an enhancement
-to the code itself, or a discussion of the library as a whole, contributions are
-always welcome. Pull requests (PRs) will be reviewed, and collaborative work is
-encouraged!
+Contributions are always welcome whether they come in the form of providing a
+fix for a current `issue <https://github.com/daffidwilde/edo/issues>`_,
+reporting a bug or implementing an enhancement to the library code itself. Pull
+requests (PRs) will be reviewed and collaboration is encouraged.
 
 To make a contribution via a PR, follow these steps:
 
-1. Go to the `GitHub repo <https://github.com/daffidwilde/edo>`_,
-   make a fork, and clone the repo locally::
+1. Make a fork of the `GitHub repo <https://github.com/daffidwilde/edo>`_ and
+   clone your fork locally::
 
-       $ git clone git@github.com/<your-username>/edo.git
+        $ git clone https://github.com/<your-username>/edo.git
 
-2. Ensure that all the tests pass (this can take a few minutes)::
+2. Install the library in development mode. If you use Anaconda, there is a
+   ``conda`` environment file (``environment.yml``) with all of the development
+   dependencies::
 
-       $ cd edo
-       $ pytest tests
+        $ cd edo
+        $ conda env create -f environment.yml
+        $ conda activate edo-dev
+        $ python setup.py develop
 
-3. Make your changes and write tests to go with them -- ensuring they pass, too.
+3. Make your changes and write tests to go with them. Ensure that they pass and
+   you have 100% coverage::
+   
+        $ python -m pytest --cov=edo --cov-fail-under=100 tests
 
-4. Push to your fork and open a pull request!
+4. Push to your fork and open a pull request.

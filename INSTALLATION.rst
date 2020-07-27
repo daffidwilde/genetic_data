@@ -1,17 +1,11 @@
 Installation
-------------
+============
 
-Edo is built on Python 3, and relies only on `NumPy <http://www.numpy.org/>`_
-and `Pandas <https://pandas.pydata.org/>`_. Hence, no additional installs are
-required. In addition to this, however, `Matplotlib <http://matplotlib.org/>`_
-(2.2+) is assumed for these tutorials.
+The ``edo`` library requires Python 3.5+ and is ``pip``-installable::
 
-With that being said, the library is most easily installed using :code:`pip`::
+    $ python -m pip install edo
 
-    $ pip install edo
-
-However, if you would like to install it from source then go ahead and clone the
-GitHub repo::
+To install from source then clone the GitHub repo::
 
     $ git clone https://github.com/daffidwilde/edo.git
     $ cd edo
