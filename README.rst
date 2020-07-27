@@ -66,6 +66,9 @@ An article on the theory behind the algorithm has been published:
 Citation instructions
 =====================
 
+Citing the library
+------------------
+
 Please use the following to cite the library::
 
     @misc{edo-library,
@@ -81,6 +84,9 @@ To check the relevant details (i.e. ``RELEASE TITLE``, ``RELEASE YEAR`` and
 
 .. image:: https://zenodo.org/badge/139703799.svg
    :target: https://zenodo.org/badge/latestdoi/139703799
+
+Citing the paper
+----------------
 
 If you wish to cite the paper, then use the following::
 
