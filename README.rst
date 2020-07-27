@@ -59,9 +59,9 @@ Full documentation for the library is available at https://edo.readthedocs.io.
 
 An article on the theory behind the algorithm has been published:
 
->    Wilde, H., Knight, V. & Gillard, J. Evolutionary dataset optimisation:
->    learning algorithm quality through evolution. *Appl Intell* **50**,
->    1172-1191 (2020). https://doi.org/10.1007/s10489-019-01592-4
+    Wilde, H., Knight, V. & Gillard, J. Evolutionary dataset optimisation:
+    learning algorithm quality through evolution. *Appl Intell* **50**,
+    1172-1191 (2020). https://doi.org/10.1007/s10489-019-01592-4
 
 Citation instructions
 =====================
