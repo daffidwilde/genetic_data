@@ -1,77 +1,56 @@
 .. image:: https://img.shields.io/pypi/v/edo.svg
    :target: https://pypi.org/project/edo/
 
-.. image:: https://travis-ci.com/daffidwilde/edo.svg?branch=master
-    :target: https://travis-ci.com/daffidwilde/edo
-
-.. image:: https://coveralls.io/repos/github/daffidwilde/edo/badge.svg?branch=master&service=github
-   :target: https://coveralls.io/github/daffidwilde/edo?branch=master
+.. image:: https://github.com/daffidwilde/edo/workflows/CI/badge.svg
+   :target: https://github.com/daffidwilde/edo/actions?query=workflow%3ACI+branch%3Amain
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/ambv/black
 
-.. image:: https://zenodo.org/badge/139703799.svg
-   :target: https://zenodo.org/badge/latestdoi/139703799
-
 Evolutionary Dataset Optimisation
 *********************************
 
-A library for generating artificial datasets through genetic evolution.
-=======================================================================
-Typically, when faced with a problem in data science, the data is fixed and the
-researcher must select an algorithm that suits both the problem and performs
-well on the data. This is typically done by running multiple algorithms on the
-dataset or by justifying a choice based on the findings of the current
-literature. But what makes that data "good" for the algorithm? Why is it that an
-algorithm performs well on some datasets and not others?
+A library for generating artificial datasets through evolution.
+===============================================================
 
-The purpose of this library is to create a population of families of datasets
-for which a specific algorithm performs well with respect to its objective
-function. This function is passed to a genetic algorithm (GA) where each
-individual represents a family of datasets defined by their dimensions, and the
-statistical shape of each of its columns. The fitness of an individual is taken
-using some amalgamation of the fitnesses from a sample of datasets belonging to
-its family.
+This library contains an evolutionary algorithm that optimises any real-valued
+function over a subset of the space of all possible datasets. The output of the
+algorithm is a bank of effective datasets for which the provided functio
+n performs well that can then be studied.
 
-Through this genetic algorithm, the hope is to not only build up banks of
-effective datasets for a particular algorithm but to give the user the ability
-to determine and study the preferred characteristics of such datasets.
+The applications of this method are varied but an important and relevant one is
+in learning an algorithm's strengths and weaknesses.
 
-Moreover, since this GA can take any fitness function as argument, two or more
-algorithms can be compared at once. For example, by considering two similar
-algorithms :math:`A` and :math:`B` with fitness functions :math:`f_A` and
-:math:`f_B` respectively. Then for a suitable dataset :math:`X` consider the
-fitness function, denoted by :math:`f`, and
-given by:
+When determining the quality of an algorithm, the standard route is to run the
+comparable algorithms on a finite set of existing (or newly simulated) datasets
+and calculating some metric. The algorithm(s) with the smallest value of this
+metric are chosen to be the best performing.
 
-.. math::
-    f(X) = f_A(X) - f_B(X)
+An issue with this approach is that it pays little regard to the reliability
+and quality of the datasets being used, which begs the question: what makes
+a dataset "good" for an algorithm? Or, why is it that an algorithm performs well
+on some datasets but not others?
 
-This fitness function, when passed to the GA, will attempt to generate
-individuals for which algorithm :math:`A` outperforms algorithm :math:`B`.
+By passing the objective function of the algorithm to the ``edo.DataOptimiser``
+class, questions like these can be answered by studying the properties of the
+resultant datasets. Beyond that, a combination of objective functions could be
+used to determine how an algorithm performs against any number of other
+algorithms. A comprehensive description of the evolutionary algorithm and an
+examplar case study is available at https://doi.org/10.1007/s10489-019-01592-4.
 
-What is a genetic algorithm?
-============================
-Genetic algorithms (GAs) form a branch of search and optimisation methods that
-utilise the concept of natural selection. GAs work by creating populations of
-individuals based on their fitness. These individuals are potential solutions in
-the search space and are typically represented by a string of "alleles".
-Together, these alleles form a "chromosome" representation. Most GAs, regardless
-of their application, have the following operators:
+Publications and documentation
+==============================
 
-* **Selection:** A method for selecting a subset of individuals from the current
-  population for producing the next. Almost always based on the fitness of the
-  individuals.
-* **Crossover:** An operator on two individuals, often deemed to be "parents",
-  that creates one or more "offspring".
-* **Mutation:** Takes each new offspring in turn and changes ("mutates") each of
-  their alleles with some probability.
+Full documentation for the library is available at https://edo.readthedocs.io.
 
-A schematic of a generic GA is given below.
+An article on the theory behind the algorithm has been published:
 
-.. image:: ./docs/_static/flowchart.svg
-    :alt: A schematic for a genetic algorithm
-    :width: 80 %
-    :align: center
+|    Wilde, H., Knight, V. & Gillard, J. Evolutionary dataset optimisation:
+     learning algorithm quality through evolution. *Appl Intell* **50**,
+     1172–1191 (2020). https://doi.org/10.1007/s10489-019-01592-4
+
+.. include:: CITATION.rst
 
 .. include:: INSTALLATION.rst
+
+.. include:: CONTRIBUTING.rst
