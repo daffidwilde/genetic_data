@@ -13,11 +13,11 @@ Evolutionary Dataset Optimisation
 A library for generating artificial datasets through evolution.
 ===============================================================
 
-This library contains an evolutionary algorithm that optimises any real-valued
-function over a subset of the space of all possible datasets that we call
-`Evolutionary Dataset Optimisation`. The output of the algorithm is a bank of
-effective datasets for which the provided function performs well that can then
-be studied.
+The ``edo`` library provides an evolutionary algorithm that optimises any
+real-valued function over a subset of the space of all possible datasets that we
+call `Evolutionary Dataset Optimisation`. The output of the algorithm is a bank
+of effective datasets for which the provided function performs well that can
+then be studied.
 
 The applications of this method are varied but an important and relevant one is
 in learning an algorithm's strengths and weaknesses.

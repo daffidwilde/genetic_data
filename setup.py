@@ -1,4 +1,4 @@
-""" Setup script. """
+""" Setup file. """
 
 from setuptools import find_packages, setup
 
@@ -12,15 +12,16 @@ with open("src/edo/version.py", "r") as f:
 setup(
     name="edo",
     version=version["__version__"],
-    description="Generating artificial datasets through genetic evolution.",
+    description="Generating artificial datasets through evolution.",
     long_description=README,
     long_description_content_type="text/x-rst",
     url="https://github.com/daffidwilde/edo",
     author="Henry Wilde",
     author_email="henrydavidwilde@gmail.com",
     license="MIT",
-    keywords=["genetic-algorithm" "data" "evolution"],
+    keywords=["evolutionary algorithm", "artificial data", "evolution"],
     packages=find_packages("src"),
     package_dir={"": "src"},
-    tests_require=["pytest", "hypothesis", "numpy"],
+    python_requires=">=3.5",
+    tests_require=["pytest", "pytest-cov", "hypothesis", "numpy"],
 )

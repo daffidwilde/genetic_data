@@ -1,3 +1,6 @@
+Citation instructions
+=====================
+
 Citing the library
 ------------------
 
