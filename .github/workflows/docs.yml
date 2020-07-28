@@ -1,0 +1,36 @@
+name: Documentation
+
+on:
+  pull_request:
+  schedule:
+  - cron: '0 0 * * *'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        cd docs
+        python -m pip install -r requirements.txt
+    - name: Check documentation compiles
+      run: |
+        make clean
+        make html
+        rm -rf _build
+    - name: Run doctests
+      run: |
+        cd ..
+        python -m pytest --nbval --current-env docs
+        python -m pytest --doctest-glob="*.rst" docs
+    - name: Run linters
+      run: |
+        python -m blackbook .
