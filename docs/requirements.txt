@@ -1,0 +1,13 @@
+# Core dependencies
+edo
+ipython>=7.6
+nbsphinx
+numpydoc
+sphinx
+sphinx_rtd_theme
+sphinxcontrib-bibtex
+
+# Doctests and linting
+blackbook
+nbval
+pytest
