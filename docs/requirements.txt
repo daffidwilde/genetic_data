@@ -4,6 +4,7 @@ ipython>=7.6
 matplotlib>=2.2
 nbsphinx
 numpydoc
+scikit-learn
 sphinx
 sphinx_rtd_theme
 sphinxcontrib-bibtex
