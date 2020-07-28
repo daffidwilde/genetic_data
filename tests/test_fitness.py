@@ -11,7 +11,7 @@ from hypothesis.strategies import integers
 import edo
 from edo.distributions import Normal, Poisson, Uniform
 from edo.fitness import get_fitness, get_population_fitness, write_fitness
-from edo.individual import create_individual, Individual
+from edo.individual import Individual, create_individual
 from edo.population import create_initial_population
 
 from .util.parameters import INTEGER_INDIVIDUAL, POP_FITNESS, POPULATION
