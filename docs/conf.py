@@ -42,6 +42,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinx.ext.autosummary",
+    "sphinxcontrib.bibtex",
     "nbsphinx",
     "numpydoc",
 ]
