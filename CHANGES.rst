@@ -1,6 +1,11 @@
 History
 =======
 
+v0.3.2 (2020-07-28)
+-------------------
+
+- Add `MANIFEST.in` for `requirements.txt` and documentation files.
+
 v0.3.1 (2020-07-28)
 -------------------
 
