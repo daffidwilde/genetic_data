@@ -42,7 +42,6 @@ def mutation(individual, prob, row_limits, col_limits, families, weights=None):
     dataframe, metadata = mutate_ncols(
         dataframe, metadata, col_limits, families, weights, random_state, prob
     )
-    metadata = mutate_params(metadata, random_state, prob)
 
     dataframe = mutate_values(dataframe, metadata, random_state, prob)
     return Individual(dataframe, metadata, random_state)
@@ -90,20 +89,6 @@ def mutate_ncols(
         )
 
     return dataframe, metadata
-
-
-def mutate_params(metadata, random_state, prob):
-    """ Mutate the parameters of each column in the metadata of an individual.
-    Each mutation has probability ``prob``. """
-
-    for pdf in metadata:
-        subtype = pdf.__class__
-        limits = pdf.param_limits
-        for param in limits:
-            if random_state.random() < prob:
-                vars(pdf)[param] = vars(subtype(random_state))[param]
-
-    return metadata
 
 
 def mutate_values(dataframe, metadata, random_state, prob):

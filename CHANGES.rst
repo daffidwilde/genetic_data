@@ -1,6 +1,11 @@
 History
 =======
 
+v0.3.3 (2020-07-28)
+-------------------
+
+- Remove mutation of metadata parameters.
+
 v0.3.2 (2020-07-28)
 -------------------
 
