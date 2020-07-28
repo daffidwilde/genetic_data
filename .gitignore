@@ -8,7 +8,7 @@ dist
 *egg-info*
 htmlcov/
 *.hypothesis/*
-*ipynb*
+*ipynb_checkpoints*
 *.log
 *.pdf
 *.png
