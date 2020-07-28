@@ -2,12 +2,18 @@
 
 from setuptools import find_packages, setup
 
-with open("README.rst", "r") as readme_file:
-    README = readme_file.read()
+with open("README.rst", "r") as readme:
+    README = readme.read()
 
 version = {}
-with open("src/edo/version.py", "r") as f:
-    exec(f.read(), version)
+with open("src/edo/version.py", "r") as vers:
+    exec(vers.read(), version)
+
+requirements = []
+with open("requirements.txt", "r") as reqs:
+    for line in reqs.read().splitlines():
+        if not line.startswith("#"):
+            requirements.append(line)
 
 setup(
     name="edo",
@@ -16,12 +22,13 @@ setup(
     long_description=README,
     long_description_content_type="text/x-rst",
     url="https://github.com/daffidwilde/edo",
-    author="Henry Wilde",
+    author="Henry Wilde, Vincent Knight, Jonathan Gillard",
     author_email="henrydavidwilde@gmail.com",
     license="MIT",
     keywords=["evolutionary algorithm", "artificial data", "evolution"],
     packages=find_packages("src"),
     package_dir={"": "src"},
-    python_requires=">=3.5",
+    python_requires=">=3.6",
+    install_requires=requirements,
     tests_require=["pytest", "pytest-cov", "hypothesis", "numpy"],
 )

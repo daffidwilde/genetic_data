@@ -978,7 +978,7 @@ def test_run_not_reproducible_without_seed(size, distributions, maximise):
     max_iter = 5
 
     opt_one = DataOptimiser(
-        lambda df: np.random.random(),
+        lambda ind: np.random.random(),
         size,
         row_limits,
         col_limits,
@@ -990,7 +990,7 @@ def test_run_not_reproducible_without_seed(size, distributions, maximise):
     pop_history_one, fit_history_one = opt_one.run(processes=4)
 
     opt_two = DataOptimiser(
-        lambda df: np.random.random(),
+        lambda ind: np.random.random(),
         size,
         row_limits,
         col_limits,

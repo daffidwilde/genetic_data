@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis.strategies import text
 
 from edo import Family
@@ -147,6 +147,7 @@ def test_tuple_limits(row_limits, col_limits, weights, seed):
 
 
 @INTEGER_INDIVIDUAL
+@settings(deadline=None)
 def test_to_and_from_file(row_limits, col_limits, weights, seed):
     """ Test that an individual can be saved to and created from file. """
 

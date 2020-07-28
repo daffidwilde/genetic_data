@@ -11,7 +11,7 @@ from hypothesis.strategies import integers
 import edo
 from edo.distributions import Normal, Poisson, Uniform
 from edo.fitness import get_fitness, get_population_fitness, write_fitness
-from edo.individual import create_individual
+from edo.individual import Individual, create_individual
 from edo.population import create_initial_population
 
 from .util.parameters import INTEGER_INDIVIDUAL, POP_FITNESS, POPULATION
@@ -102,11 +102,13 @@ def test_get_population_fitness_parallel(
         assert ind.fitness == fit
 
 
-@given(size=integers(min_value=1, max_value=100))
+@given(size=integers(min_value=1, max_value=50))
 def test_write_fitness(size):
     """ Test that a generation's fitness can be written to file correctly. """
 
-    fitness = [trivial_fitness(pd.DataFrame()) for _ in range(size)]
+    fitness = [
+        trivial_fitness(Individual(pd.DataFrame(), [])) for _ in range(size)
+    ]
     path = Path(".testcache")
 
     write_fitness(fitness, generation=0, root=path)

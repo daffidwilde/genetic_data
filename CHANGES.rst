@@ -1,6 +1,13 @@
 History
 =======
 
+v0.3.1 (2020-07-28)
+-------------------
+
+- Add missing install requirements to `setup.py`.
+- Fitness functions must take an instance of `Individual`.
+- Fix flaky tests with long runtimes.
+
 v0.3 (2020-07-27)
 -----------------
 
@@ -30,14 +37,12 @@ v0.2.1 (2019-04-25)
 - Ignore Dask aux files if they come up
 - Fix warning from PyYAML
 
-
 v0.2 (2019-04-15)
 -----------------
 
 - Column distributions can now produce independent versions of themselves (#112)
 - Fitness computation is parallelised and cached (#117)
 - Results written to disk. Output metadata as dictionaries.
-
 
 v0.1 (2019-02-05)
 -----------------
