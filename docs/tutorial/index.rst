@@ -13,4 +13,4 @@ that, however, the library needs to be installed.
    installation.rst
    xsquared.ipynb
    circle.ipynb
-   tutorial_iii.rst
+   kmeans.ipynb
