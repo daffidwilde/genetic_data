@@ -11,7 +11,7 @@ def get_fitness(individual, fitness, **kwargs):
     """ Return the fitness score of the individual. """
 
     if individual.fitness is None:
-        individual.fitness = fitness(individual.dataframe, **kwargs)
+        individual.fitness = fitness(individual, **kwargs)
 
     return individual.fitness
 

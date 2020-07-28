@@ -20,8 +20,9 @@ class DataOptimiser:
     Parameters
     ----------
     fitness : func
-        Any real-valued function that takes one ``pandas.DataFrame`` as
-        argument. Any further arguments should be passed in ``kwargs``.
+        Any real-valued function that at least takes an instance of
+        ``Individual`` as argument. Any further arguments should be passed in
+        the ``kwargs`` parameter of the ``run`` method.
     size : int
         The size of the population to create.
     row_limits : list

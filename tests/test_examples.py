@@ -29,13 +29,15 @@ class AngleUniform(Uniform):
     param_limits = {"bounds": [-2 * np.pi, 2 * np.pi]}
 
 
-def circle_fitness(df):
+def circle_fitness(individual):
     """ Determine the similarity of the dataframe to the unit circle. """
 
-    return max(
-        df[0].var() - (df[1] - 1).abs().max(),
-        df[1].var() - (df[0] - 1).abs().max(),
-    )
+    columns = [meta.name for meta in individual.metadata]
+    df = individual.dataframe
+    angle_idx = columns.index("AngleUniform")
+    radius_idx = columns.index("RadiusUniform")
+
+    return df[angle_idx].var() - (df[radius_idx] - 1).abs().max()
 
 
 def run_circle_example():
@@ -90,10 +92,10 @@ def test_circle_example(repetitions):
 ##########
 
 
-def sample_fitness(df):
+def sample_fitness(individual):
     """ Take a sample of 10% of the rows and find their mean. """
 
-    return df.sample(frac=0.1, random_state=0).mean().mean()
+    return individual.dataframe.sample(frac=0.1, random_state=0).mean().mean()
 
 
 def run_sample_example():
