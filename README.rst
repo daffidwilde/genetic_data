@@ -42,7 +42,7 @@ examplar case study is available at https://doi.org/10.1007/s10489-019-01592-4.
 Installation
 ============
 
-The ``edo`` library requires Python 3.5+ and is ``pip``-installable::
+The ``edo`` library requires Python 3.6+ and is ``pip``-installable::
 
     $ python -m pip install edo
 
