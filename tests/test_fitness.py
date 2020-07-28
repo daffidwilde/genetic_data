@@ -102,7 +102,7 @@ def test_get_population_fitness_parallel(
         assert ind.fitness == fit
 
 
-@given(size=integers(min_value=1, max_value=100))
+@given(size=integers(min_value=1, max_value=50))
 def test_write_fitness(size):
     """ Test that a generation's fitness can be written to file correctly. """
 
