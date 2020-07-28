@@ -5,8 +5,7 @@ Reference
    :maxdepth: 2
    :caption: Contents
 
-   parameters.rst
-   distributions.rst
+   source/modules.rst
    bibliography.rst
-   citing.rst
+   citation.rst
    contributing.rst
