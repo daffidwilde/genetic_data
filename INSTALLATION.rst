@@ -1,7 +1,7 @@
 Installation
 ============
 
-The ``edo`` library requires Python 3.5+ and is ``pip``-installable::
+The ``edo`` library requires Python 3.6+ and is ``pip``-installable::
 
     $ python -m pip install edo
 
