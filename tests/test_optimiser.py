@@ -280,8 +280,8 @@ def test_get_next_generation(
     )
 
     do.random_state = np.random.RandomState(size)
-    do._initialise_run(4)
-    do._get_next_generation(4)
+    do._initialise_run(None)
+    do._get_next_generation(None)
     assert isinstance(do.population, list)
     assert len(do.population) == len(do.pop_fitness)
     assert len(do.population) == size
@@ -928,7 +928,7 @@ def test_run_is_reproducible(
     )
 
     pop_history_one, fit_history_one = do_one.run(
-        processes=4, random_state=size, kwargs={"arg": None}
+        processes=None, random_state=size
     )
 
     families = [edo.Family(dist) for dist in distributions]
