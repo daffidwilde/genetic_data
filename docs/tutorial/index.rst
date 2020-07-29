@@ -8,7 +8,7 @@ In these tutorials, we will make use of a few small examples to demonstrate how
 that, however, the library needs to be installed.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    installation.rst
    xsquared.ipynb
