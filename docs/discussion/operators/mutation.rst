@@ -3,16 +3,12 @@
 Mutation
 ========
 
-To maintain a level of variety in a population and to force the genetic
+To maintain a level of variety in a population and to force the evolutionary
 algorithm to explore more of the search space, new individuals are mutated
 immediately after their creation during the crossover process.
 
-There are many ways of mutating an individual but the most common is to take
-each new offspring and run along their alleles, deciding whether or not to
-mutate that allele according to a small probability. For the chromosome
-representation of individuals, this means turning a 0 into a 1, and vice versa.
-
-The method of mutation in Edo is not quite as simple. An individual is
+The mutation process in EDO is not quite as simple as in a traditional genetic
+algorithm. This is due to the representation of individuals. An individual is
 mutated in the following way:
 
 1. Mutate the number of rows and columns by adding and/or removing a line
@@ -20,63 +16,53 @@ mutated in the following way:
    are added by sampling a new value from each current column distribution and
    adding them to the bottom of the dataset. Columns are added in the same way
    as in the :ref:`creation process <create-ind>`. Note that the number of rows
-   and columns will not mutate beyond the bounds passed to the genetic
-   algorithm.
-
-2. Then, with the dimensions of the dataset mutated, each value in the dataset
-   is mutated using the same mutation probability. A value is mutated by
-   replacing it with a single value sampled from the distribution associated
-   with its column.
-
-Parameters for the mutation operator and their definitions can be found
-:ref:`here <params-mutation>`.
+   and columns will not mutate beyond the bounds passed in ``col_limits``.
+2. With the dimensions of the dataset mutated, each value in the dataset is
+   mutated using the same mutation probability. A value is mutated by replacing
+   it with a single value sampled from the distribution associated with its
+   column.
 
 Example
 -------
 
-Import :mod:`numpy` and the relevant pieces from :code:`edo`::
+Consider the following mutation of an individual::
 
     >>> import numpy as np
+    >>> from edo import Family
+    >>> from edo.distributions import Poisson
     >>> from edo.individual import create_individual
     >>> from edo.operators import mutation
-    >>> from edo.pdfs import Poisson
-
-Set a seed::
-
-    >>> np.random.seed(0)
-
-Define the constraints and parameters of the simulation::
-   
-    >>> row_limits, col_limits = [1, 3], [1, 5]
-    >>> pdfs = [Poisson]
-
-Generate an individual::
-
-    >>> individual = create_individual(row_limits, col_limits, pdfs)
-
-This individual has this dataset:
-
-.. csv-table:: The individual
-   :file: individual.csv
-   :align: center
-
-.. include:: individual.rst
-
-Set the mutation probability. This is deliberately large to make for a
-substantial mutation::
-
-    >>> mutation_prob = 0.5
-
-Mutate the individual that was just created::
-
-    >>> mutant = mutation(
-    ...     individual, mutation_prob, row_limits, col_limits, pdfs
+    >>> 
+    >>> row_limits, col_limits = [3, 5], [2, 5]
+    >>> families = [Family(Poisson)]
+    >>> state = np.random.RandomState(0)
+    >>> 
+    >>> individual = create_individual(
+    ...     row_limits, col_limits, families, weights=None, random_state=state
     ... )
 
-This gives the following mutated dataset:
+The individual looks like this::
 
-.. csv-table:: The mutant
-   :file: mutant.csv
-   :align: center
+    >>> individual.dataframe
+        0  1  2  3  4
+    0  12  8  4  1  7
+    1   6  6  5  1  5
+    2   8  7  7  1  3
+    >>> individual.metadata
+    [Poisson(lam=7.15), Poisson(lam=7.74), Poisson(lam=6.53), Poisson(lam=2.83), Poisson(lam=6.92)]
 
-.. include:: mutant.rst
+Now we can mutate this individual after setting the mutation probability. This
+is deliberately large to make for a substantial mutation::
+
+    >>> mutation_prob = 0.7
+    >>> mutant = mutation(individual, mutation_prob, row_limits, col_limits, families)
+
+This gives the following individual::
+
+    >>> mutant.dataframe
+        0  1  2  3
+    0   8  4  1  5
+    1  11  3  4  5
+    2   9  7  3  3
+    >>> mutant.metadata
+    [Poisson(lam=7.74), Poisson(lam=6.53), Poisson(lam=2.83), Poisson(lam=6.92)]

@@ -4,7 +4,7 @@ Discussion
 .. toctree::
    :maxdepth: 2
 
-   genetic.rst
+   algorithm.rst
    individual.rst
    operators/index.rst
    seed.rst
