@@ -21,6 +21,8 @@ from and mutate the values of the corresponding column in the dataset. These
 objects are stored as class attributes in the :class:`edo.individual.Individual`
 class.
 
+.. _create-ind:
+
 Creation
 ++++++++
 
