@@ -107,7 +107,15 @@ class DataOptimiser:
         """ A placeholder for a function which can adjust (typically, reduce)
         the mutation probability over the run of the EA. """
 
-    def run(self, root=None, random_state=None, processes=None, kwargs=None):
+    def run(
+        self,
+        root=None,
+        random_state=None,
+        processes=None,
+        fitness_kwargs=None,
+        stop_kwargs=None,
+        dwindle_kwargs=None,
+    ):
         """ Run the evolutionary algorithm under the given constraints.
 
         Parameters
@@ -125,10 +133,15 @@ class DataOptimiser:
             The number of parallel processes to use when calculating the
             population fitness. If ``None`` then a single-thread scheduler is
             used.
-        kwargs : dict, optional
-            Any additional parameters that need to be passed to the functions
-            for fitness, stopping or dwindling should be placed here as a
-            dictionary or suitable mapping.
+        fitness_kwargs : dict, optional
+            Any additional parameters for the fitness function should be placed
+            here.
+        stop_kwargs : dict, optional
+            Any additional parameters for the ``stop`` method should be placed
+            here.
+        dwindle_kwargs : dict, optional
+            Any additional parameters for the ``dwindle`` method should be
+            placed here.
 
         Returns
         -------
@@ -139,8 +152,12 @@ class DataOptimiser:
             Every individual's fitness in each generation.
         """
 
-        if kwargs is None:
-            kwargs = {}
+        if fitness_kwargs is None:
+            fitness_kwargs = {}
+        if stop_kwargs is None:
+            stop_kwargs = {}
+        if dwindle_kwargs is None:
+            dwindle_kwargs = {}
 
         if isinstance(random_state, int):
             self.random_state = np.random.RandomState(random_state)
@@ -149,16 +166,16 @@ class DataOptimiser:
         else:
             self.random_state = np.random.mtrand._rand
 
-        self._initialise_run(processes, **kwargs)
+        self._initialise_run(processes, **fitness_kwargs)
         self._update_histories(root)
-        self.stop(**kwargs)
+        self.stop(**stop_kwargs)
         while self.generation < self.max_iter and not self.converged:
 
             self.generation += 1
-            self._get_next_generation(processes, **kwargs)
+            self._get_next_generation(processes, **fitness_kwargs)
             self._update_histories(root)
-            self.stop(**kwargs)
-            self.dwindle(**kwargs)
+            self.stop(**stop_kwargs)
+            self.dwindle(**dwindle_kwargs)
 
         if root is not None:
             distributions = [family.distribution for family in self.families]
@@ -169,7 +186,7 @@ class DataOptimiser:
 
         return self.pop_history, self.fit_history
 
-    def _initialise_run(self, processes, **kwargs):
+    def _initialise_run(self, processes, **fitness_kwargs):
         """ Create the initial population and get its fitness. """
 
         state_seeds = self.random_state.randint(
@@ -194,7 +211,7 @@ class DataOptimiser:
         )
 
         self.pop_fitness = get_population_fitness(
-            self.population, self.fitness, processes, **kwargs
+            self.population, self.fitness, processes, **fitness_kwargs
         )
 
     def _get_next_generation(self, processes, **kwargs):

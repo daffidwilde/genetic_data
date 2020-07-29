@@ -12,47 +12,53 @@ Below are some quick examples of how to do these things.
 Setting the initial probability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is done using the :code:`mutation_prob` parameter in :code:`run_algorithm`.
-
-Using the example from the :ref:`first tutorial <refs-tutorial-i>`, we can (for
-instance) remove all mutation by setting this parameter to be zero::
+This is done using the ``mutation_prob`` parameter in
+:class:`edo.DataOptimiser`. For instance, we can remove all mutation by setting
+this parameter to be zero::
 
     >>> import edo
-
-    >>> def x_squared(df):
-    ...     return df.iloc[0, 0] ** 2
-
-    >>> pop, fit, all_pops, all_fits = edo.run_algorithm(
-    ...     fitness=x_squared,
-    ...     ...
-    ...     mutation_prob=0
+    >>> from edo.distributions import Uniform
+    >>> 
+    >>> def xsquared(ind):
+    ...     return ind.dataframe.iloc[0, 0] ** 2
+    >>> 
+    >>> opt = edo.DataOptimiser(
+    ...     xsquared, 100, [1, 1], [1, 1], [edo.Family(Uniform)], mutation_prob=0
     ... )
 
 Dwindling mutation probability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sometimes a genetic algorithm can be thrown off once it has started converging.
-The purpose of the mutation process is to do this deliberately. However, as the
-GA progresses, mutation can make the population unpredictable or noisy.
+Sometimes an evolutionary algorithm can be thrown off once it has started
+converging. The purpose of the mutation process is to do this deliberately.
+However, as the EA progresses, mutation can make this disruption unhelpful and
+the population may become unpredictable or noisy.
 
-To combat this, a function for dwindling (or incrementing, if that's your thing)
-the mutation probability can be passed to the :code:`dwindle` parameter.
+To combat this, the :func:`edo.DataOptimiser.dwindle` method can be redefined in
+a subclass::
 
-This function must take only the current mutation probability and the current
-iteration as argument, and must return the new mutation probability::
+    >>> class MyOptimiser(edo.DataOptimiser):
+    ...     def dwindle(self, N=50):
+    ...         """ Cut the mutation probability every ``N`` generations. """
+    ...         if self.generation % N == 0:
+    ...             self.mutation_prob /= 2
 
-    >>> def half_mutation_prob(mutation_prob, iteration):
-    ...     """ Cut the mutation prob in half every 50 iterations. """
-    ... 
-    ...     if iteration % 50 == 0:
-    ...         mutation_prob /= 2
-    ...     return mutation_prob
+Any further arguments for this method should be passed in the ``dwindle``
+parameter of :func:`edo.DataOptimiser.run`::
 
-    >>> pop, fit, all_pops, all_fits = edo.run_algorithm(
-    ...     fitness=x_squared,
-    ...     ...
-    ...     dwindle=half_mutation_prob
+    >>> opt = MyOptimiser(
+    ...     xsquared,
+    ...     100,
+    ...     [1, 1],
+    ...     [1, 1],
+    ...     [edo.Family(Uniform)],
+    ...     max_iter=1,
+    ...     mutation_prob=1,
     ... )
+    >>> 
+    >>> pop_history, fit_history = opt.run(dwindle_kwargs={"N": 1})
+    >>> opt.mutation_prob
+    0.5
 
 .. _compact:
 
@@ -60,14 +66,9 @@ Compacting the mutation space
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The final way to alter the mutation process is to progressively reduce the
-mutation space. This is done by reducing the intervals from which distribution
-parameters are sampled. The reduced interval is found using the current
-parameter values for all the parent columns found in the :ref:`selection process
-<selection>`. This method is derived from that set out in [Amirjanov2017]_ and
-is controlled using the :code:`compact`::
+mutation space via :ref:`shrinking <shrinkage>`. This is done using the
+``shrinkage`` parameter of :class:`edo.DataOptimiser`::
 
-    >>> pop, fit, all_pops, all_fits = edo.run_algorithm(
-    ...     fitness=x_squared,
-    ...     ...
-    ...     compact=0.75
+    >>> opt = edo.DataOptimiser(
+    ...     xsquared, 100, [1, 1], [1, 1], [edo.Family(Uniform)], shrinkage=0.9
     ... )
