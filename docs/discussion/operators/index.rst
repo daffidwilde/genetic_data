@@ -9,3 +9,4 @@ Operators
    selection.rst
    crossover.rst
    mutation.rst
+   shrinkage.rst
