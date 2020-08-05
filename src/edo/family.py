@@ -133,7 +133,7 @@ class Family:
             family.random_state = pickle.load(state)
 
         subtype_paths = sorted(
-            path.glob(r"[0-9].pkl"), key=lambda p: int(p.stem)
+            path.glob(r"[0-9]*.pkl"), key=lambda p: int(p.stem)
         )
         for path in subtype_paths:
 
