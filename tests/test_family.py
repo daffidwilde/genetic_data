@@ -179,3 +179,40 @@ def test_load(distribution):
             assert fpart == ppart
 
     os.system("rm -r .testcache")
+
+
+@given(distribution=distributions())
+@settings(deadline=None)
+def test_load_more_than_ten(distribution):
+    """ Test that a family with more than 10 subtypes can be created from a
+    cache. """
+
+    family = Family(distribution)
+    for _ in range(11):
+        family.add_subtype()
+
+    family.save(".testcache")
+
+    pickled = Family.load(distribution, root=".testcache")
+
+    assert isinstance(pickled, Family)
+    assert pickled.distribution is distribution
+    assert pickled.subtype_id == 11
+    assert list(pickled.subtypes.keys()) == list(range(11))
+
+    for subtype_id, subtype in pickled.subtypes.items():
+        assert issubclass(subtype, distribution)
+        assert subtype.__init__ is distribution.__init__
+        assert subtype.sample is distribution.sample
+        assert subtype.subtype_id == subtype_id
+        assert subtype.family is pickled
+
+    for fpart, ppart in zip(
+        family.random_state.get_state(), pickled.random_state.get_state()
+    ):
+        try:
+            assert all(fpart == ppart)
+        except TypeError:
+            assert fpart == ppart
+
+    os.system("rm -r .testcache")
