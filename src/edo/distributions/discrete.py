@@ -4,7 +4,7 @@ from .base import Distribution
 
 
 class Bernoulli(Distribution):
-    """ The Bernoulli distribution class, i.e. a binomial distribution with
+    """The Bernoulli distribution class, i.e. a binomial distribution with
     exactly one trial.
 
     Parameters
@@ -40,14 +40,14 @@ class Bernoulli(Distribution):
         return f"Bernoulli(prob={round(self.prob, 2)})"
 
     def sample(self, nrows, random_state):
-        """ Take a sample of size ``nrows`` from the Bernoulli distribution
-        using the provided ``np.random.RandomState`` instance. """
+        """Take a sample of size ``nrows`` from the Bernoulli distribution
+        using the provided ``np.random.RandomState`` instance."""
 
         return random_state.binomial(n=1, p=self.prob, size=nrows)
 
 
 class Poisson(Distribution):
-    """ The Poisson distribution class.
+    """The Poisson distribution class.
 
     Parameters
     ----------
@@ -82,7 +82,7 @@ class Poisson(Distribution):
         return f"Poisson(lam={round(self.lam, 2)})"
 
     def sample(self, nrows, random_state):
-        """ Take a sample of size ``nrows`` from the Poisson distribution
-        using the provided ``np.random.RandomState`` instance. """
+        """Take a sample of size ``nrows`` from the Poisson distribution
+        using the provided ``np.random.RandomState`` instance."""
 
         return random_state.poisson(lam=self.lam, size=nrows)

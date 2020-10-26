@@ -7,7 +7,7 @@ from .operators import crossover, mutation
 def create_initial_population(
     row_limits, col_limits, families, weights, random_states
 ):
-    """ Create an initial population for the genetic algorithm based on the
+    """Create an initial population for the genetic algorithm based on the
     given parameters.
 
     Parameters
@@ -54,7 +54,7 @@ def create_new_population(
     weights,
     random_states,
 ):
-    """ Given a set of potential parents to be carried into the next generation,
+    """Given a set of potential parents to be carried into the next generation,
     create offspring from pairs within that set until there are enough
     individuals.
 

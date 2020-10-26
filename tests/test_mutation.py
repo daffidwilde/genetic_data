@@ -31,8 +31,8 @@ def _common_asserts(mutant, families):
 
 @INTEGER_MUTATION
 def test_integer_limits(row_limits, col_limits, weights, prob, seed):
-    """ Verify that `mutation` creates a valid individual with all integer
-    column limits. """
+    """Verify that `mutation` creates a valid individual with all integer
+    column limits."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -54,8 +54,8 @@ def test_integer_limits(row_limits, col_limits, weights, prob, seed):
 
 @INTEGER_TUPLE_MUTATION
 def test_integer_tuple_limits(row_limits, col_limits, weights, prob, seed):
-    """ Verify that `mutation` creates a valid individual where the lower and
-    upper column limits are integer and tuple respectively. """
+    """Verify that `mutation` creates a valid individual where the lower and
+    upper column limits are integer and tuple respectively."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -86,8 +86,8 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob, seed):
 
 @TUPLE_INTEGER_MUTATION
 def test_tuple_integer_limits(row_limits, col_limits, weights, prob, seed):
-    """ Verify that `mutation` creates a valid individual where the lower and
-    upper column limits and tuple and integer respectively. """
+    """Verify that `mutation` creates a valid individual where the lower and
+    upper column limits and tuple and integer respectively."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -118,8 +118,8 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob, seed):
 
 @TUPLE_MUTATION
 def test_tuple_limits(row_limits, col_limits, weights, prob, seed):
-    """ Verify that `mutation` creates a valid individual with all tuple column
-    limits. """
+    """Verify that `mutation` creates a valid individual with all tuple column
+    limits."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]

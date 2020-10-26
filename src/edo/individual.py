@@ -12,7 +12,7 @@ from .family import Family
 
 
 class Individual:
-    """ A class to represent an individual in the EA.
+    """A class to represent an individual in the EA.
 
     Parameters
     ----------
@@ -56,9 +56,9 @@ class Individual:
     def from_file(
         cls, path, distributions, family_root=".edocache", method="pandas"
     ):
-        """ Create an instance of ``Individual`` from the files at ``path`` and
+        """Create an instance of ``Individual`` from the files at ``path`` and
         ``family_root`` using either ``pandas`` or ``dask`` to read in
-        individuals. Always fall back on ``pandas``. """
+        individuals. Always fall back on ``pandas``."""
 
         path = Path(path)
         distributions = {dist.name: dist for dist in distributions}
@@ -135,8 +135,8 @@ def _sample_ncols(col_limits, random_state):
 def _get_minimum_columns(
     nrows, col_limits, families, family_counts, random_state
 ):
-    """ If ``col_limits`` has a tuple lower limit then sample columns of the
-    corresponding element of ``families`` as needed to satisfy this bound. """
+    """If ``col_limits`` has a tuple lower limit then sample columns of the
+    corresponding element of ``families`` as needed to satisfy this bound."""
 
     columns, metadata = [], []
     for family, min_limit in zip(families, col_limits[0]):
@@ -160,9 +160,9 @@ def _get_remaining_columns(
     family_counts,
     random_state,
 ):
-    """ Sample all remaining columns for the current individual. If
+    """Sample all remaining columns for the current individual. If
     ``col_limits`` has a tuple upper limit then sample all remaining
-    columns for the individual without exceeding the bounds. """
+    columns for the individual without exceeding the bounds."""
 
     while len(columns) < ncols:
         family = random_state.choice(families, p=weights)
@@ -183,7 +183,7 @@ def _get_remaining_columns(
 
 
 def create_individual(row_limits, col_limits, families, weights, random_state):
-    """ Create an individual within the limits provided.
+    """Create an individual within the limits provided.
 
     Parameters
     ----------

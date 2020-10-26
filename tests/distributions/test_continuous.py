@@ -21,8 +21,8 @@ CONTINUOUS = given(
 
 @CONTINUOUS
 def test_gamma_set_param_limits(first_limits, second_limits, seed):
-    """ Check that a Gamma object can sample its parameters correctly if its
-    class attributes are altered. """
+    """Check that a Gamma object can sample its parameters correctly if its
+    class attributes are altered."""
 
     Gamma.param_limits = {"alpha": first_limits, "theta": second_limits}
 
@@ -34,8 +34,8 @@ def test_gamma_set_param_limits(first_limits, second_limits, seed):
 
 @CONTINUOUS
 def test_normal_set_param_limits(first_limits, second_limits, seed):
-    """ Check that a Normal object can sample its parameters correctly if its
-    class attributes are altered. """
+    """Check that a Normal object can sample its parameters correctly if its
+    class attributes are altered."""
 
     Normal.param_limits = {"mean": first_limits, "std": second_limits}
 
@@ -48,8 +48,8 @@ def test_normal_set_param_limits(first_limits, second_limits, seed):
 
 @CONTINUOUS
 def test_uniform_set_param_limits(first_limits, second_limits, seed):
-    """ Check that a Uniform object can sample its parameters correctly if its
-    class attributes are altered. """
+    """Check that a Uniform object can sample its parameters correctly if its
+    class attributes are altered."""
 
     Uniform.param_limits = {"bounds": first_limits}
 

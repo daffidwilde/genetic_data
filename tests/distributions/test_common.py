@@ -54,8 +54,8 @@ def test_repr(distribution, seed):
 
 @params
 def test_set_param_limits(distribution, seed):
-    """ Check distribution classes can have their default parameter limits
-    changed. """
+    """Check distribution classes can have their default parameter limits
+    changed."""
 
     param_limits = dict(distribution.param_limits)
     for param_name in distribution.param_limits:

@@ -6,7 +6,7 @@ from .util import get_family_counts
 
 
 def mutation(individual, prob, row_limits, col_limits, families, weights=None):
-    """ Mutate an individual. Here, the characteristics of an individual can be
+    """Mutate an individual. Here, the characteristics of an individual can be
     split into two parts: their dimensions, and their values. Each of these
     parts is mutated in a different way using the same probability,
     ``prob``.
@@ -48,9 +48,9 @@ def mutation(individual, prob, row_limits, col_limits, families, weights=None):
 
 
 def mutate_nrows(dataframe, metadata, row_limits, random_state, prob):
-    """ Mutate the number of rows an individual has by adding a new row and/or
+    """Mutate the number of rows an individual has by adding a new row and/or
     dropping a row at random so as not to exceed the bounds of
-    ``row_limits``. """
+    ``row_limits``."""
 
     if random_state.random() < prob and dataframe.shape[0] < row_limits[1]:
         dataframe = _add_row(dataframe, metadata, random_state)
@@ -64,9 +64,9 @@ def mutate_nrows(dataframe, metadata, row_limits, random_state, prob):
 def mutate_ncols(
     dataframe, metadata, col_limits, families, weights, random_state, prob
 ):
-    """ Mutate the number of columns an individual has by adding a new column
+    """Mutate the number of columns an individual has by adding a new column
     and/or dropping a column at random. In either case, the bounds defined in
-    ``col_limits`` cannot be exceeded. """
+    ``col_limits`` cannot be exceeded."""
 
     if isinstance(col_limits[1], tuple):
         condition = dataframe.shape[1] < sum(col_limits[1])
@@ -92,9 +92,9 @@ def mutate_ncols(
 
 
 def mutate_values(dataframe, metadata, random_state, prob):
-    """ Iterate over the values of ``dataframe`` and mutate them each with
+    """Iterate over the values of ``dataframe`` and mutate them each with
     probability ``prob``. Mutating a value is done by resampling from the
-    associated column distribution in ``metadata``. """
+    associated column distribution in ``metadata``."""
 
     for j, col in enumerate(dataframe.columns):
         pdf = metadata[j]
@@ -107,8 +107,8 @@ def mutate_values(dataframe, metadata, random_state, prob):
 
 
 def _rename(dataframe):
-    """ Rename columns or reindex to make sense after deletion or addition of a
-    new line. """
+    """Rename columns or reindex to make sense after deletion or addition of a
+    new line."""
 
     dataframe = dataframe.reset_index(drop=True)
     dataframe.columns = (i for i, _ in enumerate(dataframe.columns))
@@ -116,8 +116,8 @@ def _rename(dataframe):
 
 
 def _add_row(dataframe, metadata, random_state):
-    """ Append a row to the dataframe by sampling values from each column's
-    distribution. """
+    """Append a row to the dataframe by sampling values from each column's
+    distribution."""
 
     dataframe = dataframe.append(
         {i: pdf.sample(1, random_state)[0] for i, pdf in enumerate(metadata)},
@@ -136,9 +136,9 @@ def _remove_row(dataframe, random_state):
 
 
 def _add_col(dataframe, metadata, col_limits, families, weights, random_state):
-    """ Add a new column to the end of the dataframe by sampling a distribution
+    """Add a new column to the end of the dataframe by sampling a distribution
     from ``families`` according to the column limits and distribution weights
-    and sampling the required number of values from that distribution. """
+    and sampling the required number of values from that distribution."""
 
     nrows, ncols = dataframe.shape
     if isinstance(col_limits[1], tuple):

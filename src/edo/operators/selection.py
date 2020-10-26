@@ -6,7 +6,7 @@ import numpy as np
 def selection(
     population, pop_fitness, best_prop, lucky_prop, random_state, maximise=False
 ):
-    """ Given a population, select a proportion of the "best" individuals and
+    """Given a population, select a proportion of the "best" individuals and
     another of the "lucky" individuals (if they are available) to form a set of
     potential parents.
 

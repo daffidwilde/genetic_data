@@ -20,8 +20,8 @@ from .util.trivials import trivial_fitness
 
 @INTEGER_INDIVIDUAL
 def test_get_fitness(row_limits, col_limits, weights, seed):
-    """ Create an individual and get its fitness. Then verify that the fitness
-    is of the correct data type and has been added to the cache. """
+    """Create an individual and get its fitness. Then verify that the fitness
+    is of the correct data type and has been added to the cache."""
 
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
@@ -38,9 +38,9 @@ def test_get_fitness(row_limits, col_limits, weights, seed):
 
 @INTEGER_INDIVIDUAL
 def test_get_fitness_kwargs(row_limits, col_limits, weights, seed):
-    """ Create an individual and get its fitness with keyword arguments. Then
+    """Create an individual and get its fitness with keyword arguments. Then
     verify that the fitness is of the correct data type and has been added to
-    the cache. """
+    the cache."""
 
     fitness_kwargs = {"arg": None}
     distributions = [Normal, Poisson, Uniform]
@@ -59,9 +59,9 @@ def test_get_fitness_kwargs(row_limits, col_limits, weights, seed):
 @POPULATION
 @settings(max_examples=30)
 def test_get_population_fitness_serial(size, row_limits, col_limits, weights):
-    """ Create a population and find its fitness serially. Verify that the
+    """Create a population and find its fitness serially. Verify that the
     fitness array is of the correct data type and size, and that they have each
-    been added to the cache. """
+    been added to the cache."""
 
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]
@@ -83,9 +83,9 @@ def test_get_population_fitness_serial(size, row_limits, col_limits, weights):
 def test_get_population_fitness_parallel(
     size, row_limits, col_limits, weights, processes
 ):
-    """ Create a population and find its fitness in parallel. Verify that the
+    """Create a population and find its fitness in parallel. Verify that the
     fitness array is of the correct data type and size, and that they have each
-    been added to the cache. """
+    been added to the cache."""
 
     distributions = [Normal, Poisson, Uniform]
     families = [edo.Family(dist) for dist in distributions]

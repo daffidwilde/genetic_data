@@ -14,7 +14,7 @@ from edo.population import create_initial_population, create_new_population
 
 
 class DataOptimiser:
-    """ The (evolutionary) dataset optimiser. A class that generates data for a
+    """The (evolutionary) dataset optimiser. A class that generates data for a
     given fitness function and evolutionary parameters.
 
     Parameters
@@ -100,12 +100,12 @@ class DataOptimiser:
         self.fit_history = pd.DataFrame()
 
     def stop(self, **kwargs):
-        """ A placeholder for a function which acts as a stopping condition on
-        the EA. """
+        """A placeholder for a function which acts as a stopping condition on
+        the EA."""
 
     def dwindle(self, **kwargs):
-        """ A placeholder for a function which can adjust (typically, reduce)
-        the mutation probability over the run of the EA. """
+        """A placeholder for a function which can adjust (typically, reduce)
+        the mutation probability over the run of the EA."""
 
     def run(
         self,
@@ -116,7 +116,7 @@ class DataOptimiser:
         stop_kwargs=None,
         dwindle_kwargs=None,
     ):
-        """ Run the evolutionary algorithm under the given constraints.
+        """Run the evolutionary algorithm under the given constraints.
 
         Parameters
         ----------
@@ -215,8 +215,8 @@ class DataOptimiser:
         )
 
     def _get_next_generation(self, processes, **kwargs):
-        """ Create the next population via selection, crossover and mutation,
-        update the family subtypes and get the new population's fitness. """
+        """Create the next population via selection, crossover and mutation,
+        update the family subtypes and get the new population's fitness."""
 
         parents = selection(
             self.population,
@@ -271,8 +271,8 @@ class DataOptimiser:
         )
 
     def _write_generation(self, root):
-        """ Write all individuals in a generation and their collective fitnesses
-        to file at the generation's directory in `root`. """
+        """Write all individuals in a generation and their collective fitnesses
+        to file at the generation's directory in `root`."""
 
         write_fitness(self.pop_fitness, self.generation, root)
         for idx, individual in enumerate(self.population):
@@ -288,8 +288,8 @@ class DataOptimiser:
             self._write_generation(root)
 
     def _get_current_subtypes(self, parents):
-        """ Get a dictionary mapping each family to all the subtype IDs that are
-        present in the parents. """
+        """Get a dictionary mapping each family to all the subtype IDs that are
+        present in the parents."""
 
         family_to_subtype_ids = defaultdict(list)
         for parent in parents:
@@ -303,8 +303,8 @@ class DataOptimiser:
         return family_to_subtype_ids
 
     def _update_subtypes(self, parents):
-        """ Update the current subtypes for each family to be those present in
-        the parents. """
+        """Update the current subtypes for each family to be those present in
+        the parents."""
 
         current_subtypes = self._get_current_subtypes(parents)
         for family, current_ids in current_subtypes.items():
@@ -315,9 +315,9 @@ class DataOptimiser:
 
 
 def _get_pop_history(root, generation, distributions):
-    """ Read in the individuals from each generation. The dataset is given
+    """Read in the individuals from each generation. The dataset is given
     as a `dask.dataframe.core.DataFrame` but the metadata are recovered
-    instances of their original class subtypes. """
+    instances of their original class subtypes."""
 
     pop_history = []
     for gen in range(generation):
@@ -340,7 +340,7 @@ def _get_pop_history(root, generation, distributions):
 
 
 def _get_fit_history(root):
-    """ Read in the fitness history from each generation in a run  as a
-    `dask.dataframe.core.DataFrame`. """
+    """Read in the fitness history from each generation in a run  as a
+    `dask.dataframe.core.DataFrame`."""
 
     return dd.read_csv(f"{root}/fitness.csv")

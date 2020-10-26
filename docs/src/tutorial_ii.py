@@ -16,8 +16,8 @@ def squared_error(df, num_samples=50):
 
 
 def main():
-    """ Run the GA from the second tutorial and generate a plot of the fitness
-    progression. """
+    """Run the GA from the second tutorial and generate a plot of the fitness
+    progression."""
 
     pop, fit, all_pops, all_fits = edo.run_algorithm(
         fitness=squared_error,

@@ -16,9 +16,9 @@ from .util.trivials import trivial_fitness
 def test_shrink(
     size, row_limits, col_limits, weights, props, maximise, compact_ratio, itr
 ):
-    """ Test that the search space (the space of pdf parameter limits) of a
+    """Test that the search space (the space of pdf parameter limits) of a
     hypothetical GA is reduced and centred around the best individuals'
-    parameters at a particular iteration. """
+    parameters at a particular iteration."""
 
     best_prop, lucky_prop = props
     distributions = [Gamma, Normal, Poisson]

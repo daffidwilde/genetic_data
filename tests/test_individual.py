@@ -49,9 +49,9 @@ def test_repr(dataframe, metadata):
 
 @INTEGER_INDIVIDUAL
 def test_integer_limits(row_limits, col_limits, weights, seed):
-    """ Create an individual with all-integer column limits and verify that it
+    """Create an individual with all-integer column limits and verify that it
     is a namedtuple with a `pandas.DataFrame` field of a valid shape, and
-    metadata made up of instances from the classes in families. """
+    metadata made up of instances from the classes in families."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -70,9 +70,9 @@ def test_integer_limits(row_limits, col_limits, weights, seed):
 
 @INTEGER_TUPLE_INDIVIDUAL
 def test_integer_tuple_limits(row_limits, col_limits, weights, seed):
-    """ Create an individual with integer lower limits and tuple upper limits on
+    """Create an individual with integer lower limits and tuple upper limits on
     the columns. Verify the individual is valid and of a reasonable shape and
-    does not exceed the upper bounds. """
+    does not exceed the upper bounds."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -96,9 +96,9 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, seed):
 
 @TUPLE_INTEGER_INDIVIDUAL
 def test_tuple_integer_limits(row_limits, col_limits, weights, seed):
-    """ Create an individual with tuple lower limits and integer upper limits on
+    """Create an individual with tuple lower limits and integer upper limits on
     the columns. Verify the individual is valid and of a reasonable shape and
-    does not exceed the lower bounds. """
+    does not exceed the lower bounds."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -122,9 +122,9 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, seed):
 
 @TUPLE_INDIVIDUAL
 def test_tuple_limits(row_limits, col_limits, weights, seed):
-    """ Create an individual with tuple column limits. Verify the individual is
+    """Create an individual with tuple column limits. Verify the individual is
     valid and of a reasonable shape and does not exceed either of the column
-    bounds. """
+    bounds."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]

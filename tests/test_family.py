@@ -184,8 +184,8 @@ def test_load(distribution):
 @given(distribution=distributions())
 @settings(deadline=None)
 def test_load_more_than_ten(distribution):
-    """ Test that a family with more than 10 subtypes can be created from a
-    cache. """
+    """Test that a family with more than 10 subtypes can be created from a
+    cache."""
 
     family = Family(distribution)
     for _ in range(11):

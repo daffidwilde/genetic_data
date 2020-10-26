@@ -17,9 +17,9 @@ def get_fitness(individual, fitness, **kwargs):
 
 
 def get_population_fitness(population, fitness, processes=None, **kwargs):
-    """ Return the fitness of each individual in the population. This can be
+    """Return the fitness of each individual in the population. This can be
     done in parallel by specifying a number of cores to use for independent
-    processes. """
+    processes."""
 
     tasks = (
         get_fitness(individual, fitness, **kwargs) for individual in population

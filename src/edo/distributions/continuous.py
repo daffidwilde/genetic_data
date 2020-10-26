@@ -4,7 +4,7 @@ from .base import Distribution
 
 
 class Gamma(Distribution):
-    """ The gamma distribution class.
+    """The gamma distribution class.
 
     Parameters
     ----------
@@ -45,8 +45,8 @@ class Gamma(Distribution):
         return f"Gamma(alpha={alpha}, theta={theta})"
 
     def sample(self, nrows, random_state):
-        """ Take a sample of size ``nrows`` from the gamma distribution using
-        the provided ``np.random.RandomState`` instance. """
+        """Take a sample of size ``nrows`` from the gamma distribution using
+        the provided ``np.random.RandomState`` instance."""
 
         return random_state.gamma(
             shape=self.alpha, scale=self.theta, size=nrows
@@ -54,7 +54,7 @@ class Gamma(Distribution):
 
 
 class Normal(Distribution):
-    """ The normal distribution class.
+    """The normal distribution class.
 
     Parameters
     ----------
@@ -94,14 +94,14 @@ class Normal(Distribution):
         return f"Normal(mean={mean}, std={std})"
 
     def sample(self, nrows, random_state):
-        """ Take a sample of size ``nrows`` from the normal distribution using
-        the provided ``np.random.RandomState`` instance. """
+        """Take a sample of size ``nrows`` from the normal distribution using
+        the provided ``np.random.RandomState`` instance."""
 
         return random_state.normal(loc=self.mean, scale=self.std, size=nrows)
 
 
 class Uniform(Distribution):
-    """ The uniform distribution class.
+    """The uniform distribution class.
 
     Parameters
     ----------
@@ -139,7 +139,7 @@ class Uniform(Distribution):
         return f"Uniform(bounds=[{lower}, {upper}])"
 
     def sample(self, nrows, random_state):
-        """ Take a sample of size ``nrows`` from the uniform distribution using
-        the provided ``np.random.RandomState`` instance. """
+        """Take a sample of size ``nrows`` from the uniform distribution using
+        the provided ``np.random.RandomState`` instance."""
 
         return random_state.uniform(*self.bounds, size=nrows)

@@ -22,8 +22,8 @@ LIMITS = (
     seed=integers(min_value=0, max_value=2 ** 32 - 1),
 )
 def test_bernoulli_set_param_limits(prob_limits, seed):
-    """ Check that a Bernoulli object can sample its parameters correctly if its
-    class attributes are altered. """
+    """Check that a Bernoulli object can sample its parameters correctly if its
+    class attributes are altered."""
 
     Bernoulli.param_limits = {"prob": prob_limits}
 
@@ -34,8 +34,8 @@ def test_bernoulli_set_param_limits(prob_limits, seed):
 
 @given(lam_limits=LIMITS, seed=integers(min_value=0, max_value=2 ** 32 - 1))
 def test_poisson_set_param_limits(lam_limits, seed):
-    """ Check that a Poisson object can sample its parameters correctly if its
-    class attributes are altered. """
+    """Check that a Poisson object can sample its parameters correctly if its
+    class attributes are altered."""
 
     Poisson.param_limits = {"lam": lam_limits}
 

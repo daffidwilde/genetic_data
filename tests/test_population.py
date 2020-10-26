@@ -14,8 +14,8 @@ from .util.parameters import OFFSPRING, POPULATION
 
 @POPULATION
 def test_create_initial_population(size, row_limits, col_limits, weights):
-    """ Create an initial population of individuals and verify it is a list
-    of the correct length with valid individuals. """
+    """Create an initial population of individuals and verify it is a list
+    of the correct length with valid individuals."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -57,9 +57,9 @@ def test_create_new_population(
     mutation_prob,
     maximise,
 ):
-    """ Create a population and use them to create a new proto-population
+    """Create a population and use them to create a new proto-population
     of offspring. Verify that each offspring is a valid individual and there are
-    the correct number of them. """
+    the correct number of them."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]

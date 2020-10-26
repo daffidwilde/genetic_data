@@ -14,16 +14,16 @@ from edo.distributions import Uniform
 
 
 class RadiusUniform(Uniform):
-    """ A Uniform child for capturing the radius of a point in the unit
-    circle. """
+    """A Uniform child for capturing the radius of a point in the unit
+    circle."""
 
     name = "RadiusUniform"
     param_limits = {"bounds": [0, 1]}
 
 
 class AngleUniform(Uniform):
-    """ A Uniform child for capturing the angle of a point in the unit
-    circle. """
+    """A Uniform child for capturing the angle of a point in the unit
+    circle."""
 
     name = "AngleUniform"
     param_limits = {"bounds": [-2 * np.pi, 2 * np.pi]}
@@ -72,9 +72,9 @@ def run_circle_example():
 @given(repetitions=integers())
 @settings(deadline=None, max_examples=10)
 def test_circle_example(repetitions):
-    """ Check that the circle example dataset never changes. If, for some
+    """Check that the circle example dataset never changes. If, for some
     reason, it changes (or needs to be changed) on purpose, then delete
-    `circle.csv` and run this test again. """
+    `circle.csv` and run this test again."""
 
     history = run_circle_example()
 
@@ -118,8 +118,8 @@ def run_sample_example():
 @given(repetitions=integers())
 @settings(deadline=None, max_examples=5)
 def test_sample_example(repetitions):
-    """ Check that the sample example dataset never changes (with the same
-    caveat as the circle example above). """
+    """Check that the sample example dataset never changes (with the same
+    caveat as the circle example above)."""
 
     history = run_sample_example()
 

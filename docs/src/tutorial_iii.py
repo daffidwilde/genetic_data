@@ -14,8 +14,8 @@ def determination(df):
 
 
 def main():
-    """ Run the GA in the third tutorial and generate plots for the fitness
-    progression and of the best individual in the final population. """
+    """Run the GA in the third tutorial and generate plots for the fitness
+    progression and of the best individual in the final population."""
 
     pop, fit, all_pops, all_fits = edo.run_algorithm(
         fitness=determination,

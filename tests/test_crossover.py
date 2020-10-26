@@ -44,8 +44,8 @@ def _common_asserts(individual, *parents):
 @INTEGER_CROSSOVER
 @settings(deadline=None)
 def test_integer_limits(row_limits, col_limits, weights, prob, seed):
-    """ Verify that `crossover` produces a valid individual with all integer
-    column limits. """
+    """Verify that `crossover` produces a valid individual with all integer
+    column limits."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -65,8 +65,8 @@ def test_integer_limits(row_limits, col_limits, weights, prob, seed):
 
 @INTEGER_TUPLE_CROSSOVER
 def test_integer_tuple_limits(row_limits, col_limits, weights, prob, seed):
-    """ Verify that `crossover` produces a valid individual where the lower and
-    upper column limits are integer and tuple respectively. """
+    """Verify that `crossover` produces a valid individual where the lower and
+    upper column limits are integer and tuple respectively."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -90,8 +90,8 @@ def test_integer_tuple_limits(row_limits, col_limits, weights, prob, seed):
 
 @TUPLE_INTEGER_CROSSOVER
 def test_tuple_integer_limits(row_limits, col_limits, weights, prob, seed):
-    """ Verify that `crossover` produces a valid individual where the lower and
-    upper column limits are tuple and integer respectively. """
+    """Verify that `crossover` produces a valid individual where the lower and
+    upper column limits are tuple and integer respectively."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]
@@ -115,8 +115,8 @@ def test_tuple_integer_limits(row_limits, col_limits, weights, prob, seed):
 
 @TUPLE_CROSSOVER
 def test_tuple_limits(row_limits, col_limits, weights, prob, seed):
-    """ Verify that `crossover` produces a valid individual with all tuple
-    column limits. """
+    """Verify that `crossover` produces a valid individual with all tuple
+    column limits."""
 
     distributions = [Gamma, Normal, Poisson]
     families = [Family(distribution) for distribution in distributions]

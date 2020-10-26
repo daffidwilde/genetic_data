@@ -4,8 +4,8 @@ import abc
 
 
 class Distribution(metaclass=abc.ABCMeta):
-    """ An abstract base class for all currently implemented distributions and
-    those defined by users. """
+    """An abstract base class for all currently implemented distributions and
+    those defined by users."""
 
     @abc.abstractmethod
     def sample(self, nrows=None, random_state=None):

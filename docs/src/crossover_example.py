@@ -35,7 +35,7 @@ df, meta = offspring
 
 df.to_csv("../discussion/operators/offspring.csv")
 
-with open(f"../discussion/operators/offspring.rst", "w") as ind_file:
+with open("../discussion/operators/offspring.rst", "w") as ind_file:
     string = ".. :orphan:\n\n"
     string += "With the following metadata::\n\n    ["
     for col in meta:

@@ -2,8 +2,8 @@
 
 
 def _get_param_values(parents, subtype, name):
-    """ Get the parameter values from the parents for a particular distribution
-    subtype parameter. """
+    """Get the parameter values from the parents for a particular distribution
+    subtype parameter."""
 
     values = []
     for _, metadata in parents:
@@ -19,7 +19,7 @@ def _get_param_values(parents, subtype, name):
 
 
 def _adjust_subtype_param_limits(parents, subtype, itr, shrinkage):
-    r""" Adjust the search space of a distribution subtype's parameters
+    r"""Adjust the search space of a distribution subtype's parameters
     according to a power law on its limits:
 
     .. math::
@@ -46,7 +46,7 @@ def _adjust_subtype_param_limits(parents, subtype, itr, shrinkage):
 
 
 def shrink(parents, families, itr, shrinkage):
-    """ Given the current progress of the evolutionary algorithm, shrink its
+    """Given the current progress of the evolutionary algorithm, shrink its
     search space, i.e. the parameter spaces for each of the distribution classes
     in ``families``.
 

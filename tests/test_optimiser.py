@@ -455,8 +455,8 @@ def test_write_generation(
     shrinkage,
     maximise,
 ):
-    """ Test that the DataOptimiser can write a generation and its fitness to
-    file with a single core. """
+    """Test that the DataOptimiser can write a generation and its fitness to
+    file with a single core."""
 
     families = [edo.Family(dist) for dist in distributions]
 
@@ -906,8 +906,8 @@ def test_run_is_reproducible(
     shrinkage,
     maximise,
 ):
-    """ Test that two runs of the EA with the same parameters produce the
-    same population and fitness histories. """
+    """Test that two runs of the EA with the same parameters produce the
+    same population and fitness histories."""
 
     families = [edo.Family(dist) for dist in distributions]
 
@@ -969,8 +969,8 @@ def test_run_is_reproducible(
 )
 @settings(deadline=None, max_examples=10)
 def test_run_not_reproducible_without_seed(size, distributions, maximise):
-    """ Test that two runs of the EA with the same parameters will likely
-    produce different populations if they aren't seeded. """
+    """Test that two runs of the EA with the same parameters will likely
+    produce different populations if they aren't seeded."""
 
     row_limits = [10, 30]
     col_limits = [2, 5]

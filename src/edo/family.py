@@ -8,7 +8,7 @@ import numpy as np
 
 
 class Family:
-    """ A class for handling all concurrent subtypes of a distribution class. A
+    """A class for handling all concurrent subtypes of a distribution class. A
     subtype is an independent copy of the distribution class allowing more of
     the search space to be explored.
 
@@ -55,8 +55,8 @@ class Family:
         return f"{self.name}(subtypes={self.subtype_id})"
 
     def add_subtype(self, subtype_name=None, attributes=None):
-        """ Create a copy of the distribution class that is identical and
-        independent of the original. """
+        """Create a copy of the distribution class that is identical and
+        independent of the original."""
 
         if subtype_name is None:
             subtype_name = f"{self.distribution.name}Subtype"
@@ -74,8 +74,8 @@ class Family:
         self.subtype_id += 1
 
     def make_instance(self, random_state):
-        """ Select an existing subtype at random -- or create a new one if there
-        is space available -- and return an instance of that subtype. """
+        """Select an existing subtype at random -- or create a new one if there
+        is space available -- and return an instance of that subtype."""
 
         choices = list(self.subtypes)
         if self.max_subtypes is None or len(choices) < self.max_subtypes:
@@ -89,8 +89,8 @@ class Family:
         return instance
 
     def save(self, root=".edocache"):
-        """ Save the current subtypes in the family and the family's random
-        state in the ``root`` directory. """
+        """Save the current subtypes in the family and the family's random
+        state in the ``root`` directory."""
 
         path = pathlib.Path(f"{root}/subtypes/{self.distribution.name}")
         path.mkdir(exist_ok=True, parents=True)
@@ -107,9 +107,9 @@ class Family:
                 pickle.dump(attributes, sub, protocol=pickle.HIGHEST_PROTOCOL)
 
     def reset(self, root=None):
-        """ Reset the family to have no subtypes and the default ``numpy`` PRNG.
+        """Reset the family to have no subtypes and the default ``numpy`` PRNG.
         If ``root`` is passed then any cached information about the family is
-        deleted. """
+        deleted."""
 
         self.subtype_id = 0
         self.subtypes.clear()
@@ -121,9 +121,9 @@ class Family:
 
     @classmethod
     def load(cls, distribution, root=".edocache"):
-        """ Load in any existing cached subtype dictionaries for
+        """Load in any existing cached subtype dictionaries for
         ``distribution`` and restore the subtype along with the family's random
-        state. """
+        state."""
 
         family = Family(distribution)
         name = distribution.name
@@ -160,8 +160,8 @@ def _get_attrs_for_subtype(obj):
 
 
 def _subtype_to_dict(self):
-    """ Convert an unpickleable subtype instance to a dictionary so it can be
-    recovered at a later date. """
+    """Convert an unpickleable subtype instance to a dictionary so it can be
+    recovered at a later date."""
 
     attributes = {"name": self.name, "subtype_id": self.subtype_id}
 

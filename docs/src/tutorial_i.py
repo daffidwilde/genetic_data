@@ -12,8 +12,8 @@ def x_squared(df):
 
 
 def main():
-    """ Run the GA in the first tutorial and generate a plot of all fitness
-    scores in each epoch against the theoretical fitness function. """
+    """Run the GA in the first tutorial and generate a plot of all fitness
+    scores in each epoch against the theoretical fitness function."""
 
     pop, fit, all_pops, all_fits = edo.run_algorithm(
         fitness=x_squared,

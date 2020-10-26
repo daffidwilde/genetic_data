@@ -18,8 +18,8 @@ from .util.trivials import trivial_fitness
 def test_selection_by_parents(
     size, row_limits, col_limits, weights, props, maximise
 ):
-    """ Create a population, get its fitness and select potential parents
-    based on that fitness. Verify that parents are all valid individuals. """
+    """Create a population, get its fitness and select potential parents
+    based on that fitness. Verify that parents are all valid individuals."""
 
     best_prop, lucky_prop = props
     distributions = [Gamma, Normal, Poisson]
