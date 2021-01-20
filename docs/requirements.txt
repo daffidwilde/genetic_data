@@ -6,7 +6,7 @@ numpydoc
 scikit-learn
 sphinx
 sphinx_rtd_theme
-sphinxcontrib-bibtex
+sphinxcontrib-bibtex<2.0.0
 
 # Doctests and linting
 blackbook
